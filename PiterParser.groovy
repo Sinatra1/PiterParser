@@ -776,6 +776,6 @@ def parseTESheet(def fileName) {
     exportExcelTE(resultArray, fields)
 }
 
-parseMKDSheet('/home/vlad/Анал центр/ac-heating/data/Питер/Калининский/raw/Калининский.xls')
-parseTESheet('/home/vlad/Анал центр/ac-heating/data/Питер/Калининский/raw/Калининский.xls')
+parseMKDSheet('/home/vlad/Develop/FuzzySearch/Питер/data/Калининский/raw/Калининский.xls')
+parseTESheet('/home/vlad/Develop/FuzzySearch/Питер/data/Калининский/raw/Калининский.xls')
 
