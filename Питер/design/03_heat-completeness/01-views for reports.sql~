@@ -631,8 +631,8 @@ SELECT 	   he5.bticode AS "Код БТИ"
 					) AS ho2
 				) > 1
 		)
-		OR he5.enter_diametr > 200
-		OR he5.enter_pressure > 17
+		OR he5.enter_diametr IS NULL
+		OR he5.enter_pressure IS NULL
 		OR he5.total_2011 <= he5.total_2013_jan
 		OR he5.total_2011 <= he5.total_2013_feb
 		OR he5.total_2011 <= he5.total_2013_mar
@@ -661,8 +661,7 @@ SELECT 	   he5.bticode AS "Код БТИ"
 			he5.total_2013_dec)
 			<> he5.total_2013
 		   )
-		OR he5.contract_load_2013 > 25
-		OR he5.contract_load_2013 < 0.01    
+		OR he5.contract_load_2013 IS NULL   
 	     )  
 	GROUP BY "Код БТИ"
 );
@@ -693,8 +692,8 @@ CREATE OR REPLACE VIEW heat_raw_uslov_report AS (
 
 			) AS ho2
 			) > 1) AND (he5."Код БТИ" IS NOT NULL) WHEN TRUE THEN 'Да' END ) 	AS "Раздвоение во вкладке МКД"
-		, (CASE (he5.enter_diametr > 200) WHEN TRUE THEN 'Да' END) 		AS "Диаметр ввода > 200"
-		, (CASE (he5.enter_pressure > 17) WHEN TRUE THEN 'Да' END) 		AS "Давление на вводе > 17"
+		, (CASE (he5.enter_diametr IS NULL) WHEN TRUE THEN 'Да' END) 		AS "Диаметр ввода > 200"
+		, (CASE (he5.enter_pressure IS NULL) WHEN TRUE THEN 'Да' END) 		AS "Давление на вводе > 17"
 		, (CASE (he5.total_2011 <= he5.total_2013_jan
 			OR he5.total_2011 <= he5.total_2013_feb
 			OR he5.total_2011 <= he5.total_2013_mar
@@ -736,8 +735,7 @@ CREATE OR REPLACE VIEW heat_raw_uslov_report AS (
 				he5.total_2013_nov+
 				he5.total_2013_dec) <> he5.total_2013
 	   	) WHEN TRUE THEN 'Да' END) 						AS "Сумма по мес. 2013 не равна Итого 2013"
-		, (CASE (he5.contract_load_2013 > 25 
-			OR he5.contract_load_2013 < 0.01) WHEN TRUE THEN 'Да' END) 	AS "Договор. нагр. не в интервале [0,01: 25]"
+		, (CASE (he5.contract_load_2013 IS NULL) WHEN TRUE THEN 'Да' END) 	AS "Договор. нагр. не в интервале [0,01: 25]"
 
 	FROM
 	(SELECT t2."Код БТИ"
@@ -767,12 +765,12 @@ SELECT 	   ho5.bticode AS "Код БТИ",
 			(SELECT count(ho2.bticode) FROM house_raw AS ho2 WHERE ho2.bticode = ho5.bticode)
 
 		)
-		OR ho5.floors < 1
-		OR ho5.porches < 1
-		OR ho5.flats < 1
-		OR ho5.full_area < 50
-		OR ho5.heating_area < 50
-		OR ho5.living_area < 50
+		OR ho5.floors IS NULL
+		OR ho5.porches IS NULL
+		OR ho5.flats IS NULL
+		OR ho5.full_area IS NULL
+		OR ho5.heating_area IS NULL
+		OR ho5.living_area IS NULL
 		OR ho5.full_area < ho5.heating_area
 		OR ho5.full_area <> (ho5.nonliving_area + ho5.living_area)
 	       
@@ -791,12 +789,12 @@ CREATE OR REPLACE VIEW house_raw_uslov_report AS (
 		, (CASE ((SELECT count(he3.bticode) FROM heat_raw AS he3 WHERE he3.bticode = ho5."Код БТИ") <> 
 			(SELECT count(ho2.bticode) FROM house_raw AS ho2 WHERE ho2.bticode = ho5."Код БТИ")
 		) WHEN TRUE THEN 'Да' END ) 									AS "Если не каждой строке ТЭ => строка МКД"
-		, (CASE (ho5.floors < 1) WHEN TRUE THEN 'Да' END) 						AS "Колич. этажей < 1"
-		, (CASE (ho5.porches < 1) WHEN TRUE THEN 'Да' END) 						AS "Колич. парадных < 1"
-		, (CASE (ho5.flats < 1) WHEN TRUE THEN 'Да' END) 						AS "Колич. квартир < 1"
-		, (CASE (ho5.full_area < 50) WHEN TRUE THEN 'Да' END) 						AS "Общ. площадь < 50"
-		, (CASE (ho5.heating_area < 50) WHEN TRUE THEN 'Да' END) 					AS "Отаплив. площадь < 50"
-		, (CASE (ho5.living_area < 50) WHEN TRUE THEN 'Да' END) 					AS "Жил. площадь < 50"
+		, (CASE (ho5.floors IS NULL) WHEN TRUE THEN 'Да' END) 						AS "Колич. этажей < 1"
+		, (CASE (ho5.porches IS NULL) WHEN TRUE THEN 'Да' END) 						AS "Колич. парадных < 1"
+		, (CASE (ho5.flats IS NULL) WHEN TRUE THEN 'Да' END) 						AS "Колич. квартир < 1"
+		, (CASE (ho5.full_area IS NULL) WHEN TRUE THEN 'Да' END) 						AS "Общ. площадь < 50"
+		, (CASE (ho5.heating_area IS NULL) WHEN TRUE THEN 'Да' END) 					AS "Отаплив. площадь < 50"
+		, (CASE (ho5.living_area IS NULL) WHEN TRUE THEN 'Да' END) 					AS "Жил. площадь < 50"
 		, (CASE (ho5.full_area < ho5.heating_area) WHEN TRUE THEN 'Да' END) 				AS "Общ. площадь < Отаплив. площади"
 		, (CASE (ho5.full_area <> (ho5.nonliving_area + ho5.living_area)) WHEN TRUE THEN 'Да' END) AS "Общ. площадь не = (жил. + нежил.)"
 

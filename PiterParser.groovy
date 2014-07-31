@@ -9,10 +9,8 @@
 import org.apache.poi.hssf.usermodel.HSSFWorkbook
 import org.apache.poi.poifs.filesystem.POIFSFileSystem
 import org.apache.poi.ss.usermodel.Cell
-import org.apache.poi.ss.usermodel.DateUtil
 import org.apache.poi.ss.usermodel.Row
 import org.apache.poi.ss.usermodel.Sheet
-import static org.apache.poi.ss.usermodel.CellStyle.*
 import static org.apache.poi.ss.usermodel.IndexedColors.*
 
 //org.apache.commons.lang3.StringUtils.getLevenshteinDistance()
@@ -35,8 +33,17 @@ def getAddress(def cell) {
 def getUnsignedIntFieldWithout0(def cell) {
 
     def intValue = ""
+
     if(cell.cellType == Cell.CELL_TYPE_NUMERIC && cell.getNumericCellValue() > 0) {
         intValue =  cell.getNumericCellValue() as int
+    }
+    else if(cell.cellType == Cell.CELL_TYPE_STRING) {
+        def word = cell.getRichStringCellValue().getString()
+        def sb= new StringBuffer(word.toLowerCase().trim())
+
+        if(sb.indexOf('/') != -1) {
+            intValue = word
+        }
     }
 
     intValue
@@ -92,26 +99,6 @@ def getEnterPressure(def cell) {
     floatValue
 }
 
-def getCountLiftNodes(def cell) {
-
-    def intValue = ""
-    if(cell.cellType == Cell.CELL_TYPE_NUMERIC && cell.getNumericCellValue() >= 0) {
-        intValue = cell.getNumericCellValue() as int
-    }
-    else if(cell.cellType == Cell.CELL_TYPE_STRING) {
-        def word = cell.getRichStringCellValue().getString()
-
-        def permissibleValues = ['АУУ'] as Set
-        def keyValues = ['АУУ':'АУУ','нет':'0']
-
-        intValue = getNearestWordInDictionary(permissibleValues, keyValues, word, 2)
-
-    }
-
-    intValue
-}
-
-
 
 def getContractLoad2013(def cell) {
     def floatValue = ""
@@ -161,11 +148,11 @@ def getDictionaryWordInSearchWord(def dictionary, String word) {
 
     def sb= new StringBuffer(word.toLowerCase().trim())
 
-        dictionary.eachWithIndex{ dict, value ->
-            if(sb.indexOf(dict.key.toString().toLowerCase().trim()) != -1) {
-                nearestWord = dict.value
-            }
+    dictionary.eachWithIndex{ dict, value ->
+        if(sb.indexOf(dict.key.toString().toLowerCase().trim()) != -1) {
+            nearestWord = dict.value
         }
+    }
 
     nearestWord
 }
@@ -192,6 +179,25 @@ def getNearestWordInDictionary(Set<String> dictionary, def keyValues, def word, 
     return ""
 }
 
+def getCountLiftNodes(def cell) {
+
+    def intValue = ""
+    if(cell.cellType == Cell.CELL_TYPE_NUMERIC && cell.getNumericCellValue() >= 0) {
+        intValue = cell.getNumericCellValue() as int
+    }
+    else if(cell.cellType == Cell.CELL_TYPE_STRING) {
+        def word = cell.getRichStringCellValue().getString()
+
+        def permissibleValues = ['АУУ'] as Set
+        def keyValues = ['АУУ':'АУУ','нет':'0']
+
+        intValue = getNearestWordInDictionary(permissibleValues, keyValues, word, 2)
+
+    }
+
+    intValue
+}
+
 def getMkdUpravForm(def cell) {
     def permissibleValues = ['ГУП ДЕЗ', 'Частная управляющая организация', 'ТСЖ',
             'ЖК', 'ЖСК', 'непосредственное управление', 'орг-ия с гос. участием', 'организация с государственным участием',
@@ -201,7 +207,7 @@ def getMkdUpravForm(def cell) {
             'ТСЖ':'ТСЖ', 'ЖК':'ЖК', 'ЖСК':'ЖСК', 'управление':'непосредственное управление', 'непосредств':'непосредственное управление',
             'участием':'орг-ия с гос. участием', 'государ':'орг-ия с гос. участием','организация с государственным участием':'орг-ия с гос. участием',
             'государственное учреждение жилищное агентство':'ГУЖА','гос. учр-ие жилищное агентство':'ГУЖА', 'жилищ':'ГУЖА', 'агент':'ГУЖА',
-            'Районное жилищное агентство':'РЖА', 'Районное':'РЖА']
+            'Районное жилищное агентство':'РЖА', 'Районное':'РЖА', 'РЖА':'РЖА']
 
     def mkdUpravForm = ""
 
@@ -231,7 +237,7 @@ def getCategory(def cell) {
 def getHouseType(def cell) {
     def permissibleValues = ['блочный', 'брежневка', 'индивидуальный', 'кирпично-монолитный', 'монолит',
             'панельный', 'сталинка', 'хрущевка', 'кирпичный', 'другое'] as Set
-    def keyValues = ['блочн':'блочный', 'брежн':'брежневка', 'индивид':'индивидуальный', 'кирп':'кирпичный',
+    def keyValues = ['блочн':'блочный', 'брежн':'брежневка', 'инд':'индивидуальный', 'кирп':'кирпичный',
             'кир':'кирпичный','монол':'монолит', 'панел':'панельный', 'пан':'панельный', 'сталин':'сталинка', 'хрущ':'хрущевка', 'друг':'другое' ]
     def houseType = ""
 
@@ -252,11 +258,15 @@ def getSeries(def cell) {
             'И-1723','И-1724','И-2076','И-209а','И-491а','И-521а','И-522а','И-700','И-700А','И-760а','ИП-46С','К-7','Колос',
             'МГ-1','МГ-2','П-111','П-3','П-30','П-3М','П-42','П-43','П-44','П-44М','П-44Т','П-46','П-55','ПД-1','ПД-3','ПД-4',
             'ПП-70','ПП-83','Ш5733','Щ9378','Юникон','индивидуальный','другое'] as Set
-    def keyValues = ['Юник':'Юникон','индивид':'индивидуальный','lheu':'другое']
+    def keyValues = ['Юник':'Юникон', 'инд':'индивидуальный', 'друг':'другое']
     def series = ""
 
     if(cell.cellType == Cell.CELL_TYPE_STRING) {
         def word = cell.getRichStringCellValue().getString()
+        series = getNearestWordInDictionary(permissibleValues, keyValues, word, 2)
+    }
+    else if(cell.cellType == Cell.CELL_TYPE_NUMERIC) {
+        def word = (cell.getNumericCellValue() as int).toString()
         series = getNearestWordInDictionary(permissibleValues, keyValues, word, 2)
     }
 
@@ -601,7 +611,7 @@ def parseSheetTE(Sheet sheetMKD, fields) {
     def addressFields = [fields[2], fields[5], fields[19]]
     def unsignedFloatFieldsWithout0 = [fields[20], fields[21], fields[22], fields[24], fields[26], fields[28], fields[40], fields[42], fields[44], fields[46]]
     def unsignedFloatFields = [fields[30], fields[32], fields[34], fields[36], fields[38]]
-    def unsignedIntFields = [fields[8]]
+    def unsignedIntFields = [fields[0], fields[8]]
     def btiCode = [fields[1]]
     def yesNo = [fields[13], fields[14], fields[15], fields[16], fields[18]]
     def connectionType = [fields[3]]
@@ -776,6 +786,6 @@ def parseTESheet(def fileName) {
     exportExcelTE(resultArray, fields)
 }
 
-parseMKDSheet('/home/vlad/Develop/FuzzySearch/Питер/data/Калининский/raw/Калининский.xls')
-parseTESheet('/home/vlad/Develop/FuzzySearch/Питер/data/Калининский/raw/Калининский.xls')
+parseMKDSheet('/home/vlad/Develop/FuzzySearch/Питер/data/Красногвардейский/raw/Красногвардейский.xls')
+parseTESheet('/home/vlad/Develop/FuzzySearch/Питер/data/Красногвардейский/raw/Красногвардейский.xls')
 

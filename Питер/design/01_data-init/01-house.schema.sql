@@ -247,7 +247,7 @@ create table house_raw (
     series 		ser,--12
     year_built 		decimal(4,0),--13
     wall_type 		wall,--14
-    floors 		decimal(4,0),--15
+    floors 		varchar(50),--15
     underfloors 	decimal(4,0),--16
     porches 		decimal(4,0),--17
     flats 		decimal(4,0),--18
