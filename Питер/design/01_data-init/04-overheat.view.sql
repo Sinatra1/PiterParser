@@ -1,0 +1,24 @@
+create or replace view mean_msc as
+select
+    avg(cons_3y/3/heating_area)::numeric(10,3) as value,
+    avg(cons_2011/heating_area)::numeric(10,3) as "2011",
+    avg(cons_2012/heating_area)::numeric(10,3) as "2012",
+    avg(cons_2013/heating_area)::numeric(10,3) as "2013"
+from v_data
+;
+
+create or replace view v_over as
+select 
+    (sub.msc / (select value from mean_msc)) as overvalue,
+    *
+from v_data
+join (
+    select
+        (cons_3y / 3 / heating_area) as msc,
+        bticode
+    from v_data
+) as sub
+using (bticode)
+where sub.msc > (2 * (select value from mean_msc))
+;
+

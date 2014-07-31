@@ -1,0 +1,117 @@
+create or replace view v_data as (
+    select
+        ho.bticode,
+
+        ho.raion,
+        ho.street,
+        ho.house,
+        ho.korpus,
+        ho.stroenie,
+
+        ho.year_built,
+        ho.wall_type,
+        ho.series,
+        ho.full_area,
+        cast(ho.heating_area as decimal),
+        ho.heat_devices_count as devices,
+
+        he.total_2011 as cons_2011,
+        he.total_2012 as cons_2012,
+        he.total_2013 as cons_2013,
+        (total_2011 + total_2012 + total_2013) as cons_3y
+    from house_raw ho
+    join heat_raw he
+      using (bticode)
+    where
+        he.total_2013 is not null
+        and he.total_2012 is not null
+        and he.total_2011 is not null
+        and ho.heating_area is not null
+
+        -- only one house in house_raw
+        and bticode in (
+            select bticode
+            from (
+                select bticode, count(*)
+                from house_raw
+                group by bticode
+            ) as sub
+            where count = 1
+        )
+        -- only one house in heat_raw
+        and bticode in (
+            select bticode
+            from (
+                select bticode, count(*)
+                from heat_raw
+                group by bticode
+            ) as sub
+            where count = 1
+        )
+)
+;
+
+drop table if exists udel_poterb_2011;
+create table udel_poterb_2011 (
+  bticode     varchar(20), --2
+  udel_poterb      decimal
+);
+
+drop table if exists udel_poterb_2012;
+create table udel_poterb_2012 (
+  bticode     varchar(20), --2
+  udel_poterb      decimal
+);
+
+drop table if exists udel_poterb_2013;
+create table udel_poterb_2013 (
+  bticode     varchar(20), --2
+  udel_poterb      decimal
+);
+
+drop table if exists udel_poterb_3y;
+create table udel_poterb_3y (
+  bticode     varchar(20), --2
+  udel_poterb      decimal
+);
+
+drop table if exists udel_poterb_series_3y;
+create table udel_poterb_series_3y (
+  series     varchar(100), --2
+  udel_poterb_series      decimal
+);
+
+
+INSERT INTO udel_poterb_2011
+SELECT ho.bticode AS bticode, avg((v.cons_2011)/ho.heating_area) as udel_poterb 
+		from v_data as v
+		join house_raw as ho on v.bticode = ho.bticode
+	GROUP BY ho.bticode;
+
+INSERT INTO udel_poterb_2012
+SELECT ho.bticode AS bticode, avg((v.cons_2012)/ho.heating_area) as udel_poterb 
+		from v_data as v
+		join house_raw as ho on v.bticode = ho.bticode
+	GROUP BY ho.bticode;
+
+
+INSERT INTO udel_poterb_2013
+SELECT ho.bticode AS bticode, avg((v.cons_2013)/ho.heating_area) as udel_poterb 
+		from v_data as v
+		join house_raw as ho on v.bticode = ho.bticode
+	GROUP BY ho.bticode;
+
+INSERT INTO udel_poterb_3y
+SELECT ho.bticode AS bticode, avg((v.cons_2013+v.cons_2012+v.cons_2011)/3/ho.heating_area) as udel_poterb
+		from v_data as v
+		join house_raw as ho on v.bticode = ho.bticode
+	GROUP BY ho.bticode;
+
+INSERT INTO udel_poterb_series_3y
+SELECT ho.series AS series, avg((v.cons_2013+v.cons_2012+v.cons_2011)/3/ho.heating_area) as udel_poterb
+		from v_data as v
+		join house_raw as ho on v.bticode = ho.bticode
+	GROUP BY ho.series;
+
+
+

@@ -1,0 +1,42 @@
+drop table if exists heat_raw;
+create table heat_raw (
+    id_in_file  varchar(4), --1
+    bticode     varchar(20), --2
+    raion       varchar(100),
+    address     varchar(100),
+    supplier    varchar(100), --3
+    connection_type varchar(100), --4
+    -- (at least) zao have not this column
+    system_type     varchar(100),
+    consumer        varchar(200), --5
+    resource_type   varchar(100), --6
+    mes_units       varchar(10), --7
+    number_of_devices varchar(100), --8
+    total_2011      decimal, --9
+    total_2012      decimal, --10
+    total_2013_jan  decimal, -- 11
+    mr_2013_jan    varchar(10), --12
+    total_2013_feb  decimal, --13
+    mr_2013_feb    varchar(10),  --14
+    total_2013_mar  decimal,
+    mr_2013_mar    varchar(10), --16
+    total_2013_apr  decimal,
+    mr_2013_apr    varchar(10), --18
+    total_2013_may  decimal,
+    mr_2013_may    varchar(10), --20
+    total_2013_jun  decimal,
+    mr_2013_jun    varchar(10), --22
+    total_2013_jul  decimal,
+    mr_2013_jul    varchar(10), --24
+    total_2013_aug  decimal,
+    mr_2013_aug    varchar(10), --26
+    total_2013_sep  decimal,
+    mr_2013_sep    varchar(10), --28
+    total_2013_oct  decimal,
+    mr_2013_oct    varchar(10), --30
+    total_2013_nov  decimal,
+    mr_2013_nov    varchar(10), --32
+    total_2013_dec  decimal,
+    mr_2013_dec    varchar(10), --34
+    total_2013      decimal --35
+)

@@ -1,0 +1,57 @@
+copy ( 
+	SELECT t.* 
+	FROM feeling_report AS t
+	ORDER BY t."Район", t."Улица", t."Дом", t."Корпус", t."Код БТИ"
+
+) to '/home/vlad/reports/ac-data-qual/Отчет о полноте данных.csv'
+with csv header delimiter ';' encoding 'win_1251'
+;
+
+--отчет о выполнении условий вкладка МКД
+copy ( 
+	SELECT t.*
+	FROM uslov_report_MKD AS t
+	ORDER BY t."Улица", t."Дом", t."Код БТИ"
+
+) to '/home/vlad/reports/ac-data-qual/Отчет о выполнении условий вкладка МКД.csv'
+with csv header delimiter ';' encoding 'win_1251'
+;
+
+--отчет о выполнении условий вкладка ТЭ
+copy ( 
+	SELECT t.*
+	FROM uslov_report_TE AS t
+
+	ORDER BY t."Код БТИ"
+
+) to '/home/vlad/reports/ac-data-qual/Отчет о выполнении условий вкладка ТЭ.csv'
+with csv header delimiter ';' encoding 'win_1251'
+;
+
+copy ( 
+	SELECT (
+	(SELECT count(e.*) FROM error_bticodes AS e)::float
+	/
+	(SELECT count(a.*) FROM analyzed_houses AS a)::float
+	*100::float
+	) AS "Процент некорректных строк"
+
+) to '/home/vlad/reports/ac-data-qual/Процент некорректных строк.csv'
+with csv header delimiter ';' encoding 'win_1251'
+;
+
+copy ( 
+	SELECT (
+	(SELECT sum_feeling FROM error_cells AS e)::float
+	/
+	(SELECT count(a.*)::float*75::float FROM analyzed_houses AS a)::float
+	*100::float
+	) AS "Процент некорректных ячеек"
+
+) to '/home/vlad/reports/ac-data-qual/Процент некорректных ячеек.csv'
+with csv header delimiter ';' encoding 'win_1251'
+;
+
+
+
+

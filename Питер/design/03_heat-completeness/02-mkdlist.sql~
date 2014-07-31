@@ -1,0 +1,268 @@
+
+
+-- Отчет о полноте
+copy (
+
+
+    SELECT ho.raion as "Район",
+	   (CASE ho.bticode WHEN NULL THEN '?' ELSE ho.bticode END ) AS "Код БТИ",
+           ho.street as "Улица",
+           ho.house as "Дом",
+           ho.korpus as "Корпус",
+           ho.stroenie as "Строение",
+	   (CASE ho.bticode IS NULL WHEN TRUE THEN '?' ELSE ho.bticode END ) AS "Код БТИ",
+	   (CASE ((ho.bticode IS NOT NULL) AND (he.bticode IS NULL)) WHEN TRUE THEN 'Да' END ) AS "Нет информации на вкладе ТЭ",
+	   (SELECT NULL) AS "Нет информации на вкладе МКД",
+           (CASE ((SELECT count(he3.bticode) FROM heat_raw AS he3 WHERE he3.bticode = ho.bticode) > 1) AND (he.bticode IS NOT NULL) WHEN TRUE THEN 'Да' END ) AS "Раздвоение во вкладке ТЭ",
+           (SELECT NULL) AS "Раздвоение во вкладке МКД",
+	   (CASE (ho.heating_area IS NULL) 
+		AND (he.bticode IS NOT NULL) 
+		AND ((SELECT count(he4.bticode) FROM heat_raw AS he4 WHERE he4.bticode = ho.bticode) = 1)
+		WHEN TRUE THEN '?' END ) AS "Общая отапливаемой площадь",
+	   (CASE (he.connection_type IS NULL) 
+		AND (he.bticode IS NOT NULL) 
+		AND ((SELECT count(he4.bticode) FROM heat_raw AS he4 WHERE he4.bticode = ho.bticode) = 1)
+		WHEN TRUE THEN '?' END ) AS "Тип подключения дома",
+	   (CASE (he.system_type IS NULL) 
+		AND (he.bticode IS NOT NULL) 
+		AND ((SELECT count(he4.bticode) FROM heat_raw AS he4 WHERE he4.bticode = ho.bticode) = 1)
+		WHEN TRUE THEN '?' END ) AS "Вид схемы теплоснабжения",
+	   (CASE (he.total_2011 IS NULL) 
+		AND (he.bticode IS NOT NULL) 
+		AND ((SELECT count(he4.bticode) FROM heat_raw AS he4 WHERE he4.bticode = ho.bticode) = 1)
+		WHEN TRUE THEN '?' END ) AS "Потребление за 2011 год",
+	   (CASE (he.total_2012 IS NULL) 
+		AND (he.bticode IS NOT NULL) 
+		AND ((SELECT count(he4.bticode) FROM heat_raw AS he4 WHERE he4.bticode = ho.bticode) = 1)
+		WHEN TRUE THEN '?' END ) AS "Потребление за 2012 год",
+	   (CASE (he.total_2013 IS NULL) 
+		AND (he.bticode IS NOT NULL) 
+		AND ((SELECT count(he4.bticode) FROM heat_raw AS he4 WHERE he4.bticode = ho.bticode) = 1)
+		WHEN TRUE THEN '?' END ) AS "Потребление за 2013 год",
+	   (CASE (he.total_2013_jan  IS NULL) 
+		AND (he.bticode IS NOT NULL) 
+		AND ((SELECT count(he4.bticode) FROM heat_raw AS he4 WHERE he4.bticode = ho.bticode) = 1)
+		WHEN TRUE THEN '?' END ) AS "Всего за 2013 январь",
+	   (CASE (he.total_2013_feb IS NULL) 
+		AND (he.bticode IS NOT NULL) 
+		AND ((SELECT count(he4.bticode) FROM heat_raw AS he4 WHERE he4.bticode = ho.bticode) = 1)
+		WHEN TRUE THEN '?' END ) AS "Всего за 2013 февраль",
+	   (CASE (he.total_2013_mar IS NULL) 
+		AND (he.bticode IS NOT NULL) 
+		AND ((SELECT count(he4.bticode) FROM heat_raw AS he4 WHERE he4.bticode = ho.bticode) = 1)
+		WHEN TRUE THEN '?' END ) AS "Всего за 2013 март",
+	   (CASE (he.total_2013_apr IS NULL) 
+		AND (he.bticode IS NOT NULL) 
+		AND ((SELECT count(he4.bticode) FROM heat_raw AS he4 WHERE he4.bticode = ho.bticode) = 1)
+		WHEN TRUE THEN '?' END ) AS "Всего за 2013 апрель",
+	   (CASE (he.total_2013_sep IS NULL) 
+		AND (he.bticode IS NOT NULL) 
+		AND ((SELECT count(he4.bticode) FROM heat_raw AS he4 WHERE he4.bticode = ho.bticode) = 1)
+		WHEN TRUE THEN '?' END ) AS "Всего за 2013 сентябрь",
+	   (CASE (he.total_2013_oct IS NULL) 
+		AND (he.bticode IS NOT NULL) 
+		AND ((SELECT count(he4.bticode) FROM heat_raw AS he4 WHERE he4.bticode = ho.bticode) = 1)
+		WHEN TRUE THEN '?' END ) AS "Всего за 2013 октябрь",
+	   (CASE (he.total_2013_nov IS NULL) 
+		AND (he.bticode IS NOT NULL) 
+		AND ((SELECT count(he4.bticode) FROM heat_raw AS he4 WHERE he4.bticode = ho.bticode) = 1)
+		WHEN TRUE THEN '?' END ) AS "Всего за 2013 ноябрь",
+	   (CASE (he.total_2013_dec IS NULL) 
+		AND (he.bticode IS NOT NULL) 
+		AND ((SELECT count(he4.bticode) FROM heat_raw AS he4 WHERE he4.bticode = ho.bticode) = 1)
+		WHEN TRUE THEN '?' END ) AS "Всего за 2013 декабрь"
+	   
+
+FROM house_raw ho
+LEFT JOIN heat_raw he
+    ON ho.bticode = he.bticode
+
+WHERE (ho.bticode IS NOT NULL AND ho.bticode IS NULL)
+	OR ho.heating_area IS NULL
+	OR he.total_2011 IS NULL
+	OR he.total_2012 IS NULL
+	OR he.total_2013 IS NULL
+	OR he.total_2013_jan IS NULL
+	OR he.total_2013_jan IS NULL
+	OR he.total_2013_jan IS NULL
+	OR he.total_2013_feb IS NULL
+	OR he.total_2013_mar IS NULL
+	OR he.total_2013_apr IS NULL
+	OR he.total_2013_sep IS NULL
+	OR he.total_2013_oct IS NULL
+	OR he.total_2013_nov IS NULL
+	OR he.total_2013_dec IS NULL
+	OR he.connection_type IS NULL
+	OR he.system_type IS NULL
+	OR ((SELECT count(he4.bticode) FROM heat_raw AS he4 WHERE he4.bticode = ho.bticode) > 1)
+
+	ORDER BY ho.bticode
+
+) to '/home/vlad/reports/ac-data-qual/Отчет о полноте данных.csv'
+with csv header delimiter ';' encoding 'win_1251'
+;
+
+--Дополнение к отчету о полноте данных
+copy (
+	SELECT (SELECT NULL) as "Район",
+	   (CASE he5.bticode WHEN NULL THEN '?' ELSE he5.bticode END ) AS "Код БТИ",
+           (SELECT NULL) as "Улица",
+           (SELECT NULL) as "Дом",
+           (SELECT NULL) as "Корпус",
+           (SELECT NULL) as "Строение",
+	   (CASE he5.bticode IS NULL WHEN TRUE THEN '?' ELSE he5.bticode END ) AS "Код БТИ",
+	   (SELECT NULL) AS "Нет информации на вкладе ТЭ",
+	   (CASE (ho5.bticode IS NULL) AND (he5.bticode IS NOT NULL) WHEN TRUE THEN 'Да' END ) AS "Нет информации на вкладе МКД",
+           (SELECT NULL) AS "Раздвоение во вкладке ТЭ",
+	   (CASE ((SELECT count(ho6.bticode) FROM house_raw AS ho6 WHERE ho6.bticode = he5.bticode) > 1) AND (he5.bticode IS NOT NULL) WHEN TRUE THEN 'Да' END ) AS "Раздвоение во вкладке МКД",
+	   (SELECT NULL) AS "Общая отапливаемой площадь",
+	   (SELECT NULL) AS "Тип подключения дома",
+	   (SELECT NULL) AS "Вид схемы теплоснабжения",
+	   (SELECT NULL) AS "Потребление за 2011 год",
+	   (SELECT NULL) AS "Потребление за 2012 год",
+	   (SELECT NULL) AS "Потребление за 2013 год",
+	   (SELECT NULL) AS "Всего за 2013 январь",
+	   (SELECT NULL) AS "Всего за 2013 февраль",
+	   (SELECT NULL) AS "Всего за 2013 март",
+	   (SELECT NULL) AS "Всего за 2013 апрель",
+	   (SELECT NULL) AS "Всего за 2013 сентябрь",
+	   (SELECT NULL) AS "Всего за 2013 октябрь",
+	   (SELECT NULL) AS "Всего за 2013 ноябрь",
+	   (SELECT NULL) AS "Всего за 2013 декабрь"
+
+
+	FROM heat_raw AS he5
+	LEFT JOIN house_raw AS ho5 ON he5.bticode = ho5.bticode
+
+
+	WHERE (ho5.bticode IS NULL AND he5.bticode IS NOT NULL) 
+		OR ((SELECT count(ho6.bticode) FROM house_raw AS ho6 WHERE ho6.bticode = ho5.bticode) > 1)
+
+	ORDER BY he5.bticode
+
+) to '/home/vlad/reports/ac-data-qual/Дополнение к отчету о полноте данных.csv'
+with csv header delimiter ';' encoding 'win_1251'
+;
+
+
+copy (
+select ho.id_in_file as "Номер п/п",
+    ho.okrug as "Округ",
+    ho.raion as "Район",
+    ho.street as "Улица",
+    ho.house as "Дом",
+    ho.korpus as "Корпус",
+    ho.stroenie as "Строение",
+    ho.bticode as "Код БТИ",
+    ho.mkd_uprav_form as "Форма управления домом",
+    ho.category as "Категория",
+
+    ho.house_type as "Тип дома",
+    ho.series as "Серия",
+    ho.year_built as "Год постройки",
+    ho.wall_type as "Тип стен",
+    ho.floors as "Количество этажей",
+    ho.underfloors as "Подземных этажей",
+    ho.porches as "Подъездов",
+    ho.flats as "Квартир",
+
+    ho.full_area as "Общая площадь",
+    ho.heating_area as "Отапливаемая площадь",
+    ho.living_area as "Площадь жилых помещений",
+    ho.nonliving_area as "площадь нежилых помещений",
+
+    ho.electricity as "Электричество",
+    ho.water_hot as "Горячая вода",
+    ho.water_cold as "Холодная вода",
+    ho.sewerage as "Водоотведение",
+    ho.heat_supply as "Теплоснабжение",
+    ho.gas_supply as "Газ",
+    ho.gas_heaters as "Газовые нагреватели",
+    ho.gas_ovens as "Газовые плиты",
+    ho.electro_ovens as "Электроплиты",
+    ho.lifts_count as "Количкство лифтов",
+
+    ho.e_devices_count as "Количество приборов учета электроэнергии",
+    ho.hw_devices_count as "Горячей воды",
+    ho.cw_devices_count as "Холодной воды",
+    ho.heat_devices_count as "Тепловой энергии",
+    ho.gas_devices_count as "Газа",
+
+    he.id_in_file as "номер п/п", --1
+    he.bticode as "код БТИ", --2
+    he.supplier as "Поставщик", --3
+    he.connection_type as "Тип подключения", --4
+    he.consumer as "Потребитель", --5
+    he.resource_type as "Тип ресурса", --6
+    he.mes_units as "Еденицы измерения", --7
+    he.number_of_devices as "Количество приборов учёта тепловой энергии", --8
+    he.total_2011 as "Всего за 2011", --9
+    he.total_2012 as "Всего за 2012", --10
+    he.total_2013_jan as "Всего за 2013 январь", -- 11
+    he.mr_2013_jan as "Метод расчёта 2013 январь", --12
+    he.total_2013_feb as "Всего за 2013 февраль", --13
+    he.mr_2013_feb as "Метод расчёта 2013 февраль",  --14
+    he.total_2013_mar as "Всего за 2013 март",
+    he.mr_2013_mar as "Метод расчёта 2013 март", --16
+    he.total_2013_apr as "Всего за 2013 апрель",
+    he.mr_2013_apr as "Метод расчёта 2013 апрель", --18
+    he.total_2013_may as "Всего за 2013 май",
+    he.mr_2013_may as "Метод расчёта 2013 май", --20
+    he.total_2013_jun as "Всего за 2013 июнь",
+    he.mr_2013_jun as "Метод расчёта 2013 июнь", --22
+    he.total_2013_jul as "Всего за 2013 июль",
+    he.mr_2013_jul as "Метод расчёта 2013 июль", --24
+    he.total_2013_aug as "Всего за 2013 август",
+    he.mr_2013_aug as "Метод расчёта 2013 август", --26
+    he.total_2013_sep as "Всего за 2013 сентябрь",
+    he.mr_2013_sep as "Метод расчёта 2013 сентябрь", --28
+    he.total_2013_oct as "Всего за 2013 октябрь",
+    he.mr_2013_oct as "Метод расчёта 2013 октябрь", --30
+    he.total_2013_nov as "Всего за 2013 ноябрь",
+    he.mr_2013_nov as "Метод расчёта 2013 ноябрь", --32
+    he.total_2013_dec as "Всего за 2013 декабрь",
+    he.mr_2013_dec as "Метод расчёта 2013 декабрь", --34
+    he.total_2013 as "всего за 2013", --35
+    p_2011.udel_poterb AS "Удельное потребление за 2011",
+    p_2012.udel_poterb AS "Удельное потребление за 2012",
+    p_2013.udel_poterb AS "Удельное потребление за 2013",
+    p_3y.udel_poterb AS "Среднее удельное потребление по трём годам"
+    /*( SELECT avg((cons_2011)/ho.heating_area) 
+		from v_data 
+		join house_raw ho2
+		using (bticode)
+      where ho2.bticode = ho.bticode
+    )  as "Удельное потребление за 2011",
+( SELECT avg((cons_2012)/ho.heating_area) 
+		from v_data 
+		join house_raw ho2
+		using (bticode)
+      where ho2.bticode = ho.bticode
+    )  as "Удельное потребление за 2012",
+( SELECT avg((cons_2013)/ho.heating_area) 
+		from v_data 
+		join house_raw ho2
+		using (bticode)
+      where ho2.bticode = ho.bticode
+    )  as "Удельное потребление за 2013",
+( SELECT avg((cons_2013+cons_2012+cons_2011)/3/ho.heating_area) 
+		from v_data 
+		join house_raw ho2
+		using (bticode)
+      where ho2.bticode = ho.bticode
+    )  as "Среднее удельное потребление по трём годам"*/
+
+
+from house_raw AS ho
+LEFT JOIN heat_raw AS he ON ho.bticode = he.bticode
+LEFT JOIN udel_poterb_2011 AS p_2011 ON ho.bticode = p_2011.bticode
+LEFT JOIN udel_poterb_2012 AS p_2012 ON ho.bticode = p_2012.bticode
+LEFT JOIN udel_poterb_2013 AS p_2013 ON ho.bticode = p_2013.bticode
+LEFT JOIN udel_poterb_3y AS p_3y ON ho.bticode = p_3y.bticode
+
+ORDER BY ho.bticode
+
+) to '/home/vlad/reports/ac-data-qual/Полный отчет (В форме Внуково).csv'
+with csv header delimiter ';' encoding 'win_1251'
+;
+

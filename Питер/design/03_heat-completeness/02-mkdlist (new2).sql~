@@ -1,0 +1,1260 @@
+
+
+-- Отчет о полноте
+copy ( SELECT t."Район",
+	      t."Код БТИ",
+	      t."Улица",
+	      t."Дом",
+	      (SELECT ho2.korpus FROM house_raw AS ho2 
+		WHERE ho2.raion = t."Район" AND ho2.street = t."Улица" AND ho2.house = t."Дом" AND ho2.bticode = t."Код БТИ" LIMIT 1) AS "Корпус",
+	      (SELECT ho2.stroenie FROM house_raw AS ho2 
+		WHERE ho2.raion = t."Район" AND ho2.street = t."Улица" AND ho2.house = t."Дом" AND ho2.bticode = t."Код БТИ" LIMIT 1) AS "Строение",
+	      (SELECT (CASE ((ho2.bticode IS NOT NULL) AND (he2.bticode IS NULL)) WHEN TRUE THEN 'Да' END )
+		FROM house_raw AS ho2
+		LEFT JOIN heat_raw AS he2 ON ho2.bticode = he2.bticode
+		WHERE ho2.raion = t."Район" AND ho2.street = t."Улица" AND ho2.house = t."Дом" AND ho2.bticode = t."Код БТИ" LIMIT 1) AS "Нет информации на вкладе ТЭ",
+	      (SELECT NULL) AS "Нет информации на вкладе МКД",
+	      (SELECT (CASE ((SELECT count(he3.bticode) FROM heat_raw AS he3 WHERE he3.bticode = t."Код БТИ") > 1) 
+			    AND ((SELECT count(he4.bticode) FROM heat_raw AS he4 WHERE he4.bticode = t."Код БТИ") > 0) 
+			WHEN TRUE THEN 'Да' END )
+	      ) AS "Раздвоение во вкладке ТЭ",
+	      (SELECT NULL) AS "Раздвоение во вкладке МКД",
+	      (SELECT (CASE (ho2.heating_area IS NULL) 
+			  
+			AND ((SELECT count(he4.bticode) FROM heat_raw AS he4 WHERE he4.bticode = t."Код БТИ") = 1)
+			WHEN TRUE THEN '?' END )
+		FROM house_raw AS ho2
+		WHERE ho2.raion = t."Район" AND ho2.street = t."Улица" AND ho2.house = t."Дом" AND ho2.bticode = t."Код БТИ" LIMIT 1) AS "Общая отапливаемой площадь",
+	      (SELECT (CASE (he2.connection_type IS NULL) 
+			AND ((SELECT count(he4.bticode) FROM heat_raw AS he4 WHERE he4.bticode = t."Код БТИ") = 1)
+			WHEN TRUE THEN '?' END )
+		FROM house_raw AS ho2
+		LEFT JOIN heat_raw AS he2 ON ho2.bticode = he2.bticode
+		WHERE ho2.raion = t."Район" AND ho2.street = t."Улица" AND ho2.house = t."Дом" AND ho2.bticode = t."Код БТИ" LIMIT 1) AS "Тип подключения дома",
+	      (SELECT (CASE (he2.system_type IS NULL)  
+			AND ((SELECT count(he4.bticode) FROM heat_raw AS he4 WHERE he4.bticode = t."Код БТИ") = 1)
+			WHEN TRUE THEN '?' END )
+		FROM house_raw AS ho2
+		LEFT JOIN heat_raw AS he2 ON ho2.bticode = he2.bticode
+		WHERE ho2.raion = t."Район" AND ho2.street = t."Улица" AND ho2.house = t."Дом" AND ho2.bticode = t."Код БТИ" LIMIT 1) AS "Вид схемы теплоснабжения",
+	      (SELECT (CASE (he2.total_2011 IS NULL) 
+			AND ((SELECT count(he4.bticode) FROM heat_raw AS he4 WHERE he4.bticode = t."Код БТИ") = 1)
+			WHEN TRUE THEN '?' END )
+		FROM house_raw AS ho2
+		LEFT JOIN heat_raw AS he2 ON ho2.bticode = he2.bticode
+		WHERE ho2.raion = t."Район" AND ho2.street = t."Улица" AND ho2.house = t."Дом" AND ho2.bticode = t."Код БТИ" LIMIT 1) AS "Потребление за 2011 год",
+	      (SELECT (CASE (he2.total_2012 IS NULL)  
+			AND ((SELECT count(he4.bticode) FROM heat_raw AS he4 WHERE he4.bticode = t."Код БТИ") = 1)
+			WHEN TRUE THEN '?' END )
+		FROM house_raw AS ho2
+		LEFT JOIN heat_raw AS he2 ON ho2.bticode = he2.bticode
+		WHERE ho2.raion = t."Район" AND ho2.street = t."Улица" AND ho2.house = t."Дом" AND ho2.bticode = t."Код БТИ" LIMIT 1) AS "Потребление за 2012 год",
+	      (SELECT (CASE (he2.total_2013 IS NULL) 
+			AND ((SELECT count(he4.bticode) FROM heat_raw AS he4 WHERE he4.bticode = t."Код БТИ") = 1)
+			WHEN TRUE THEN '?' END )
+		FROM house_raw AS ho2
+		LEFT JOIN heat_raw AS he2 ON ho2.bticode = he2.bticode
+		WHERE ho2.raion = t."Район" AND ho2.street = t."Улица" AND ho2.house = t."Дом" AND ho2.bticode = t."Код БТИ" LIMIT 1) AS "Потребление за 2013 год",
+	      (SELECT (CASE (he2.total_2013_jan IS NULL) 
+			AND ((SELECT count(he4.bticode) FROM heat_raw AS he4 WHERE he4.bticode = t."Код БТИ") = 1)
+			WHEN TRUE THEN '?' END )
+		FROM house_raw AS ho2
+		LEFT JOIN heat_raw AS he2 ON ho2.bticode = he2.bticode
+		WHERE ho2.raion = t."Район" AND ho2.street = t."Улица" AND ho2.house = t."Дом" AND ho2.bticode = t."Код БТИ" LIMIT 1) AS "Всего за 2013 январь",
+	      (SELECT (CASE (he2.total_2013_feb IS NULL) 
+			AND ((SELECT count(he4.bticode) FROM heat_raw AS he4 WHERE he4.bticode = t."Код БТИ") = 1)
+			WHEN TRUE THEN '?' END )
+		FROM house_raw AS ho2
+		LEFT JOIN heat_raw AS he2 ON ho2.bticode = he2.bticode
+		WHERE ho2.raion = t."Район" AND ho2.street = t."Улица" AND ho2.house = t."Дом" AND ho2.bticode = t."Код БТИ" LIMIT 1) AS "Всего за 2013 февраль",
+	      (SELECT (CASE (he2.total_2013_mar IS NULL)  
+			AND ((SELECT count(he4.bticode) FROM heat_raw AS he4 WHERE he4.bticode = t."Код БТИ") = 1)
+			WHEN TRUE THEN '?' END )
+		FROM house_raw AS ho2
+		LEFT JOIN heat_raw AS he2 ON ho2.bticode = he2.bticode
+		WHERE ho2.raion = t."Район" AND ho2.street = t."Улица" AND ho2.house = t."Дом" AND ho2.bticode = t."Код БТИ" LIMIT 1) AS "Всего за 2013 март",
+	      (SELECT (CASE (he2.total_2013_apr IS NULL)  
+			AND ((SELECT count(he4.bticode) FROM heat_raw AS he4 WHERE he4.bticode = t."Код БТИ") = 1)
+			WHEN TRUE THEN '?' END )
+		FROM house_raw AS ho2
+		LEFT JOIN heat_raw AS he2 ON ho2.bticode = he2.bticode
+		WHERE ho2.raion = t."Район" AND ho2.street = t."Улица" AND ho2.house = t."Дом" AND ho2.bticode = t."Код БТИ" LIMIT 1) AS "Всего за 2013 апрель",
+	      (SELECT (CASE (he2.total_2013_sep IS NULL)  
+			AND ((SELECT count(he4.bticode) FROM heat_raw AS he4 WHERE he4.bticode = t."Код БТИ") = 1)
+			WHEN TRUE THEN '?' END )
+		FROM house_raw AS ho2
+		LEFT JOIN heat_raw AS he2 ON ho2.bticode = he2.bticode
+		WHERE ho2.raion = t."Район" AND ho2.street = t."Улица" AND ho2.house = t."Дом" AND ho2.bticode = t."Код БТИ" LIMIT 1) AS "Всего за 2013 сентябрь",
+	      (SELECT (CASE (he2.total_2013_oct IS NULL) 
+			AND ((SELECT count(he4.bticode) FROM heat_raw AS he4 WHERE he4.bticode = t."Код БТИ") = 1)
+			WHEN TRUE THEN '?' END )
+		FROM house_raw AS ho2
+		LEFT JOIN heat_raw AS he2 ON ho2.bticode = he2.bticode
+		WHERE ho2.raion = t."Район" AND ho2.street = t."Улица" AND ho2.house = t."Дом" AND ho2.bticode = t."Код БТИ" LIMIT 1) AS "Всего за 2013 октябрь",
+	      (SELECT (CASE (he2.total_2013_nov IS NULL) 
+			AND ((SELECT count(he4.bticode) FROM heat_raw AS he4 WHERE he4.bticode = t."Код БТИ") = 1)
+			WHEN TRUE THEN '?' END )
+		FROM house_raw AS ho2
+		LEFT JOIN heat_raw AS he2 ON ho2.bticode = he2.bticode
+		WHERE ho2.raion = t."Район" AND ho2.street = t."Улица" AND ho2.house = t."Дом" AND ho2.bticode = t."Код БТИ" LIMIT 1) AS "Всего за 2013 ноябрь",
+	      (SELECT (CASE (he2.total_2013_dec IS NULL) 
+			AND ((SELECT count(he4.bticode) FROM heat_raw AS he4 WHERE he4.bticode = t."Код БТИ") = 1)
+			WHEN TRUE THEN '?' END )
+		FROM house_raw AS ho2
+		LEFT JOIN heat_raw AS he2 ON ho2.bticode = he2.bticode
+		WHERE ho2.raion = t."Район" AND ho2.street = t."Улица" AND ho2.house = t."Дом" AND ho2.bticode = t."Код БТИ" LIMIT 1) AS "Всего за 2013 декабрь",
+	      (SELECT (CASE (he2.contract_load_2013 IS NULL OR he2.contract_load_2013 > 10) 
+			AND ((SELECT count(he4.bticode) FROM heat_raw AS he4 WHERE he4.bticode = t."Код БТИ") = 1)
+			WHEN TRUE THEN '?' END )
+		FROM house_raw AS ho2
+		LEFT JOIN heat_raw AS he2 ON ho2.bticode = he2.bticode
+		WHERE ho2.raion = t."Район" AND ho2.street = t."Улица" AND ho2.house = t."Дом" AND ho2.bticode = t."Код БТИ" LIMIT 1) AS "Договорная нагрузка",
+	      (SELECT (CASE (he2.temperature_grafic IS NULL) 
+			AND ((SELECT count(he4.bticode) FROM heat_raw AS he4 WHERE he4.bticode = t."Код БТИ") = 1)
+			WHEN TRUE THEN '?' END )
+		FROM house_raw AS ho2
+		LEFT JOIN heat_raw AS he2 ON ho2.bticode = he2.bticode
+		WHERE ho2.raion = t."Район" AND ho2.street = t."Улица" AND ho2.house = t."Дом" AND ho2.bticode = t."Код БТИ" LIMIT 1) AS "Нормативный температурный график",
+	      (SELECT (CASE (he2.heating_scheme IS NULL) 
+			AND ((SELECT count(he4.bticode) FROM heat_raw AS he4 WHERE he4.bticode = t."Код БТИ") = 1)
+			WHEN TRUE THEN '?' END )
+		FROM house_raw AS ho2
+		LEFT JOIN heat_raw AS he2 ON ho2.bticode = he2.bticode
+		WHERE ho2.raion = t."Район" AND ho2.street = t."Улица" AND ho2.house = t."Дом" AND ho2.bticode = t."Код БТИ" LIMIT 1) AS "Схема присоединения системы отопления",
+	      (SELECT (CASE (he2.count_lift_nodes IS NULL)  
+			AND ((SELECT count(he4.bticode) FROM heat_raw AS he4 WHERE he4.bticode = t."Код БТИ") = 1)
+			WHEN TRUE THEN '?' END )
+		FROM house_raw AS ho2
+		LEFT JOIN heat_raw AS he2 ON ho2.bticode = he2.bticode
+		WHERE ho2.raion = t."Район" AND ho2.street = t."Улица" AND ho2.house = t."Дом" AND ho2.bticode = t."Код БТИ" LIMIT 1) AS "Количество элеваторных узлов",
+	      (SELECT (CASE (he2.heating_transit IS NULL) 
+			AND ((SELECT count(he4.bticode) FROM heat_raw AS he4 WHERE he4.bticode = t."Код БТИ") = 1)
+			WHEN TRUE THEN '?' END ) 
+		FROM house_raw AS ho2
+		LEFT JOIN heat_raw AS he2 ON ho2.bticode = he2.bticode
+		WHERE ho2.raion = t."Район" AND ho2.street = t."Улица" AND ho2.house = t."Дом" AND ho2.bticode = t."Код БТИ" LIMIT 1) AS "Транзит на отопление"
+
+	FROM
+	    (SELECT ho.raion as "Район",
+		   ho.bticode AS "Код БТИ",
+		   ho.street as "Улица",
+		   ho.house as "Дом"
+
+		   
+		FROM house_raw AS ho
+		LEFT JOIN heat_raw AS he ON ho.bticode = he.bticode
+
+
+		WHERE (ho.bticode IS NOT NULL AND he.bticode IS NULL)
+			OR ho.heating_area IS NULL
+			OR he.total_2011 IS NULL
+			OR he.total_2012 IS NULL
+			OR he.total_2013 IS NULL
+			OR he.total_2013_jan IS NULL
+			OR he.total_2013_jan IS NULL
+			OR he.total_2013_jan IS NULL
+			OR he.total_2013_feb IS NULL
+			OR he.total_2013_mar IS NULL
+			OR he.total_2013_apr IS NULL
+			OR he.total_2013_sep IS NULL
+			OR he.total_2013_oct IS NULL
+			OR he.total_2013_nov IS NULL
+			OR he.total_2013_dec IS NULL
+			OR he.contract_load_2013 IS NULL
+			OR he.contract_load_2013 > 10
+			OR he.temperature_grafic IS NULL
+			OR he.heating_scheme IS NULL
+			OR he.count_lift_nodes IS NULL
+			OR he.heating_transit IS NULL
+			OR he.connection_type IS NULL
+			OR he.system_type IS NULL
+			OR ((SELECT count(he4.bticode) FROM heat_raw AS he4 WHERE he4.bticode = ho.bticode) > 1)
+
+		GROUP BY "Район", "Улица", "Дом", ho.bticode
+	    ) AS t
+
+	ORDER BY t."Код БТИ"
+
+) to '/home/vlad/reports/ac-data-qual/Отчет о полноте данных.csv'
+with csv header delimiter ';' encoding 'win_1251'
+;
+
+--Дополнение к отчету о полноте данных
+copy ( SELECT t."Район",
+	      t."Код БТИ",
+	      t."Улица",
+	      t."Дом",
+	      (SELECT ho2.korpus FROM house_raw AS ho2 
+		WHERE ho2.raion = t."Район" AND ho2.street = t."Улица" AND ho2.house = t."Дом" AND ho2.bticode = t."Код БТИ" LIMIT 1) AS "Корпус",
+	      (SELECT ho2.stroenie FROM house_raw AS ho2 
+		WHERE ho2.raion = t."Район" AND ho2.street = t."Улица" AND ho2.house = t."Дом" AND ho2.bticode = t."Код БТИ" LIMIT 1) AS "Строение",
+	      (SELECT NULL) AS "Нет информации на вкладе ТЭ",
+	      (CASE ((SELECT count(ho2.bticode) FROM house_raw AS ho2 WHERE ho2.bticode = t."Код БТИ") = 0) AND (t."Код БТИ" IS NOT NULL) WHEN TRUE THEN 'Да' END ) AS "Нет информации на вкладе МКД",
+	      (SELECT NULL) AS "Раздвоение во вкладке ТЭ",
+	      (CASE ((SELECT count(ho2.bticode) FROM house_raw AS ho2 WHERE ho2.bticode = t."Код БТИ") > 1) AND (t."Код БТИ" IS NOT NULL) WHEN TRUE THEN 'Да' END ) AS "Раздвоение во вкладке МКД",
+	      (SELECT NULL) AS "Общая отапливаемой площадь",
+	      (SELECT NULL) AS "Тип подключения дома",
+	      (SELECT NULL) AS "Вид схемы теплоснабжения",
+	      (SELECT NULL) AS "Потребление за 2011 год",
+	      (SELECT NULL) AS "Потребление за 2012 год",
+	      (SELECT NULL) AS "Потребление за 2013 год",
+	      (SELECT NULL) AS "Всего за 2013 январь",
+	      (SELECT NULL) AS "Всего за 2013 февраль",
+	      (SELECT NULL) AS "Всего за 2013 март",
+	      (SELECT NULL) AS "Всего за 2013 апрель",
+	      (SELECT NULL) AS "Всего за 2013 сентябрь",
+	      (SELECT NULL) AS "Всего за 2013 октябрь",
+	      (SELECT NULL) AS "Всего за 2013 ноябрь",
+	      (SELECT NULL) AS "Всего за 2013 декабрь",
+	      (SELECT NULL) AS "Договорная нагрузка",
+	      (SELECT NULL) AS "Нормативный температурный график",
+	      (SELECT NULL) AS "Схема присоединения системы отопления",
+	      (SELECT NULL) AS "Количество элеваторных узлов",
+	      (SELECT NULL) AS "Транзит на отопление"
+
+	FROM
+	    (SELECT ho5.raion as "Район",
+		   he5.bticode AS "Код БТИ",
+		   ho5.street as "Улица",
+		   ho5.house as "Дом"
+
+		   
+		FROM heat_raw AS he5
+		LEFT JOIN house_raw AS ho5 ON he5.bticode = ho5.bticode
+
+
+		WHERE (ho5.bticode IS NULL AND he5.bticode IS NOT NULL) 
+			OR ((SELECT count(ho6.bticode) FROM house_raw AS ho6 WHERE ho6.bticode = he5.bticode) > 1)
+
+		GROUP BY "Район", "Улица", "Дом", "Код БТИ"
+	    ) AS t
+
+	ORDER BY t."Код БТИ"
+
+) to '/home/vlad/reports/ac-data-qual/Дополнение к отчету о полноте данных.csv'
+with csv header delimiter ';' encoding 'win_1251'
+;
+
+
+copy (
+SELECT t."Номер п/п",
+    t."Округ",
+    t."Район",
+    t."Улица",
+    t."Дом",
+    (SELECT ho2.korpus FROM house_raw AS ho2 
+	WHERE ho2.okrug = t."Округ" 
+		AND ho2.raion = t."Район" 
+		AND ho2.street = t."Улица"
+		AND ho2.house = t."Дом"
+		AND ho2.bticode = t."Код БТИ" LIMIT 1) as "Корпус",
+    (SELECT ho2.stroenie FROM house_raw AS ho2 
+	WHERE ho2.okrug = t."Округ" 
+		AND ho2.raion = t."Район" 
+		AND ho2.street = t."Улица"
+		AND ho2.house = t."Дом"
+		AND ho2.bticode = t."Код БТИ" LIMIT 1) as "Строение",
+    t."Код БТИ",
+    (SELECT ho2.mkd_uprav_form FROM house_raw AS ho2 
+	WHERE ho2.okrug = t."Округ" 
+		AND ho2.raion = t."Район" 
+		AND ho2.street = t."Улица"
+		AND ho2.house = t."Дом"
+		AND ho2.bticode = t."Код БТИ" LIMIT 1) as "Форма управления домом",
+    (SELECT ho2.category FROM house_raw AS ho2 
+	WHERE ho2.okrug = t."Округ" 
+		AND ho2.raion = t."Район" 
+		AND ho2.street = t."Улица"
+		AND ho2.house = t."Дом"
+		AND ho2.bticode = t."Код БТИ" LIMIT 1) as "Категория",
+
+    (SELECT ho2.house_type FROM house_raw AS ho2 
+	WHERE ho2.okrug = t."Округ" 
+		AND ho2.raion = t."Район" 
+		AND ho2.street = t."Улица"
+		AND ho2.house = t."Дом"
+		AND ho2.bticode = t."Код БТИ" LIMIT 1) as "Тип дома",
+    (SELECT ho2.series FROM house_raw AS ho2 
+	WHERE ho2.okrug = t."Округ" 
+		AND ho2.raion = t."Район" 
+		AND ho2.street = t."Улица"
+		AND ho2.house = t."Дом"
+		AND ho2.bticode = t."Код БТИ" LIMIT 1) as "Серия",
+    (SELECT ho2.year_built FROM house_raw AS ho2 
+	WHERE ho2.okrug = t."Округ" 
+		AND ho2.raion = t."Район" 
+		AND ho2.street = t."Улица"
+		AND ho2.house = t."Дом"
+		AND ho2.bticode = t."Код БТИ" LIMIT 1) as "Год постройки",
+    (SELECT ho2.wall_type FROM house_raw AS ho2 
+	WHERE ho2.okrug = t."Округ" 
+		AND ho2.raion = t."Район" 
+		AND ho2.street = t."Улица"
+		AND ho2.house = t."Дом"
+		AND ho2.bticode = t."Код БТИ" LIMIT 1) as "Тип стен",
+    (SELECT ho2.floors FROM house_raw AS ho2 
+	WHERE ho2.okrug = t."Округ" 
+		AND ho2.raion = t."Район" 
+		AND ho2.street = t."Улица"
+		AND ho2.house = t."Дом"
+		AND ho2.bticode = t."Код БТИ" LIMIT 1) as "Количество этажей",
+    (SELECT ho2.underfloors FROM house_raw AS ho2 
+	WHERE ho2.okrug = t."Округ" 
+		AND ho2.raion = t."Район" 
+		AND ho2.street = t."Улица"
+		AND ho2.house = t."Дом"
+		AND ho2.bticode = t."Код БТИ" LIMIT 1) as "Подземных этажей",
+    (SELECT ho2.porches FROM house_raw AS ho2 
+	WHERE ho2.okrug = t."Округ" 
+		AND ho2.raion = t."Район" 
+		AND ho2.street = t."Улица"
+		AND ho2.house = t."Дом"
+		AND ho2.bticode = t."Код БТИ" LIMIT 1) as "Подъездов",
+    (SELECT ho2.flats FROM house_raw AS ho2 
+	WHERE ho2.okrug = t."Округ" 
+		AND ho2.raion = t."Район" 
+		AND ho2.street = t."Улица"
+		AND ho2.house = t."Дом"
+		AND ho2.bticode = t."Код БТИ" LIMIT 1) as "Квартир",
+    (SELECT ho2.full_area FROM house_raw AS ho2 
+	WHERE ho2.okrug = t."Округ" 
+		AND ho2.raion = t."Район" 
+		AND ho2.street = t."Улица"
+		AND ho2.house = t."Дом"
+		AND ho2.bticode = t."Код БТИ" LIMIT 1) as "Общая площадь",
+    (SELECT ho2.heating_area FROM house_raw AS ho2 
+	WHERE ho2.okrug = t."Округ" 
+		AND ho2.raion = t."Район" 
+		AND ho2.street = t."Улица"
+		AND ho2.house = t."Дом"
+		AND ho2.bticode = t."Код БТИ" LIMIT 1) as "Отапливаемая площадь",
+    (SELECT ho2.living_area FROM house_raw AS ho2 
+	WHERE ho2.okrug = t."Округ" 
+		AND ho2.raion = t."Район" 
+		AND ho2.street = t."Улица"
+		AND ho2.house = t."Дом"
+		AND ho2.bticode = t."Код БТИ" LIMIT 1)  as "Площадь жилых помещений",
+    (SELECT ho2.nonliving_area FROM house_raw AS ho2 
+	WHERE ho2.okrug = t."Округ" 
+		AND ho2.raion = t."Район" 
+		AND ho2.street = t."Улица"
+		AND ho2.house = t."Дом"
+		AND ho2.bticode = t."Код БТИ" LIMIT 1) as "площадь нежилых помещений",
+
+    (SELECT ho2.electricity FROM house_raw AS ho2 
+	WHERE ho2.okrug = t."Округ" 
+		AND ho2.raion = t."Район" 
+		AND ho2.street = t."Улица"
+		AND ho2.house = t."Дом"
+		AND ho2.bticode = t."Код БТИ" LIMIT 1) as "Электричество",
+    (SELECT ho2.water_hot FROM house_raw AS ho2 
+	WHERE ho2.okrug = t."Округ" 
+		AND ho2.raion = t."Район" 
+		AND ho2.street = t."Улица"
+		AND ho2.house = t."Дом"
+		AND ho2.bticode = t."Код БТИ" LIMIT 1) as "Горячая вода",
+    (SELECT ho2.water_cold FROM house_raw AS ho2 
+	WHERE ho2.okrug = t."Округ" 
+		AND ho2.raion = t."Район" 
+		AND ho2.street = t."Улица"
+		AND ho2.house = t."Дом"
+		AND ho2.bticode = t."Код БТИ" LIMIT 1) as "Холодная вода",
+    (SELECT ho2.sewerage FROM house_raw AS ho2 
+	WHERE ho2.okrug = t."Округ" 
+		AND ho2.raion = t."Район" 
+		AND ho2.street = t."Улица"
+		AND ho2.house = t."Дом"
+		AND ho2.bticode = t."Код БТИ" LIMIT 1) as "Водоотведение",
+    (SELECT ho2.heat_supply FROM house_raw AS ho2 
+	WHERE ho2.okrug = t."Округ" 
+		AND ho2.raion = t."Район" 
+		AND ho2.street = t."Улица"
+		AND ho2.house = t."Дом"
+		AND ho2.bticode = t."Код БТИ" LIMIT 1) as "Теплоснабжение",
+    (SELECT ho2.gas_supply FROM house_raw AS ho2 
+	WHERE ho2.okrug = t."Округ" 
+		AND ho2.raion = t."Район" 
+		AND ho2.street = t."Улица"
+		AND ho2.house = t."Дом"
+		AND ho2.bticode = t."Код БТИ" LIMIT 1) as "Газ",
+    (SELECT ho2.gas_heaters FROM house_raw AS ho2 
+	WHERE ho2.okrug = t."Округ" 
+		AND ho2.raion = t."Район" 
+		AND ho2.street = t."Улица"
+		AND ho2.house = t."Дом"
+		AND ho2.bticode = t."Код БТИ" LIMIT 1) as "Газовые нагреватели",
+    (SELECT ho2.gas_ovens FROM house_raw AS ho2 
+	WHERE ho2.okrug = t."Округ" 
+		AND ho2.raion = t."Район" 
+		AND ho2.street = t."Улица"
+		AND ho2.house = t."Дом"
+		AND ho2.bticode = t."Код БТИ" LIMIT 1) as "Газовые плиты",
+    (SELECT ho2.electro_ovens FROM house_raw AS ho2 
+	WHERE ho2.okrug = t."Округ" 
+		AND ho2.raion = t."Район" 
+		AND ho2.street = t."Улица"
+		AND ho2.house = t."Дом"
+		AND ho2.bticode = t."Код БТИ" LIMIT 1) as "Электроплиты",
+    (SELECT ho2.lifts_count FROM house_raw AS ho2 
+	WHERE ho2.okrug = t."Округ" 
+		AND ho2.raion = t."Район" 
+		AND ho2.street = t."Улица"
+		AND ho2.house = t."Дом"
+		AND ho2.bticode = t."Код БТИ" LIMIT 1) as "Количкство лифтов",
+
+    (SELECT ho2.e_devices_count FROM house_raw AS ho2 
+	WHERE ho2.okrug = t."Округ" 
+		AND ho2.raion = t."Район" 
+		AND ho2.street = t."Улица"
+		AND ho2.house = t."Дом"
+		AND ho2.bticode = t."Код БТИ" LIMIT 1) as "Количество приборов учета электроэнергии",
+    (SELECT ho2.hw_devices_count FROM house_raw AS ho2 
+	WHERE ho2.okrug = t."Округ" 
+		AND ho2.raion = t."Район" 
+		AND ho2.street = t."Улица"
+		AND ho2.house = t."Дом"
+		AND ho2.bticode = t."Код БТИ" LIMIT 1) as "Горячей воды",
+    (SELECT ho2.cw_devices_count FROM house_raw AS ho2 
+	WHERE ho2.okrug = t."Округ" 
+		AND ho2.raion = t."Район" 
+		AND ho2.street = t."Улица"
+		AND ho2.house = t."Дом"
+		AND ho2.bticode = t."Код БТИ" LIMIT 1) as "Холодной воды",
+    (SELECT ho2.heat_devices_count FROM house_raw AS ho2 
+	WHERE ho2.okrug = t."Округ" 
+		AND ho2.raion = t."Район" 
+		AND ho2.street = t."Улица"
+		AND ho2.house = t."Дом"
+		AND ho2.bticode = t."Код БТИ" LIMIT 1) as "Тепловой энергии",
+    (SELECT ho2.gas_devices_count FROM house_raw AS ho2 
+	WHERE ho2.okrug = t."Округ" 
+		AND ho2.raion = t."Район" 
+		AND ho2.street = t."Улица"
+		AND ho2.house = t."Дом"
+		AND ho2.bticode = t."Код БТИ" LIMIT 1) as "Газа",
+    (SELECT he2.supplier FROM house_raw AS ho2 
+	JOIN heat_raw AS he2 ON ho2.bticode = he2.bticode
+	WHERE ho2.okrug = t."Округ" 
+		AND ho2.raion = t."Район" 
+		AND ho2.street = t."Улица"
+		AND ho2.house = t."Дом"
+		AND ho2.bticode = t."Код БТИ" LIMIT 1) as "Поставщик", --3
+    (SELECT he2.connection_type FROM house_raw AS ho2 
+	JOIN heat_raw AS he2 ON ho2.bticode = he2.bticode
+	WHERE ho2.okrug = t."Округ" 
+		AND ho2.raion = t."Район" 
+		AND ho2.street = t."Улица"
+		AND ho2.house = t."Дом"
+		AND ho2.bticode = t."Код БТИ" LIMIT 1) as "Тип подключения", --4
+    (SELECT he2.consumer FROM house_raw AS ho2 
+	JOIN heat_raw AS he2 ON ho2.bticode = he2.bticode
+	WHERE ho2.okrug = t."Округ" 
+		AND ho2.raion = t."Район" 
+		AND ho2.street = t."Улица"
+		AND ho2.house = t."Дом"
+		AND ho2.bticode = t."Код БТИ" LIMIT 1) as "Потребитель", --5
+    (SELECT he2.resource_type FROM house_raw AS ho2 
+	JOIN heat_raw AS he2 ON ho2.bticode = he2.bticode
+	WHERE ho2.okrug = t."Округ" 
+		AND ho2.raion = t."Район" 
+		AND ho2.street = t."Улица"
+		AND ho2.house = t."Дом"
+		AND ho2.bticode = t."Код БТИ" LIMIT 1) as "Тип ресурса", --6
+    (SELECT he2.mes_units FROM house_raw AS ho2 
+	JOIN heat_raw AS he2 ON ho2.bticode = he2.bticode
+	WHERE ho2.okrug = t."Округ" 
+		AND ho2.raion = t."Район" 
+		AND ho2.street = t."Улица"
+		AND ho2.house = t."Дом"
+		AND ho2.bticode = t."Код БТИ" LIMIT 1) as "Еденицы измерения", --7
+    (SELECT he2.number_of_devices FROM house_raw AS ho2 
+	JOIN heat_raw AS he2 ON ho2.bticode = he2.bticode
+	WHERE ho2.okrug = t."Округ" 
+		AND ho2.raion = t."Район" 
+		AND ho2.street = t."Улица"
+		AND ho2.house = t."Дом"
+		AND ho2.bticode = t."Код БТИ" LIMIT 1) as "Количество приборов учёта тепловой энергии", --8
+    (SELECT he2.total_2011 FROM house_raw AS ho2 
+	JOIN heat_raw AS he2 ON ho2.bticode = he2.bticode
+	WHERE ho2.okrug = t."Округ" 
+		AND ho2.raion = t."Район" 
+		AND ho2.street = t."Улица"
+		AND ho2.house = t."Дом"
+		AND ho2.bticode = t."Код БТИ" LIMIT 1) as "Всего за 2011", --9
+    (SELECT he2.total_2012 FROM house_raw AS ho2 
+	JOIN heat_raw AS he2 ON ho2.bticode = he2.bticode
+	WHERE ho2.okrug = t."Округ" 
+		AND ho2.raion = t."Район" 
+		AND ho2.street = t."Улица"
+		AND ho2.house = t."Дом"
+		AND ho2.bticode = t."Код БТИ" LIMIT 1) as "Всего за 2012", --10
+    (SELECT he2.total_2013_jan FROM house_raw AS ho2 
+	JOIN heat_raw AS he2 ON ho2.bticode = he2.bticode
+	WHERE ho2.okrug = t."Округ" 
+		AND ho2.raion = t."Район" 
+		AND ho2.street = t."Улица"
+		AND ho2.house = t."Дом"
+		AND ho2.bticode = t."Код БТИ" LIMIT 1) as "Всего за 2013 январь", -- 11
+    (SELECT he2.mr_2013_jan FROM house_raw AS ho2 
+	JOIN heat_raw AS he2 ON ho2.bticode = he2.bticode
+	WHERE ho2.okrug = t."Округ" 
+		AND ho2.raion = t."Район" 
+		AND ho2.street = t."Улица"
+		AND ho2.house = t."Дом"
+		AND ho2.bticode = t."Код БТИ" LIMIT 1) as "Метод расчёта 2013 январь", --12
+    (SELECT he2.total_2013_feb FROM house_raw AS ho2 
+	JOIN heat_raw AS he2 ON ho2.bticode = he2.bticode
+	WHERE ho2.okrug = t."Округ" 
+		AND ho2.raion = t."Район" 
+		AND ho2.street = t."Улица"
+		AND ho2.house = t."Дом"
+		AND ho2.bticode = t."Код БТИ" LIMIT 1) as "Всего за 2013 февраль", --13
+    (SELECT he2.mr_2013_feb FROM house_raw AS ho2 
+	JOIN heat_raw AS he2 ON ho2.bticode = he2.bticode
+	WHERE ho2.okrug = t."Округ" 
+		AND ho2.raion = t."Район" 
+		AND ho2.street = t."Улица"
+		AND ho2.house = t."Дом"
+		AND ho2.bticode = t."Код БТИ" LIMIT 1) as "Метод расчёта 2013 февраль",  --14
+    (SELECT he2.total_2013_mar FROM house_raw AS ho2 
+	JOIN heat_raw AS he2 ON ho2.bticode = he2.bticode
+	WHERE ho2.okrug = t."Округ" 
+		AND ho2.raion = t."Район" 
+		AND ho2.street = t."Улица"
+		AND ho2.house = t."Дом"
+		AND ho2.bticode = t."Код БТИ" LIMIT 1) as "Всего за 2013 март",
+    (SELECT he2.mr_2013_mar FROM house_raw AS ho2 
+	JOIN heat_raw AS he2 ON ho2.bticode = he2.bticode
+	WHERE ho2.okrug = t."Округ" 
+		AND ho2.raion = t."Район" 
+		AND ho2.street = t."Улица"
+		AND ho2.house = t."Дом"
+		AND ho2.bticode = t."Код БТИ" LIMIT 1) as "Метод расчёта 2013 март", --16
+    (SELECT he2.total_2013_apr FROM house_raw AS ho2 
+	JOIN heat_raw AS he2 ON ho2.bticode = he2.bticode
+	WHERE ho2.okrug = t."Округ" 
+		AND ho2.raion = t."Район" 
+		AND ho2.street = t."Улица"
+		AND ho2.house = t."Дом"
+		AND ho2.bticode = t."Код БТИ" LIMIT 1) as "Всего за 2013 апрель",
+    (SELECT he2.mr_2013_apr FROM house_raw AS ho2 
+	JOIN heat_raw AS he2 ON ho2.bticode = he2.bticode
+	WHERE ho2.okrug = t."Округ" 
+		AND ho2.raion = t."Район" 
+		AND ho2.street = t."Улица"
+		AND ho2.house = t."Дом"
+		AND ho2.bticode = t."Код БТИ" LIMIT 1) as "Метод расчёта 2013 апрель", --18
+    (SELECT he2.total_2013_may FROM house_raw AS ho2 
+	JOIN heat_raw AS he2 ON ho2.bticode = he2.bticode
+	WHERE ho2.okrug = t."Округ" 
+		AND ho2.raion = t."Район" 
+		AND ho2.street = t."Улица"
+		AND ho2.house = t."Дом"
+		AND ho2.bticode = t."Код БТИ" LIMIT 1) as "Всего за 2013 май",
+    (SELECT he2.mr_2013_may FROM house_raw AS ho2 
+	JOIN heat_raw AS he2 ON ho2.bticode = he2.bticode
+	WHERE ho2.okrug = t."Округ" 
+		AND ho2.raion = t."Район" 
+		AND ho2.street = t."Улица"
+		AND ho2.house = t."Дом"
+		AND ho2.bticode = t."Код БТИ" LIMIT 1) as "Метод расчёта 2013 май", --20
+    (SELECT he2.total_2013_jun FROM house_raw AS ho2 
+	JOIN heat_raw AS he2 ON ho2.bticode = he2.bticode
+	WHERE ho2.okrug = t."Округ" 
+		AND ho2.raion = t."Район" 
+		AND ho2.street = t."Улица"
+		AND ho2.house = t."Дом"
+		AND ho2.bticode = t."Код БТИ" LIMIT 1) as "Всего за 2013 июнь",
+    (SELECT he2.mr_2013_jun FROM house_raw AS ho2 
+	JOIN heat_raw AS he2 ON ho2.bticode = he2.bticode
+	WHERE ho2.okrug = t."Округ" 
+		AND ho2.raion = t."Район" 
+		AND ho2.street = t."Улица"
+		AND ho2.house = t."Дом"
+		AND ho2.bticode = t."Код БТИ" LIMIT 1) as "Метод расчёта 2013 июнь", --22
+    (SELECT he2.total_2013_jul FROM house_raw AS ho2 
+	JOIN heat_raw AS he2 ON ho2.bticode = he2.bticode
+	WHERE ho2.okrug = t."Округ" 
+		AND ho2.raion = t."Район" 
+		AND ho2.street = t."Улица"
+		AND ho2.house = t."Дом"
+		AND ho2.bticode = t."Код БТИ" LIMIT 1) as "Всего за 2013 июль",
+    (SELECT he2.mr_2013_jul FROM house_raw AS ho2 
+	JOIN heat_raw AS he2 ON ho2.bticode = he2.bticode
+	WHERE ho2.okrug = t."Округ" 
+		AND ho2.raion = t."Район" 
+		AND ho2.street = t."Улица"
+		AND ho2.house = t."Дом"
+		AND ho2.bticode = t."Код БТИ" LIMIT 1) as "Метод расчёта 2013 июль", --24
+    (SELECT he2.total_2013_aug FROM house_raw AS ho2 
+	JOIN heat_raw AS he2 ON ho2.bticode = he2.bticode
+	WHERE ho2.okrug = t."Округ" 
+		AND ho2.raion = t."Район" 
+		AND ho2.street = t."Улица"
+		AND ho2.house = t."Дом"
+		AND ho2.bticode = t."Код БТИ" LIMIT 1) as "Всего за 2013 август",
+    (SELECT he2.mr_2013_aug FROM house_raw AS ho2 
+	JOIN heat_raw AS he2 ON ho2.bticode = he2.bticode
+	WHERE ho2.okrug = t."Округ" 
+		AND ho2.raion = t."Район" 
+		AND ho2.street = t."Улица"
+		AND ho2.house = t."Дом"
+		AND ho2.bticode = t."Код БТИ" LIMIT 1) as "Метод расчёта 2013 август", --26
+    (SELECT he2.total_2013_sep FROM house_raw AS ho2 
+	JOIN heat_raw AS he2 ON ho2.bticode = he2.bticode
+	WHERE ho2.okrug = t."Округ" 
+		AND ho2.raion = t."Район" 
+		AND ho2.street = t."Улица"
+		AND ho2.house = t."Дом"
+		AND ho2.bticode = t."Код БТИ" LIMIT 1) as "Всего за 2013 сентябрь",
+    (SELECT he2.mr_2013_sep FROM house_raw AS ho2 
+	JOIN heat_raw AS he2 ON ho2.bticode = he2.bticode
+	WHERE ho2.okrug = t."Округ" 
+		AND ho2.raion = t."Район" 
+		AND ho2.street = t."Улица"
+		AND ho2.house = t."Дом"
+		AND ho2.bticode = t."Код БТИ" LIMIT 1) as "Метод расчёта 2013 сентябрь", --28
+    (SELECT he2.total_2013_oct FROM house_raw AS ho2 
+	JOIN heat_raw AS he2 ON ho2.bticode = he2.bticode
+	WHERE ho2.okrug = t."Округ" 
+		AND ho2.raion = t."Район" 
+		AND ho2.street = t."Улица"
+		AND ho2.house = t."Дом"
+		AND ho2.bticode = t."Код БТИ" LIMIT 1) as "Всего за 2013 октябрь",
+    (SELECT he2.mr_2013_oct FROM house_raw AS ho2 
+	JOIN heat_raw AS he2 ON ho2.bticode = he2.bticode
+	WHERE ho2.okrug = t."Округ" 
+		AND ho2.raion = t."Район" 
+		AND ho2.street = t."Улица"
+		AND ho2.house = t."Дом"
+		AND ho2.bticode = t."Код БТИ" LIMIT 1) as "Метод расчёта 2013 октябрь", --30
+    (SELECT he2.total_2013_nov FROM house_raw AS ho2 
+	JOIN heat_raw AS he2 ON ho2.bticode = he2.bticode
+	WHERE ho2.okrug = t."Округ" 
+		AND ho2.raion = t."Район" 
+		AND ho2.street = t."Улица"
+		AND ho2.house = t."Дом"
+		AND ho2.bticode = t."Код БТИ" LIMIT 1) as "Всего за 2013 ноябрь",
+    (SELECT he2.mr_2013_nov FROM house_raw AS ho2 
+	JOIN heat_raw AS he2 ON ho2.bticode = he2.bticode
+	WHERE ho2.okrug = t."Округ" 
+		AND ho2.raion = t."Район" 
+		AND ho2.street = t."Улица"
+		AND ho2.house = t."Дом"
+		AND ho2.bticode = t."Код БТИ" LIMIT 1) as "Метод расчёта 2013 ноябрь", --32
+    (SELECT he2.total_2013_dec FROM house_raw AS ho2 
+	JOIN heat_raw AS he2 ON ho2.bticode = he2.bticode
+	WHERE ho2.okrug = t."Округ" 
+		AND ho2.raion = t."Район" 
+		AND ho2.street = t."Улица"
+		AND ho2.house = t."Дом"
+		AND ho2.bticode = t."Код БТИ" LIMIT 1) as "Всего за 2013 декабрь",
+    (SELECT he2.mr_2013_dec FROM house_raw AS ho2 
+	JOIN heat_raw AS he2 ON ho2.bticode = he2.bticode
+	WHERE ho2.okrug = t."Округ" 
+		AND ho2.raion = t."Район" 
+		AND ho2.street = t."Улица"
+		AND ho2.house = t."Дом"
+		AND ho2.bticode = t."Код БТИ" LIMIT 1) as "Метод расчёта 2013 декабрь", --34
+    (SELECT he2.total_2013 FROM house_raw AS ho2 
+	JOIN heat_raw AS he2 ON ho2.bticode = he2.bticode
+	WHERE ho2.okrug = t."Округ" 
+		AND ho2.raion = t."Район" 
+		AND ho2.street = t."Улица"
+		AND ho2.house = t."Дом"
+		AND ho2.bticode = t."Код БТИ" LIMIT 1) as "всего за 2013", --35
+    (SELECT he2.contract_load_2013 FROM house_raw AS ho2 
+	JOIN heat_raw AS he2 ON ho2.bticode = he2.bticode
+	WHERE ho2.okrug = t."Округ" 
+		AND ho2.raion = t."Район" 
+		AND ho2.street = t."Улица"
+		AND ho2.house = t."Дом"
+		AND ho2.bticode = t."Код БТИ" LIMIT 1) as "Договорная нагрузка (годовая за 2013г.)", --37
+    (SELECT he2.temperature_grafic FROM house_raw AS ho2 
+	JOIN heat_raw AS he2 ON ho2.bticode = he2.bticode
+	WHERE ho2.okrug = t."Округ" 
+		AND ho2.raion = t."Район" 
+		AND ho2.street = t."Улица"
+		AND ho2.house = t."Дом"
+		AND ho2.bticode = t."Код БТИ" LIMIT 1) as "Нормативный температурный график", --38
+    (SELECT he2.heating_scheme FROM house_raw AS ho2 
+	JOIN heat_raw AS he2 ON ho2.bticode = he2.bticode
+	WHERE ho2.okrug = t."Округ" 
+		AND ho2.raion = t."Район" 
+		AND ho2.street = t."Улица"
+		AND ho2.house = t."Дом"
+		AND ho2.bticode = t."Код БТИ" LIMIT 1) as "Схема присоединения системы отопления (зависимая/независимая)", --39 
+    (SELECT he2.count_lift_nodes FROM house_raw AS ho2 
+	JOIN heat_raw AS he2 ON ho2.bticode = he2.bticode
+	WHERE ho2.okrug = t."Округ" 
+		AND ho2.raion = t."Район" 
+		AND ho2.street = t."Улица"
+		AND ho2.house = t."Дом"
+		AND ho2.bticode = t."Код БТИ" LIMIT 1) as "Количество элеваторных узлов (при их наличии)", --40
+    (SELECT he2.heating_transit FROM house_raw AS ho2 
+	JOIN heat_raw AS he2 ON ho2.bticode = he2.bticode
+	WHERE ho2.okrug = t."Округ" 
+		AND ho2.raion = t."Район" 
+		AND ho2.street = t."Улица"
+		AND ho2.house = t."Дом"
+		AND ho2.bticode = t."Код БТИ" LIMIT 1)  as "Наличие транзита на отопление (разгружен/не разгружен)", --41 
+    (SELECT p_2011.udel_poterb FROM house_raw AS ho2 
+	JOIN udel_poterb_2011 AS p_2011 ON ho2.bticode = p_2011.bticode
+	WHERE ho2.okrug = t."Округ" 
+		AND ho2.raion = t."Район" 
+		AND ho2.street = t."Улица"
+		AND ho2.house = t."Дом"
+		AND ho2.bticode = t."Код БТИ" LIMIT 1) AS "Удельное потребление за 2011",
+    (SELECT p_2012.udel_poterb FROM house_raw AS ho2 
+	JOIN udel_poterb_2012 AS p_2012 ON ho2.bticode = p_2012.bticode
+	WHERE ho2.okrug = t."Округ" 
+		AND ho2.raion = t."Район" 
+		AND ho2.street = t."Улица"
+		AND ho2.house = t."Дом"
+		AND ho2.bticode = t."Код БТИ" LIMIT 1) AS "Удельное потребление за 2012",
+    (SELECT p_2013.udel_poterb FROM house_raw AS ho2 
+	JOIN udel_poterb_2013 AS p_2013 ON ho2.bticode = p_2013.bticode
+	WHERE ho2.okrug = t."Округ" 
+		AND ho2.raion = t."Район" 
+		AND ho2.street = t."Улица"
+		AND ho2.house = t."Дом"
+		AND ho2.bticode = t."Код БТИ" LIMIT 1) AS "Удельное потребление за 2013",
+    (SELECT p_3y.udel_poterb FROM house_raw AS ho2 
+	JOIN udel_poterb_3y AS p_3y ON ho2.bticode = p_3y.bticode
+	WHERE ho2.okrug = t."Округ" 
+		AND ho2.raion = t."Район" 
+		AND ho2.street = t."Улица"
+		AND ho2.house = t."Дом"
+		AND ho2.bticode = t."Код БТИ" LIMIT 1) AS "Среднее удельное потребление по трём годам"
+    
+from (SELECT ho.id_in_file as "Номер п/п",
+	    ho.okrug as "Округ",
+	    ho.raion as "Район",
+	    ho.street as "Улица",
+	    ho.house as "Дом",
+	    ho.bticode as "Код БТИ"
+
+	   
+	FROM house_raw AS ho
+	LEFT JOIN heat_raw AS he ON ho.bticode = he.bticode
+
+	GROUP BY "Округ", "Район", "Улица", "Дом", "Код БТИ", "Номер п/п"
+    ) AS t
+
+ORDER BY t."Код БТИ"
+
+) to '/home/vlad/reports/ac-data-qual/Полный отчет (В форме Внуково).csv'
+with csv header delimiter ';' encoding 'win_1251'
+;
+
+copy (
+SELECT t."Номер п/п",
+    t."Округ",
+    t."Район",
+    t."Улица",
+    t."Дом",
+    (SELECT ho2.korpus FROM house_raw AS ho2 
+	WHERE ho2.okrug = t."Округ" 
+		AND ho2.raion = t."Район" 
+		AND ho2.street = t."Улица"
+		AND ho2.house = t."Дом"
+		AND ho2.bticode = t."Код БТИ" LIMIT 1) as "Корпус",
+    (SELECT ho2.stroenie FROM house_raw AS ho2 
+	WHERE ho2.okrug = t."Округ" 
+		AND ho2.raion = t."Район" 
+		AND ho2.street = t."Улица"
+		AND ho2.house = t."Дом"
+		AND ho2.bticode = t."Код БТИ" LIMIT 1) as "Строение",
+    t."Код БТИ",
+    (SELECT ho2.mkd_uprav_form FROM house_raw AS ho2 
+	WHERE ho2.okrug = t."Округ" 
+		AND ho2.raion = t."Район" 
+		AND ho2.street = t."Улица"
+		AND ho2.house = t."Дом"
+		AND ho2.bticode = t."Код БТИ" LIMIT 1) as "Форма управления домом",
+    (SELECT ho2.category FROM house_raw AS ho2 
+	WHERE ho2.okrug = t."Округ" 
+		AND ho2.raion = t."Район" 
+		AND ho2.street = t."Улица"
+		AND ho2.house = t."Дом"
+		AND ho2.bticode = t."Код БТИ" LIMIT 1) as "Категория",
+
+    (SELECT ho2.house_type FROM house_raw AS ho2 
+	WHERE ho2.okrug = t."Округ" 
+		AND ho2.raion = t."Район" 
+		AND ho2.street = t."Улица"
+		AND ho2.house = t."Дом"
+		AND ho2.bticode = t."Код БТИ" LIMIT 1) as "Тип дома",
+    (SELECT ho2.series FROM house_raw AS ho2 
+	WHERE ho2.okrug = t."Округ" 
+		AND ho2.raion = t."Район" 
+		AND ho2.street = t."Улица"
+		AND ho2.house = t."Дом"
+		AND ho2.bticode = t."Код БТИ" LIMIT 1) as "Серия",
+    (SELECT ho2.year_built FROM house_raw AS ho2 
+	WHERE ho2.okrug = t."Округ" 
+		AND ho2.raion = t."Район" 
+		AND ho2.street = t."Улица"
+		AND ho2.house = t."Дом"
+		AND ho2.bticode = t."Код БТИ" LIMIT 1) as "Год постройки",
+    (SELECT ho2.wall_type FROM house_raw AS ho2 
+	WHERE ho2.okrug = t."Округ" 
+		AND ho2.raion = t."Район" 
+		AND ho2.street = t."Улица"
+		AND ho2.house = t."Дом"
+		AND ho2.bticode = t."Код БТИ" LIMIT 1) as "Тип стен",
+    (SELECT ho2.floors FROM house_raw AS ho2 
+	WHERE ho2.okrug = t."Округ" 
+		AND ho2.raion = t."Район" 
+		AND ho2.street = t."Улица"
+		AND ho2.house = t."Дом"
+		AND ho2.bticode = t."Код БТИ" LIMIT 1) as "Количество этажей",
+    (SELECT ho2.underfloors FROM house_raw AS ho2 
+	WHERE ho2.okrug = t."Округ" 
+		AND ho2.raion = t."Район" 
+		AND ho2.street = t."Улица"
+		AND ho2.house = t."Дом"
+		AND ho2.bticode = t."Код БТИ" LIMIT 1) as "Подземных этажей",
+    (SELECT ho2.porches FROM house_raw AS ho2 
+	WHERE ho2.okrug = t."Округ" 
+		AND ho2.raion = t."Район" 
+		AND ho2.street = t."Улица"
+		AND ho2.house = t."Дом"
+		AND ho2.bticode = t."Код БТИ" LIMIT 1) as "Подъездов",
+    (SELECT ho2.flats FROM house_raw AS ho2 
+	WHERE ho2.okrug = t."Округ" 
+		AND ho2.raion = t."Район" 
+		AND ho2.street = t."Улица"
+		AND ho2.house = t."Дом"
+		AND ho2.bticode = t."Код БТИ" LIMIT 1) as "Квартир",
+    (SELECT ho2.full_area FROM house_raw AS ho2 
+	WHERE ho2.okrug = t."Округ" 
+		AND ho2.raion = t."Район" 
+		AND ho2.street = t."Улица"
+		AND ho2.house = t."Дом"
+		AND ho2.bticode = t."Код БТИ" LIMIT 1) as "Общая площадь",
+    (SELECT ho2.heating_area FROM house_raw AS ho2 
+	WHERE ho2.okrug = t."Округ" 
+		AND ho2.raion = t."Район" 
+		AND ho2.street = t."Улица"
+		AND ho2.house = t."Дом"
+		AND ho2.bticode = t."Код БТИ" LIMIT 1) as "Отапливаемая площадь",
+    (SELECT ho2.living_area FROM house_raw AS ho2 
+	WHERE ho2.okrug = t."Округ" 
+		AND ho2.raion = t."Район" 
+		AND ho2.street = t."Улица"
+		AND ho2.house = t."Дом"
+		AND ho2.bticode = t."Код БТИ" LIMIT 1)  as "Площадь жилых помещений",
+    (SELECT ho2.nonliving_area FROM house_raw AS ho2 
+	WHERE ho2.okrug = t."Округ" 
+		AND ho2.raion = t."Район" 
+		AND ho2.street = t."Улица"
+		AND ho2.house = t."Дом"
+		AND ho2.bticode = t."Код БТИ" LIMIT 1) as "площадь нежилых помещений",
+
+    (SELECT ho2.electricity FROM house_raw AS ho2 
+	WHERE ho2.okrug = t."Округ" 
+		AND ho2.raion = t."Район" 
+		AND ho2.street = t."Улица"
+		AND ho2.house = t."Дом"
+		AND ho2.bticode = t."Код БТИ" LIMIT 1) as "Электричество",
+    (SELECT ho2.water_hot FROM house_raw AS ho2 
+	WHERE ho2.okrug = t."Округ" 
+		AND ho2.raion = t."Район" 
+		AND ho2.street = t."Улица"
+		AND ho2.house = t."Дом"
+		AND ho2.bticode = t."Код БТИ" LIMIT 1) as "Горячая вода",
+    (SELECT ho2.water_cold FROM house_raw AS ho2 
+	WHERE ho2.okrug = t."Округ" 
+		AND ho2.raion = t."Район" 
+		AND ho2.street = t."Улица"
+		AND ho2.house = t."Дом"
+		AND ho2.bticode = t."Код БТИ" LIMIT 1) as "Холодная вода",
+    (SELECT ho2.sewerage FROM house_raw AS ho2 
+	WHERE ho2.okrug = t."Округ" 
+		AND ho2.raion = t."Район" 
+		AND ho2.street = t."Улица"
+		AND ho2.house = t."Дом"
+		AND ho2.bticode = t."Код БТИ" LIMIT 1) as "Водоотведение",
+    (SELECT ho2.heat_supply FROM house_raw AS ho2 
+	WHERE ho2.okrug = t."Округ" 
+		AND ho2.raion = t."Район" 
+		AND ho2.street = t."Улица"
+		AND ho2.house = t."Дом"
+		AND ho2.bticode = t."Код БТИ" LIMIT 1) as "Теплоснабжение",
+    (SELECT ho2.gas_supply FROM house_raw AS ho2 
+	WHERE ho2.okrug = t."Округ" 
+		AND ho2.raion = t."Район" 
+		AND ho2.street = t."Улица"
+		AND ho2.house = t."Дом"
+		AND ho2.bticode = t."Код БТИ" LIMIT 1) as "Газ",
+    (SELECT ho2.gas_heaters FROM house_raw AS ho2 
+	WHERE ho2.okrug = t."Округ" 
+		AND ho2.raion = t."Район" 
+		AND ho2.street = t."Улица"
+		AND ho2.house = t."Дом"
+		AND ho2.bticode = t."Код БТИ" LIMIT 1) as "Газовые нагреватели",
+    (SELECT ho2.gas_ovens FROM house_raw AS ho2 
+	WHERE ho2.okrug = t."Округ" 
+		AND ho2.raion = t."Район" 
+		AND ho2.street = t."Улица"
+		AND ho2.house = t."Дом"
+		AND ho2.bticode = t."Код БТИ" LIMIT 1) as "Газовые плиты",
+    (SELECT ho2.electro_ovens FROM house_raw AS ho2 
+	WHERE ho2.okrug = t."Округ" 
+		AND ho2.raion = t."Район" 
+		AND ho2.street = t."Улица"
+		AND ho2.house = t."Дом"
+		AND ho2.bticode = t."Код БТИ" LIMIT 1) as "Электроплиты",
+    (SELECT ho2.lifts_count FROM house_raw AS ho2 
+	WHERE ho2.okrug = t."Округ" 
+		AND ho2.raion = t."Район" 
+		AND ho2.street = t."Улица"
+		AND ho2.house = t."Дом"
+		AND ho2.bticode = t."Код БТИ" LIMIT 1) as "Количкство лифтов",
+
+    (SELECT ho2.e_devices_count FROM house_raw AS ho2 
+	WHERE ho2.okrug = t."Округ" 
+		AND ho2.raion = t."Район" 
+		AND ho2.street = t."Улица"
+		AND ho2.house = t."Дом"
+		AND ho2.bticode = t."Код БТИ" LIMIT 1) as "Количество приборов учета электроэнергии",
+    (SELECT ho2.hw_devices_count FROM house_raw AS ho2 
+	WHERE ho2.okrug = t."Округ" 
+		AND ho2.raion = t."Район" 
+		AND ho2.street = t."Улица"
+		AND ho2.house = t."Дом"
+		AND ho2.bticode = t."Код БТИ" LIMIT 1) as "Горячей воды",
+    (SELECT ho2.cw_devices_count FROM house_raw AS ho2 
+	WHERE ho2.okrug = t."Округ" 
+		AND ho2.raion = t."Район" 
+		AND ho2.street = t."Улица"
+		AND ho2.house = t."Дом"
+		AND ho2.bticode = t."Код БТИ" LIMIT 1) as "Холодной воды",
+    (SELECT ho2.heat_devices_count FROM house_raw AS ho2 
+	WHERE ho2.okrug = t."Округ" 
+		AND ho2.raion = t."Район" 
+		AND ho2.street = t."Улица"
+		AND ho2.house = t."Дом"
+		AND ho2.bticode = t."Код БТИ" LIMIT 1) as "Тепловой энергии",
+    (SELECT ho2.gas_devices_count FROM house_raw AS ho2 
+	WHERE ho2.okrug = t."Округ" 
+		AND ho2.raion = t."Район" 
+		AND ho2.street = t."Улица"
+		AND ho2.house = t."Дом"
+		AND ho2.bticode = t."Код БТИ" LIMIT 1) as "Газа",
+    (SELECT he2.supplier FROM house_raw AS ho2 
+	JOIN heat_raw AS he2 ON ho2.bticode = he2.bticode
+	WHERE ho2.okrug = t."Округ" 
+		AND ho2.raion = t."Район" 
+		AND ho2.street = t."Улица"
+		AND ho2.house = t."Дом"
+		AND ho2.bticode = t."Код БТИ" LIMIT 1) as "Поставщик", --3
+    (SELECT he2.connection_type FROM house_raw AS ho2 
+	JOIN heat_raw AS he2 ON ho2.bticode = he2.bticode
+	WHERE ho2.okrug = t."Округ" 
+		AND ho2.raion = t."Район" 
+		AND ho2.street = t."Улица"
+		AND ho2.house = t."Дом"
+		AND ho2.bticode = t."Код БТИ" LIMIT 1) as "Тип подключения", --4
+    (SELECT he2.consumer FROM house_raw AS ho2 
+	JOIN heat_raw AS he2 ON ho2.bticode = he2.bticode
+	WHERE ho2.okrug = t."Округ" 
+		AND ho2.raion = t."Район" 
+		AND ho2.street = t."Улица"
+		AND ho2.house = t."Дом"
+		AND ho2.bticode = t."Код БТИ" LIMIT 1) as "Потребитель", --5
+    (SELECT he2.resource_type FROM house_raw AS ho2 
+	JOIN heat_raw AS he2 ON ho2.bticode = he2.bticode
+	WHERE ho2.okrug = t."Округ" 
+		AND ho2.raion = t."Район" 
+		AND ho2.street = t."Улица"
+		AND ho2.house = t."Дом"
+		AND ho2.bticode = t."Код БТИ" LIMIT 1) as "Тип ресурса", --6
+    (SELECT he2.mes_units FROM house_raw AS ho2 
+	JOIN heat_raw AS he2 ON ho2.bticode = he2.bticode
+	WHERE ho2.okrug = t."Округ" 
+		AND ho2.raion = t."Район" 
+		AND ho2.street = t."Улица"
+		AND ho2.house = t."Дом"
+		AND ho2.bticode = t."Код БТИ" LIMIT 1) as "Еденицы измерения", --7
+    (SELECT he2.number_of_devices FROM house_raw AS ho2 
+	JOIN heat_raw AS he2 ON ho2.bticode = he2.bticode
+	WHERE ho2.okrug = t."Округ" 
+		AND ho2.raion = t."Район" 
+		AND ho2.street = t."Улица"
+		AND ho2.house = t."Дом"
+		AND ho2.bticode = t."Код БТИ" LIMIT 1) as "Количество приборов учёта тепловой энергии", --8
+    (SELECT he2.total_2011 FROM house_raw AS ho2 
+	JOIN heat_raw AS he2 ON ho2.bticode = he2.bticode
+	WHERE ho2.okrug = t."Округ" 
+		AND ho2.raion = t."Район" 
+		AND ho2.street = t."Улица"
+		AND ho2.house = t."Дом"
+		AND ho2.bticode = t."Код БТИ" LIMIT 1) as "Всего за 2011", --9
+    (SELECT he2.total_2012 FROM house_raw AS ho2 
+	JOIN heat_raw AS he2 ON ho2.bticode = he2.bticode
+	WHERE ho2.okrug = t."Округ" 
+		AND ho2.raion = t."Район" 
+		AND ho2.street = t."Улица"
+		AND ho2.house = t."Дом"
+		AND ho2.bticode = t."Код БТИ" LIMIT 1) as "Всего за 2012", --10
+    (SELECT he2.total_2013_jan FROM house_raw AS ho2 
+	JOIN heat_raw AS he2 ON ho2.bticode = he2.bticode
+	WHERE ho2.okrug = t."Округ" 
+		AND ho2.raion = t."Район" 
+		AND ho2.street = t."Улица"
+		AND ho2.house = t."Дом"
+		AND ho2.bticode = t."Код БТИ" LIMIT 1) as "Всего за 2013 январь", -- 11
+    (SELECT he2.mr_2013_jan FROM house_raw AS ho2 
+	JOIN heat_raw AS he2 ON ho2.bticode = he2.bticode
+	WHERE ho2.okrug = t."Округ" 
+		AND ho2.raion = t."Район" 
+		AND ho2.street = t."Улица"
+		AND ho2.house = t."Дом"
+		AND ho2.bticode = t."Код БТИ" LIMIT 1) as "Метод расчёта 2013 январь", --12
+    (SELECT he2.total_2013_feb FROM house_raw AS ho2 
+	JOIN heat_raw AS he2 ON ho2.bticode = he2.bticode
+	WHERE ho2.okrug = t."Округ" 
+		AND ho2.raion = t."Район" 
+		AND ho2.street = t."Улица"
+		AND ho2.house = t."Дом"
+		AND ho2.bticode = t."Код БТИ" LIMIT 1) as "Всего за 2013 февраль", --13
+    (SELECT he2.mr_2013_feb FROM house_raw AS ho2 
+	JOIN heat_raw AS he2 ON ho2.bticode = he2.bticode
+	WHERE ho2.okrug = t."Округ" 
+		AND ho2.raion = t."Район" 
+		AND ho2.street = t."Улица"
+		AND ho2.house = t."Дом"
+		AND ho2.bticode = t."Код БТИ" LIMIT 1) as "Метод расчёта 2013 февраль",  --14
+    (SELECT he2.total_2013_mar FROM house_raw AS ho2 
+	JOIN heat_raw AS he2 ON ho2.bticode = he2.bticode
+	WHERE ho2.okrug = t."Округ" 
+		AND ho2.raion = t."Район" 
+		AND ho2.street = t."Улица"
+		AND ho2.house = t."Дом"
+		AND ho2.bticode = t."Код БТИ" LIMIT 1) as "Всего за 2013 март",
+    (SELECT he2.mr_2013_mar FROM house_raw AS ho2 
+	JOIN heat_raw AS he2 ON ho2.bticode = he2.bticode
+	WHERE ho2.okrug = t."Округ" 
+		AND ho2.raion = t."Район" 
+		AND ho2.street = t."Улица"
+		AND ho2.house = t."Дом"
+		AND ho2.bticode = t."Код БТИ" LIMIT 1) as "Метод расчёта 2013 март", --16
+    (SELECT he2.total_2013_apr FROM house_raw AS ho2 
+	JOIN heat_raw AS he2 ON ho2.bticode = he2.bticode
+	WHERE ho2.okrug = t."Округ" 
+		AND ho2.raion = t."Район" 
+		AND ho2.street = t."Улица"
+		AND ho2.house = t."Дом"
+		AND ho2.bticode = t."Код БТИ" LIMIT 1) as "Всего за 2013 апрель",
+    (SELECT he2.mr_2013_apr FROM house_raw AS ho2 
+	JOIN heat_raw AS he2 ON ho2.bticode = he2.bticode
+	WHERE ho2.okrug = t."Округ" 
+		AND ho2.raion = t."Район" 
+		AND ho2.street = t."Улица"
+		AND ho2.house = t."Дом"
+		AND ho2.bticode = t."Код БТИ" LIMIT 1) as "Метод расчёта 2013 апрель", --18
+    (SELECT he2.total_2013_may FROM house_raw AS ho2 
+	JOIN heat_raw AS he2 ON ho2.bticode = he2.bticode
+	WHERE ho2.okrug = t."Округ" 
+		AND ho2.raion = t."Район" 
+		AND ho2.street = t."Улица"
+		AND ho2.house = t."Дом"
+		AND ho2.bticode = t."Код БТИ" LIMIT 1) as "Всего за 2013 май",
+    (SELECT he2.mr_2013_may FROM house_raw AS ho2 
+	JOIN heat_raw AS he2 ON ho2.bticode = he2.bticode
+	WHERE ho2.okrug = t."Округ" 
+		AND ho2.raion = t."Район" 
+		AND ho2.street = t."Улица"
+		AND ho2.house = t."Дом"
+		AND ho2.bticode = t."Код БТИ" LIMIT 1) as "Метод расчёта 2013 май", --20
+    (SELECT he2.total_2013_jun FROM house_raw AS ho2 
+	JOIN heat_raw AS he2 ON ho2.bticode = he2.bticode
+	WHERE ho2.okrug = t."Округ" 
+		AND ho2.raion = t."Район" 
+		AND ho2.street = t."Улица"
+		AND ho2.house = t."Дом"
+		AND ho2.bticode = t."Код БТИ" LIMIT 1) as "Всего за 2013 июнь",
+    (SELECT he2.mr_2013_jun FROM house_raw AS ho2 
+	JOIN heat_raw AS he2 ON ho2.bticode = he2.bticode
+	WHERE ho2.okrug = t."Округ" 
+		AND ho2.raion = t."Район" 
+		AND ho2.street = t."Улица"
+		AND ho2.house = t."Дом"
+		AND ho2.bticode = t."Код БТИ" LIMIT 1) as "Метод расчёта 2013 июнь", --22
+    (SELECT he2.total_2013_jul FROM house_raw AS ho2 
+	JOIN heat_raw AS he2 ON ho2.bticode = he2.bticode
+	WHERE ho2.okrug = t."Округ" 
+		AND ho2.raion = t."Район" 
+		AND ho2.street = t."Улица"
+		AND ho2.house = t."Дом"
+		AND ho2.bticode = t."Код БТИ" LIMIT 1) as "Всего за 2013 июль",
+    (SELECT he2.mr_2013_jul FROM house_raw AS ho2 
+	JOIN heat_raw AS he2 ON ho2.bticode = he2.bticode
+	WHERE ho2.okrug = t."Округ" 
+		AND ho2.raion = t."Район" 
+		AND ho2.street = t."Улица"
+		AND ho2.house = t."Дом"
+		AND ho2.bticode = t."Код БТИ" LIMIT 1) as "Метод расчёта 2013 июль", --24
+    (SELECT he2.total_2013_aug FROM house_raw AS ho2 
+	JOIN heat_raw AS he2 ON ho2.bticode = he2.bticode
+	WHERE ho2.okrug = t."Округ" 
+		AND ho2.raion = t."Район" 
+		AND ho2.street = t."Улица"
+		AND ho2.house = t."Дом"
+		AND ho2.bticode = t."Код БТИ" LIMIT 1) as "Всего за 2013 август",
+    (SELECT he2.mr_2013_aug FROM house_raw AS ho2 
+	JOIN heat_raw AS he2 ON ho2.bticode = he2.bticode
+	WHERE ho2.okrug = t."Округ" 
+		AND ho2.raion = t."Район" 
+		AND ho2.street = t."Улица"
+		AND ho2.house = t."Дом"
+		AND ho2.bticode = t."Код БТИ" LIMIT 1) as "Метод расчёта 2013 август", --26
+    (SELECT he2.total_2013_sep FROM house_raw AS ho2 
+	JOIN heat_raw AS he2 ON ho2.bticode = he2.bticode
+	WHERE ho2.okrug = t."Округ" 
+		AND ho2.raion = t."Район" 
+		AND ho2.street = t."Улица"
+		AND ho2.house = t."Дом"
+		AND ho2.bticode = t."Код БТИ" LIMIT 1) as "Всего за 2013 сентябрь",
+    (SELECT he2.mr_2013_sep FROM house_raw AS ho2 
+	JOIN heat_raw AS he2 ON ho2.bticode = he2.bticode
+	WHERE ho2.okrug = t."Округ" 
+		AND ho2.raion = t."Район" 
+		AND ho2.street = t."Улица"
+		AND ho2.house = t."Дом"
+		AND ho2.bticode = t."Код БТИ" LIMIT 1) as "Метод расчёта 2013 сентябрь", --28
+    (SELECT he2.total_2013_oct FROM house_raw AS ho2 
+	JOIN heat_raw AS he2 ON ho2.bticode = he2.bticode
+	WHERE ho2.okrug = t."Округ" 
+		AND ho2.raion = t."Район" 
+		AND ho2.street = t."Улица"
+		AND ho2.house = t."Дом"
+		AND ho2.bticode = t."Код БТИ" LIMIT 1) as "Всего за 2013 октябрь",
+    (SELECT he2.mr_2013_oct FROM house_raw AS ho2 
+	JOIN heat_raw AS he2 ON ho2.bticode = he2.bticode
+	WHERE ho2.okrug = t."Округ" 
+		AND ho2.raion = t."Район" 
+		AND ho2.street = t."Улица"
+		AND ho2.house = t."Дом"
+		AND ho2.bticode = t."Код БТИ" LIMIT 1) as "Метод расчёта 2013 октябрь", --30
+    (SELECT he2.total_2013_nov FROM house_raw AS ho2 
+	JOIN heat_raw AS he2 ON ho2.bticode = he2.bticode
+	WHERE ho2.okrug = t."Округ" 
+		AND ho2.raion = t."Район" 
+		AND ho2.street = t."Улица"
+		AND ho2.house = t."Дом"
+		AND ho2.bticode = t."Код БТИ" LIMIT 1) as "Всего за 2013 ноябрь",
+    (SELECT he2.mr_2013_nov FROM house_raw AS ho2 
+	JOIN heat_raw AS he2 ON ho2.bticode = he2.bticode
+	WHERE ho2.okrug = t."Округ" 
+		AND ho2.raion = t."Район" 
+		AND ho2.street = t."Улица"
+		AND ho2.house = t."Дом"
+		AND ho2.bticode = t."Код БТИ" LIMIT 1) as "Метод расчёта 2013 ноябрь", --32
+    (SELECT he2.total_2013_dec FROM house_raw AS ho2 
+	JOIN heat_raw AS he2 ON ho2.bticode = he2.bticode
+	WHERE ho2.okrug = t."Округ" 
+		AND ho2.raion = t."Район" 
+		AND ho2.street = t."Улица"
+		AND ho2.house = t."Дом"
+		AND ho2.bticode = t."Код БТИ" LIMIT 1) as "Всего за 2013 декабрь",
+    (SELECT he2.mr_2013_dec FROM house_raw AS ho2 
+	JOIN heat_raw AS he2 ON ho2.bticode = he2.bticode
+	WHERE ho2.okrug = t."Округ" 
+		AND ho2.raion = t."Район" 
+		AND ho2.street = t."Улица"
+		AND ho2.house = t."Дом"
+		AND ho2.bticode = t."Код БТИ" LIMIT 1) as "Метод расчёта 2013 декабрь", --34
+    (SELECT he2.total_2013 FROM house_raw AS ho2 
+	JOIN heat_raw AS he2 ON ho2.bticode = he2.bticode
+	WHERE ho2.okrug = t."Округ" 
+		AND ho2.raion = t."Район" 
+		AND ho2.street = t."Улица"
+		AND ho2.house = t."Дом"
+		AND ho2.bticode = t."Код БТИ" LIMIT 1) as "всего за 2013", --35
+    (SELECT he2.contract_load_2013 FROM house_raw AS ho2 
+	JOIN heat_raw AS he2 ON ho2.bticode = he2.bticode
+	WHERE ho2.okrug = t."Округ" 
+		AND ho2.raion = t."Район" 
+		AND ho2.street = t."Улица"
+		AND ho2.house = t."Дом"
+		AND ho2.bticode = t."Код БТИ" LIMIT 1) as "Договорная нагрузка (годовая за 2013г.)", --37
+    (SELECT he2.temperature_grafic FROM house_raw AS ho2 
+	JOIN heat_raw AS he2 ON ho2.bticode = he2.bticode
+	WHERE ho2.okrug = t."Округ" 
+		AND ho2.raion = t."Район" 
+		AND ho2.street = t."Улица"
+		AND ho2.house = t."Дом"
+		AND ho2.bticode = t."Код БТИ" LIMIT 1) as "Нормативный температурный график", --38
+    (SELECT he2.heating_scheme FROM house_raw AS ho2 
+	JOIN heat_raw AS he2 ON ho2.bticode = he2.bticode
+	WHERE ho2.okrug = t."Округ" 
+		AND ho2.raion = t."Район" 
+		AND ho2.street = t."Улица"
+		AND ho2.house = t."Дом"
+		AND ho2.bticode = t."Код БТИ" LIMIT 1) as "Схема присоединения системы отопления (зависимая/независимая)", --39 
+    (SELECT he2.count_lift_nodes FROM house_raw AS ho2 
+	JOIN heat_raw AS he2 ON ho2.bticode = he2.bticode
+	WHERE ho2.okrug = t."Округ" 
+		AND ho2.raion = t."Район" 
+		AND ho2.street = t."Улица"
+		AND ho2.house = t."Дом"
+		AND ho2.bticode = t."Код БТИ" LIMIT 1) as "Количество элеваторных узлов (при их наличии)", --40
+    (SELECT he2.heating_transit FROM house_raw AS ho2 
+	JOIN heat_raw AS he2 ON ho2.bticode = he2.bticode
+	WHERE ho2.okrug = t."Округ" 
+		AND ho2.raion = t."Район" 
+		AND ho2.street = t."Улица"
+		AND ho2.house = t."Дом"
+		AND ho2.bticode = t."Код БТИ" LIMIT 1)  as "Наличие транзита на отопление (разгружен/не разгружен)", --41 
+    (SELECT p_2011.udel_poterb FROM house_raw AS ho2 
+	JOIN udel_poterb_2011 AS p_2011 ON ho2.bticode = p_2011.bticode
+	WHERE ho2.okrug = t."Округ" 
+		AND ho2.raion = t."Район" 
+		AND ho2.street = t."Улица"
+		AND ho2.house = t."Дом"
+		AND ho2.bticode = t."Код БТИ" LIMIT 1) AS "Удельное потребление за 2011",
+    (SELECT p_2012.udel_poterb FROM house_raw AS ho2 
+	JOIN udel_poterb_2012 AS p_2012 ON ho2.bticode = p_2012.bticode
+	WHERE ho2.okrug = t."Округ" 
+		AND ho2.raion = t."Район" 
+		AND ho2.street = t."Улица"
+		AND ho2.house = t."Дом"
+		AND ho2.bticode = t."Код БТИ" LIMIT 1) AS "Удельное потребление за 2012",
+    (SELECT p_2013.udel_poterb FROM house_raw AS ho2 
+	JOIN udel_poterb_2013 AS p_2013 ON ho2.bticode = p_2013.bticode
+	WHERE ho2.okrug = t."Округ" 
+		AND ho2.raion = t."Район" 
+		AND ho2.street = t."Улица"
+		AND ho2.house = t."Дом"
+		AND ho2.bticode = t."Код БТИ" LIMIT 1) AS "Удельное потребление за 2013",
+    (SELECT p_3y.udel_poterb FROM house_raw AS ho2 
+	JOIN udel_poterb_3y AS p_3y ON ho2.bticode = p_3y.bticode
+	WHERE ho2.okrug = t."Округ" 
+		AND ho2.raion = t."Район" 
+		AND ho2.street = t."Улица"
+		AND ho2.house = t."Дом"
+		AND ho2.bticode = t."Код БТИ" LIMIT 1) AS "Среднее удельное потребление по трём годам"
+    
+from (SELECT ho.id_in_file as "Номер п/п",
+	    ho.okrug as "Округ",
+	    ho.raion as "Район",
+	    ho.street as "Улица",
+	    ho.house as "Дом",
+	    ho.bticode as "Код БТИ"
+
+	   
+	FROM house_raw AS ho
+	JOIN heat_raw AS he ON ho.bticode = he.bticode
+
+	GROUP BY "Округ", "Район", "Улица", "Дом", "Код БТИ", "Номер п/п"
+    ) AS t
+
+ORDER BY t."Код БТИ"
+
+) to '/home/vlad/reports/ac-data-qual/Объединение двух вкладок.csv'
+with csv header delimiter ';' encoding 'win_1251'
+;
+

@@ -1,0 +1,289 @@
+-- house_raw: no bticode
+copy (
+select raion as "Район", bticode as "Код БТИ",
+street as "Улица", house as "Дом", korpus as "Корпус", stroenie as "Строение"
+from house_raw
+where bticode is null
+) to '/home/vlad/reports/ac-data-qual/нет кода бти на вкладке мкд.csv'
+with csv header delimiter ';' encoding 'win_1251'
+;
+
+-- house_raw: no entry in heat
+copy (
+select ho.raion as "Район", bticode as "Код БТИ",
+street as "Улица", house as "Дом", korpus as "Корпус", stroenie as "Строение"
+from house_raw ho
+left join heat_raw
+    using (bticode)
+where
+    ho.bticode is not null and
+    heat_raw.bticode is null
+) to '/home/vlad/reports/ac-data-qual/нет строки во вкладке ТЭ.csv'
+with csv header delimiter ';' encoding 'win_1251'
+;
+
+-- house_raw: no heating area
+copy (
+select raion as "Район", bticode as "Код БТИ",
+street as "Улица", house as "Дом", korpus as "Корпус", stroenie as "Строение"
+from house_raw
+where heating_area is null
+) to '/home/vlad/reports/ac-data-qual/нет общей отапливаемой площади.csv'
+with csv header delimiter ';' encoding 'win_1251'
+;
+
+-- heat_raw: no bticode
+--copy (
+ --   select raion as "Район", address as "Адрес"
+  --  from heat_raw
+   -- where bticode is null
+--) to '/home/vlad/reports/ac-data-qual/нет кода бти на вкладке ТЭ.csv'
+--with csv header delimiter ';' encoding 'win_1251'
+--;
+
+-- heat_raw: no any total 
+copy (
+    select ho.raion as "Район", bticode as "Код БТИ",
+    street as "Улица", house as "Дом", korpus as "Корпус", stroenie as "Строение",
+    total_2011::int::bool, total_2012::int::bool, total_2013::int::bool
+from heat_raw he
+join house_raw ho
+    using (bticode)
+where
+    total_2011 is null or
+    total_2012 is null or
+    total_2013 is null
+) to '/home/vlad/reports/ac-data-qual/есть данные по потреблению не по всем годам.csv'
+with csv header delimiter ';' encoding 'win_1251'
+;
+
+-- heat_raw: no contract_load_2013
+copy (
+    select ho.raion as "Район", bticode as "Код БТИ",
+    street as "Улица", house as "Дом", korpus as "Корпус", stroenie as "Строение",
+    total_2011::int::bool, total_2012::int::bool, total_2013::int::bool
+from heat_raw he
+join house_raw ho
+    using (bticode)
+where
+    contract_load_2013 is null
+) to '/home/vlad/reports/ac-data-qual/нет данных по Договорной нагрузке.csv'
+with csv header delimiter ';' encoding 'win_1251'
+;
+
+-- heat_raw: no temperature_grafic
+copy (
+    select ho.raion as "Район", bticode as "Код БТИ",
+    street as "Улица", house as "Дом", korpus as "Корпус", stroenie as "Строение",
+    total_2011::int::bool, total_2012::int::bool, total_2013::int::bool
+from heat_raw he
+join house_raw ho
+    using (bticode)
+where
+    temperature_grafic is null
+) to '/home/vlad/reports/ac-data-qual/нет данных по Нормативного температурного графика.csv'
+with csv header delimiter ';' encoding 'win_1251'
+;
+
+-- heat_raw: no heating_scheme
+copy (
+    select ho.raion as "Район", bticode as "Код БТИ",
+    street as "Улица", house as "Дом", korpus as "Корпус", stroenie as "Строение",
+    total_2011::int::bool, total_2012::int::bool, total_2013::int::bool
+from heat_raw he
+join house_raw ho
+    using (bticode)
+where
+    heating_scheme is null
+) to '/home/vlad/reports/ac-data-qual/нет данных по Схеме присоединения системы отопления.csv'
+with csv header delimiter ';' encoding 'win_1251'
+;
+
+-- heat_raw: no count_lift_nodes
+copy (
+    select ho.raion as "Район", bticode as "Код БТИ",
+    street as "Улица", house as "Дом", korpus as "Корпус", stroenie as "Строение",
+    total_2011::int::bool, total_2012::int::bool, total_2013::int::bool
+from heat_raw he
+join house_raw ho
+    using (bticode)
+where
+    count_lift_nodes is null
+) to '/home/vlad/reports/ac-data-qual/нет данных по Количеству элеваторных узлов.csv'
+with csv header delimiter ';' encoding 'win_1251'
+;
+
+-- heat_raw: no heating_transit
+copy (
+    select ho.raion as "Район", bticode as "Код БТИ",
+    street as "Улица", house as "Дом", korpus as "Корпус", stroenie as "Строение",
+    total_2011::int::bool, total_2012::int::bool, total_2013::int::bool
+from heat_raw he
+join house_raw ho
+    using (bticode)
+where
+    heating_transit is null
+) to '/home/vlad/reports/ac-data-qual/нет данных по Наличию транзита на отопление.csv'
+with csv header delimiter ';' encoding 'win_1251'
+;
+
+-- heat_raw: no heating_transit
+copy (
+    select ho.raion as "Район",
+	   (CASE ho.bticode WHEN NULL THEN '?' ELSE ho.bticode END ) AS "Код БТИ",
+           ho.street as "Улица",
+           ho.house as "Дом",
+           ho.korpus as "Корпус",
+           ho.stroenie as "Строение",
+	   (CASE ho.bticode WHEN NULL THEN '?' ELSE ho.bticode END ) AS "Код БТИ",
+	   (CASE (ho.bticode IS NOT NULL AND ho.bticode IS NULL) WHEN TRUE THEN '?' END ) AS "Строка во вкладке ТЭ",
+	   (CASE ho.heating_area WHEN NULL THEN '?' END ) AS "Общая отапливаемой площадь",
+	   (CASE he.total_2011 WHEN NULL THEN '?' END ) AS "Потребление за 2011 год",
+	   (CASE he.total_2012 WHEN NULL THEN '?' END ) AS "Потребление за 2012 год",
+	   (CASE he.total_2013 WHEN NULL THEN '?' END ) AS "Потребление за 2013 год",
+	   (CASE he.contract_load_2013 WHEN NULL THEN '?' END ) AS "Договорная нагрузка",
+	   (CASE (he.temperature_grafic LIKE '%120-70%' OR he.temperature_grafic LIKE '%105-70%' OR he.temperature_grafic LIKE '%95-70%') WHEN FALSE THEN '?' END ) AS "Нормативный температурный график",
+	   (CASE (he.heating_scheme LIKE '%независимая%') OR (he.heating_scheme LIKE '%зависимая%') OR (he.heating_scheme LIKE '%отсутствует%') WHEN FALSE THEN '?' END ) AS "Схема присоединения системы отопления",
+	   (CASE he.count_lift_nodes WHEN NULL THEN '?' END ) AS "Количество элеваторных узлов",
+	   (CASE (he.heating_transit LIKE '%разгружен%') OR (he.heating_transit LIKE '%неразгружен%') OR (he.heating_transit LIKE '%отсутствует%') WHEN FALSE THEN '?' END ) AS "Транзит на отопление"
+
+FROM house_raw ho
+LEFT JOIN heat_raw he
+    ON ho.bticode = he.bticode
+
+WHERE (ho.bticode IS NULL) 
+	OR (ho.bticode IS NOT NULL AND ho.bticode IS NULL)
+	OR (ho.heating_area IS NULL)
+	OR (he.total_2011 IS NULL)
+	OR (he.total_2012 IS NULL)
+	OR (he.total_2013 IS NULL)
+	OR (he.contract_load_2013 IS NULL)
+	OR (he.temperature_grafic NOT LIKE'%120-70%' AND he.temperature_grafic NOT LIKE '%105-70%' AND he.temperature_grafic NOT LIKE '%95-70%')
+	OR ((he.heating_scheme NOT LIKE '%независимая%') AND (he.heating_scheme NOT LIKE '%зависимая%') AND (he.heating_scheme NOT LIKE '%отсутствует%'))
+	OR (he.count_lift_nodes IS NULL)
+	OR ((he.heating_transit NOT LIKE '%разгружен%') AND (he.heating_transit NOT LIKE '%неразгружен%') AND (he.heating_transit NOT LIKE '%отсутствует%'))
+
+) to '/home/vlad/reports/ac-data-qual/Отчет о полноте данных.csv'
+with csv header delimiter ';' encoding 'win_1251'
+;
+
+
+
+copy (
+select ho.id_in_file as "Номер п/п",
+    ho.okrug as "Округ",
+    ho.raion as "Район",
+    ho.street as "Улица",
+    ho.house as "Дом",
+    ho.korpus as "Корпус",
+    ho.stroenie as "Строение",
+    ho.bticode as "Код БТИ",
+    ho.mkd_uprav_form as "Форма управления домом",
+    ho.category as "Категория",
+
+    ho.house_type as "Тип дома",
+    ho.series as "Серия",
+    ho.year_built as "Год постройки",
+    ho.wall_type as "Тип стен",
+    ho.floors as "Количество этажей",
+    ho.underfloors as "Подземных этажей",
+    ho.porches as "Подъездов",
+    ho.flats as "Квартир",
+
+    ho.full_area as "Общая площадь",
+    ho.heating_area as "Отапливаемая площадь",
+    ho.living_area as "Площадь жилых помещений",
+    ho.nonliving_area as "площадь нежилых помещений",
+
+    ho.electricity as "Электричество",
+    ho.water_hot as "Горячая вода",
+    ho.water_cold as "Холодная вода",
+    ho.sewerage as "Водоотведение",
+    ho.heat_supply as "Теплоснабжение",
+    ho.gas_supply as "Газ",
+    ho.gas_heaters as "Газовые нагреватели",
+    ho.gas_ovens as "Газовые плиты",
+    ho.electro_ovens as "Электроплиты",
+    ho.lifts_count as "Количкство лифтов",
+
+    ho.e_devices_count as "Количество приборов учета электроэнергии",
+    ho.hw_devices_count as "Горячей воды",
+    ho.cw_devices_count as "Холодной воды",
+    ho.heat_devices_count as "Тепловой энергии",
+    ho.gas_devices_count as "Газа",
+
+    he.id_in_file as "номер п/п", --1
+    he.bticode as "код БТИ", --2
+    he.supplier as "Поставщик", --3
+    he.connection_type as "Тип подключения", --4
+    he.consumer as "Потребитель", --5
+    he.resource_type as "Тип ресурса", --6
+    he.mes_units as "Еденицы измерения", --7
+    he.number_of_devices as "Количество приборов учёта тепловой энергии", --8
+    he.total_2011 as "Всего за 2011", --9
+    he.total_2012 as "Всего за 2012", --10
+    he.total_2013_jan as "Всего за 2013 январь", -- 11
+    he.mr_2013_jan as "Метод расчёта 2013 январь", --12
+    he.total_2013_feb as "Всего за 2013 февраль", --13
+    he.mr_2013_feb as "Метод расчёта 2013 февраль",  --14
+    he.total_2013_mar as "Всего за 2013 март",
+    he.mr_2013_mar as "Метод расчёта 2013 март", --16
+    he.total_2013_apr as "Всего за 2013 апрель",
+    he.mr_2013_apr as "Метод расчёта 2013 апрель", --18
+    he.total_2013_may as "Всего за 2013 май",
+    he.mr_2013_may as "Метод расчёта 2013 май", --20
+    he.total_2013_jun as "Всего за 2013 июнь",
+    he.mr_2013_jun as "Метод расчёта 2013 июнь", --22
+    he.total_2013_jul as "Всего за 2013 июль",
+    he.mr_2013_jul as "Метод расчёта 2013 июль", --24
+    he.total_2013_aug as "Всего за 2013 август",
+    he.mr_2013_aug as "Метод расчёта 2013 август", --26
+    he.total_2013_sep as "Всего за 2013 сентябрь",
+    he.mr_2013_sep as "Метод расчёта 2013 сентябрь", --28
+    he.total_2013_oct as "Всего за 2013 октябрь",
+    he.mr_2013_oct as "Метод расчёта 2013 октябрь", --30
+    he.total_2013_nov as "Всего за 2013 ноябрь",
+    he.mr_2013_nov as "Метод расчёта 2013 ноябрь", --32
+    he.total_2013_dec as "Всего за 2013 декабрь",
+    he.mr_2013_dec as "Метод расчёта 2013 декабрь", --34
+    he.total_2013 as "всего за 2013", --35
+    he.contract_load_2013 as "Договорная нагрузка (годовая за 2013г.)", --37
+    he.temperature_grafic as "Нормативный температурный график", --38
+    he.heating_scheme as "Схема присоединения системы отопления (зависимая/независимая)", --39 
+    he.count_lift_nodes as "Количество элеваторных узлов (при их наличии)", --40
+    he.heating_transit as "Наличие транзита на отопление (разгружен/не разгружен)", --41 
+    ( SELECT avg((cons_2011)/ho.heating_area) 
+		from v_data 
+		join house_raw ho2
+		using (bticode)
+      where ho2.bticode = ho.bticode
+    )  as "Удельное потребление за 2011",
+( SELECT avg((cons_2012)/ho.heating_area) 
+		from v_data 
+		join house_raw ho2
+		using (bticode)
+      where ho2.bticode = ho.bticode
+    )  as "Удельное потребление за 2012",
+( SELECT avg((cons_2013)/ho.heating_area) 
+		from v_data 
+		join house_raw ho2
+		using (bticode)
+      where ho2.bticode = ho.bticode
+    )  as "Удельное потребление за 2013",
+( SELECT avg((cons_2013+cons_2012+cons_2011)/3/ho.heating_area) 
+		from v_data 
+		join house_raw ho2
+		using (bticode)
+      where ho2.bticode = ho.bticode
+    )  as "Среднее удельное потребление по трём годам"
+
+
+from house_raw AS ho
+LEFT JOIN heat_raw AS he ON ho.bticode = he.bticode
+
+ORDER BY ho.bticode
+
+) to '/home/vlad/reports/ac-data-qual/Полный отчет (В форме Внуково).csv'
+with csv header delimiter ';' encoding 'win_1251'
+;
+

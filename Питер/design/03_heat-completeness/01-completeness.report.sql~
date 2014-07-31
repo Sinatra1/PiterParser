@@ -1,0 +1,75 @@
+-- количество домов по районам, которые можно посчитать
+copy (
+    select
+        raion as "Район",
+        total as "Домов в таблице МКД",
+        good as "Есть код БТИ в обеих таблицах",
+        verygood as "Есть данные по затратам и общей пл"
+    from
+    (
+        select raion, count(*) as total
+        from house_raw
+        group by raion
+
+    )a
+    left join
+    (
+        select ho.raion, count(*) as good
+        from house_raw ho
+        join heat_raw
+        using (bticode)
+        group by ho.raion
+
+    )b
+    using (raion)
+    left join
+    (
+        select raion, count(*) as verygood
+        from v_data
+        group by raion
+    )c
+    using (raion)
+    order by raion
+
+) to '/house/vlad/reports/ac-data-qual/-качество-данных.csv' 
+with csv header delimiter ';' encoding 'windows_1251'
+;
+\q
+
+
+
+-- part of empty bticode
+select empty_count ||' из '|| total_count ||' — '|| (empty_count/total_count*100) ||'%'
+from
+(
+select
+    (
+        select count(*)
+        from heat_raw
+    ) as total_count
+    ,(
+        select count(*)
+        from heat_raw
+        where bticode is null
+    ) as empty_count
+) q
+
+-- identified houses
+select count(*) 
+from (
+    select 1 
+    from heat_raw 
+    join house_raw 
+     using (bticode) 
+    group by bticode
+) q;
+
+-- heat data
+select count(*) 
+from heat_raw 
+where 
+    total_2011 is null or
+    total_2012 is null or
+    total_2013 is null 
+;
+
