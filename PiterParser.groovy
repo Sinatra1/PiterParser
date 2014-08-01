@@ -11,6 +11,8 @@ import org.apache.poi.poifs.filesystem.POIFSFileSystem
 import org.apache.poi.ss.usermodel.Cell
 import org.apache.poi.ss.usermodel.Row
 import org.apache.poi.ss.usermodel.Sheet
+import ru.fuzzysearch.FuzzySearch
+
 import static org.apache.poi.ss.usermodel.IndexedColors.*
 
 //org.apache.commons.lang3.StringUtils.getLevenshteinDistance()
@@ -133,8 +135,8 @@ def getSearchWordInDictionaryWord(Set<String> dictionary, String word) {
     def nearestWord = ""
 
     dictionary.each {
-        def sb= new StringBuffer(it.toLowerCase().trim())
-        word = word.toLowerCase().trim()
+        def sb= new StringBuffer(it.toLowerCase().trim().replaceAll('-', ''))
+        word = word.toLowerCase().trim().replaceAll('-', '')
         if(sb.indexOf(word) != -1) {
             nearestWord = it
         }
@@ -146,10 +148,10 @@ def getSearchWordInDictionaryWord(Set<String> dictionary, String word) {
 def getDictionaryWordInSearchWord(def dictionary, String word) {
     def nearestWord = ""
 
-    def sb= new StringBuffer(word.toLowerCase().trim())
+    def sb= new StringBuffer(word.toLowerCase().trim().replaceAll('-', ''))
 
     dictionary.eachWithIndex{ dict, value ->
-        if(sb.indexOf(dict.key.toString().toLowerCase().trim()) != -1) {
+        if(sb.indexOf(dict.key.toString().toLowerCase().trim().replaceAll('-', '')) != -1) {
             nearestWord = dict.value
         }
     }
@@ -263,7 +265,7 @@ def getSeries(def cell) {
 
     if(cell.cellType == Cell.CELL_TYPE_STRING) {
         def word = cell.getRichStringCellValue().getString()
-        series = getNearestWordInDictionary(permissibleValues, keyValues, word, 3)
+        series = getNearestWordInDictionary(permissibleValues, keyValues, word, 2)
     }
     else if(cell.cellType == Cell.CELL_TYPE_NUMERIC) {
         def word = (cell.getNumericCellValue() as int).toString()
