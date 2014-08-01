@@ -1,5 +1,8 @@
 sudo -s -H -u postgres
 
+Кронштадтский нету кодов БТИ
+Красносельский нету кодов БТИ на вкладке ТЭ
+
 
 %s/'\s\+/'/g
 %s/\s\+'/'/g
@@ -82,6 +85,128 @@ copy heat_raw from '/home/vlad/Develop/FuzzySearch/Питер/data/Кировс�
 copy house_raw from '/home/vlad/Develop/FuzzySearch/Питер/data/Колпинский/prepared/house.csv' with csv header delimiter '|';
 
 copy heat_raw from '/home/vlad/Develop/FuzzySearch/Питер/data/Колпинский/prepared/heat.csv' with csv header delimiter '|';
+
+Красногвардейский
+
+%s/'\s\+/'/g
+%s/\s\+'/'/g
+%s/'\(\d\+\.\d\+\)'/\1/g
+%s/'\(\d\+\)'/\1/g
+
+copy house_raw from '/home/vlad/Develop/FuzzySearch/Питер/data/Красногвардейский/prepared/house.csv' with csv header delimiter '|';
+
+copy heat_raw from '/home/vlad/Develop/FuzzySearch/Питер/data/Красногвардейский/prepared/heat.csv' with csv header delimiter '|';
+
+Красносельский
+
+%s/'\s\+/'/g
+%s/\s\+'/'/g
+%s/'\(\d\+\.\d\+\)'/\1/g
+%s/'\(\d\+\)'/\1/g
+
+copy house_raw from '/home/vlad/Develop/FuzzySearch/Питер/data/Красносельский/prepared/house.csv' with csv header delimiter '|';
+
+copy heat_raw from '/home/vlad/Develop/FuzzySearch/Питер/data/Красносельский/prepared/heat.csv' with csv header delimiter '|';
+
+Московский
+
+%s/'\s\+/'/g
+%s/\s\+'/'/g
+%s/'\(\d\+\.\d\+\)'/\1/g
+%s/'\(\d\+\)'/\1/g
+
+copy house_raw from '/home/vlad/Develop/FuzzySearch/Питер/data/Московский/prepared/house.csv' with csv header delimiter '|';
+
+copy heat_raw from '/home/vlad/Develop/FuzzySearch/Питер/data/Московский/prepared/heat.csv' with csv header delimiter '|';
+
+Невский
+
+%s/'\s\+/'/g
+%s/\s\+'/'/g
+%s/'\(\d\+\.\d\+\)'/\1/g
+%s/'\(\d\+\)'/\1/g
+
+copy house_raw from '/home/vlad/Develop/FuzzySearch/Питер/data/Невский/prepared/house.csv' with csv header delimiter '|';
+
+copy heat_raw from '/home/vlad/Develop/FuzzySearch/Питер/data/Невский/prepared/heat.csv' with csv header delimiter '|';
+
+Осиновая роща Приозерское
+
+%s/'\s\+/'/g
+%s/\s\+'/'/g
+%s/'\(\d\+\.\d\+\)'/\1/g
+%s/'\(\d\+\)'/\1/g
+
+copy house_raw from '/home/vlad/Develop/FuzzySearch/Питер/data/Осиновая роща Приозерское/prepared/house.csv' with csv header delimiter '|';
+
+copy heat_raw from '/home/vlad/Develop/FuzzySearch/Питер/data/Осиновая роща Приозерское/prepared/heat.csv' with csv header delimiter '|';
+
+Петроградский
+
+%s/'\s\+/'/g
+%s/\s\+'/'/g
+%s/'\(\d\+\.\d\+\)'/\1/g
+%s/'\(\d\+\)'/\1/g
+
+copy house_raw from '/home/vlad/Develop/FuzzySearch/Питер/data/Петроградский/prepared/house.csv' with csv header delimiter '|';
+
+copy heat_raw from '/home/vlad/Develop/FuzzySearch/Питер/data/Петроградский/prepared/heat.csv' with csv header delimiter '|';
+
+Петродворцовый
+
+%s/'\s\+/'/g
+%s/\s\+'/'/g
+%s/'\(\d\+\.\d\+\)'/\1/g
+%s/'\(\d\+\)'/\1/g
+
+copy house_raw from '/home/vlad/Develop/FuzzySearch/Питер/data/Петродворцовый/prepared/house.csv' with csv header delimiter '|';
+
+copy heat_raw from '/home/vlad/Develop/FuzzySearch/Питер/data/Петродворцовый/prepared/heat.csv' with csv header delimiter '|';
+
+Приморский
+
+%s/'\s\+/'/g
+%s/\s\+'/'/g
+%s/'\(\d\+\.\d\+\)'/\1/g
+%s/'\(\d\+\)'/\1/g
+
+copy house_raw from '/home/vlad/Develop/FuzzySearch/Питер/data/Приморский/prepared/house.csv' with csv header delimiter '|';
+
+copy heat_raw from '/home/vlad/Develop/FuzzySearch/Питер/data/Приморский/prepared/heat.csv' with csv header delimiter '|';
+
+Пушкинский
+
+%s/'\s\+/'/g
+%s/\s\+'/'/g
+%s/'\(\d\+\.\d\+\)'/\1/g
+%s/'\(\d\+\)'/\1/g
+
+copy house_raw from '/home/vlad/Develop/FuzzySearch/Питер/data/Пушкинский/prepared/house.csv' with csv header delimiter '|';
+
+copy heat_raw from '/home/vlad/Develop/FuzzySearch/Питер/data/Пушкинский/prepared/heat.csv' with csv header delimiter '|';
+
+Фрунзенский
+
+%s/'\s\+/'/g
+%s/\s\+'/'/g
+%s/'\(\d\+\.\d\+\)'/\1/g
+%s/'\(\d\+\)'/\1/g
+
+copy house_raw from '/home/vlad/Develop/FuzzySearch/Питер/data/Фрунзенский/prepared/house.csv' with csv header delimiter '|';
+
+copy heat_raw from '/home/vlad/Develop/FuzzySearch/Питер/data/Фрунзенский/prepared/heat.csv' with csv header delimiter '|';
+
+Центральный
+
+%s/'\s\+/'/g
+%s/\s\+'/'/g
+%s/'\(\d\+\.\d\+\)'/\1/g
+%s/'\(\d\+\)'/\1/g
+
+copy house_raw from '/home/vlad/Develop/FuzzySearch/Питер/data/Центральный/prepared/house.csv' with csv header delimiter '|';
+
+copy heat_raw from '/home/vlad/Develop/FuzzySearch/Питер/data/Центральный/prepared/heat.csv' with csv header delimiter '|';
+
 
 
 

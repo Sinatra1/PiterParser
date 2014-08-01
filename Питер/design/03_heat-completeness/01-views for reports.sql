@@ -7,19 +7,22 @@ CREATE OR REPLACE VIEW analyzed_houses AS (
 		LEFT JOIN heat_raw AS he ON ho.bticode = he.bticode
 
 
-		WHERE   (he.supplier NOT LIKE '%управлени%')
-			AND (he.supplier NOT LIKE '%договор%')
-			AND (he.supplier NOT LIKE '%на прямых расчетах%')
-			AND (he.supplier NOT LIKE '%овостройка%')
-			AND (he.supplier NOT LIKE '%не начислялось%')
-			AND (he.supplier NOT LIKE '%данных нет%')
-			AND (he.supplier NOT LIKE '%АОГВ%')
-			AND (he.supplier NOT LIKE '''газ''')
-			AND (he.supplier NOT LIKE '%авт. кот.%')
-			AND (he.supplier NOT LIKE '%нежилой%')
-			AND (he.supplier NOT LIKE '%амостоятельный%')
-			AND (he.supplier NOT LIKE '%азовый кател%')
-			AND (he.supplier NOT LIKE '%снесен%')
+		WHERE   ((
+				(he.supplier NOT LIKE '%управлени%')
+				AND (he.supplier NOT LIKE '%договор%')
+				AND (he.supplier NOT LIKE '%на прямых расчетах%')
+				AND (he.supplier NOT LIKE '%овостройка%')
+				AND (he.supplier NOT LIKE '%не начислялось%')
+				AND (he.supplier NOT LIKE '%данных нет%')
+				AND (he.supplier NOT LIKE '%АОГВ%')
+				AND (he.supplier NOT LIKE '''газ''')
+				AND (he.supplier NOT LIKE '%авт. кот.%')
+				AND (he.supplier NOT LIKE '%нежилой%')
+				AND (he.supplier NOT LIKE '%амостоятельный%')
+				AND (he.supplier NOT LIKE '%азовый кател%')
+				AND (he.supplier NOT LIKE '%снесен%')
+			)
+			OR he.supplier IS NULL)
 			AND ho.category IS NULL
 			
 		GROUP BY ho.bticode

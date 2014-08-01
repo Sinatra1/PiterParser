@@ -233,12 +233,12 @@ CREATE TYPE danet AS ENUM (
 drop table if exists house_raw;
 create table house_raw (
     id_in_file 		varchar(10), --1
-    okrug   		varchar(40), --2
-    raion   		varchar(40),--3
+    okrug   		varchar(255), --2
+    raion   		varchar(255),--3
     street  		varchar(100),--4
     house   		varchar(15),--5
-    korpus  		varchar(15),--6
-    stroenie 		varchar(10),--7
+    korpus  		varchar(50),--6
+    stroenie 		varchar(15),--7
     bticode  		decimal(20,0),--8
     mkd_uprav_form 	uprav,--9
     category 		cat,--10
@@ -247,7 +247,7 @@ create table house_raw (
     series 		ser,--12
     year_built 		decimal(4,0),--13
     wall_type 		wall,--14
-    floors 		varchar(50),--15
+    floors 		varchar(255),--15
     underfloors 	decimal(4,0),--16
     porches 		decimal(4,0),--17
     flats 		decimal(4,0),--18

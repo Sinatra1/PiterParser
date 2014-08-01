@@ -263,7 +263,7 @@ def getSeries(def cell) {
 
     if(cell.cellType == Cell.CELL_TYPE_STRING) {
         def word = cell.getRichStringCellValue().getString()
-        series = getNearestWordInDictionary(permissibleValues, keyValues, word, 2)
+        series = getNearestWordInDictionary(permissibleValues, keyValues, word, 3)
     }
     else if(cell.cellType == Cell.CELL_TYPE_NUMERIC) {
         def word = (cell.getNumericCellValue() as int).toString()
@@ -786,6 +786,6 @@ def parseTESheet(def fileName) {
     exportExcelTE(resultArray, fields)
 }
 
-parseMKDSheet('/home/vlad/Develop/FuzzySearch/Питер/data/Красногвардейский/raw/Красногвардейский.xls')
-parseTESheet('/home/vlad/Develop/FuzzySearch/Питер/data/Красногвардейский/raw/Красногвардейский.xls')
+parseMKDSheet('/home/vlad/Develop/FuzzySearch/Питер/data/Фрунзенский/raw/Фрунзенский.xls')
+parseTESheet('/home/vlad/Develop/FuzzySearch/Питер/data/Фрунзенский/raw/Фрунзенский.xls')
 
