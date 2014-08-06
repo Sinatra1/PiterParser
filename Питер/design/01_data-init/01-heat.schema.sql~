@@ -19,7 +19,7 @@ CREATE TYPE resourcetype AS ENUM ('''тепловая энергия''', '''го
 CREATE TYPE transit AS ENUM ('''разгружен''', '''не разгружен''', '''отсутствует''');
 CREATE TYPE scheme AS ENUM ('''зависимая''', '''независимая''', '''зависимая/независимая''');
 
-CREATE TYPE connection AS ENUM ('''ИТП''', '''ЦТП''', '''котельная''', '''тепловая сеть''');
+CREATE TYPE connection AS ENUM ('''ИТП''', '''ЦТП''', '''котельная''', '''тепловая сеть''','''Тепловая сеть''');
 
 DROP TYPE connection2;
 CREATE TYPE connection2 AS ENUM (

@@ -239,7 +239,7 @@ create table house_raw (
     house   		varchar(15),--5
     korpus  		varchar(50),--6
     stroenie 		varchar(15),--7
-    bticode  		decimal(20,0),--8
+    bticode  		varchar(50),--8
     mkd_uprav_form 	uprav,--9
     category 		cat,--10
 

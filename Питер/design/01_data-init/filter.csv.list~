@@ -2,7 +2,6 @@ sudo -s -H -u postgres
 
 Кронштадтский нету кодов БТИ
 Красносельский нету кодов БТИ на вкладке ТЭ
-Фрунзенский (загрузиться с винды)
 
 
 %s/'\s\+/'/g
@@ -10,9 +9,9 @@ sudo -s -H -u postgres
 %s/'\(\d\+\.\d\+\)'/\1/g
 %s/'\(\d\+\)'/\1/g
 
-copy house_raw from '/home/vlad/Анал центр/ac-heating/data/Питер/Адмиралтейский/prepared/house.csv' with csv header delimiter '|';
+copy house_raw from '/home/vlad/Develop/FuzzySearch/Питер/data/Адмиралтейский/prepared/house.csv' with csv header delimiter '|';
 
-	copy heat_raw from '/home/vlad/Анал центр/ac-heating/data/Питер/Адмиралтейский/prepared/heat.csv' with csv header delimiter '|';
+	copy heat_raw from '/home/vlad/Develop/FuzzySearch/Питер/data/Адмиралтейский/prepared/heat.csv' with csv header delimiter '|';
 
 --Белоостров
 house
@@ -28,9 +27,9 @@ heat
 %s/'\(\d\+\)'/\1/g
 
 
-copy house_raw from '/home/vlad/Анал центр/ac-heating/data/Питер/Белоостров/prepared/house.csv' with csv header delimiter '|';
+copy house_raw from '/home/vlad/Develop/FuzzySearch/Питер/data/Белоостров/prepared/house.csv' with csv header delimiter '|';
 
-copy heat_raw from '/home/vlad/Анал центр/ac-heating/data/Питер/Белоостров/prepared/heat.csv' with csv header delimiter '|';
+copy heat_raw from '/home/vlad/Develop/FuzzySearch/Питер/data/Белоостров/prepared/heat.csv' with csv header delimiter '|';
 
 Василеостровский
 
@@ -47,9 +46,9 @@ heat
 %s/'\(\d\+\.\d\+\)'/\1/g
 %s/'\(\d\+\)'/\1/g
 
-copy house_raw from '/home/vlad/Анал центр/ac-heating/data/Питер/Василеостровский/prepared/house.csv' with csv header delimiter '|';
+copy house_raw from '/home/vlad/Develop/FuzzySearch/Питер/data/Василеостровский/prepared/house.csv' with csv header delimiter '|';
 
-copy heat_raw from '/home/vlad/Анал центр/ac-heating/data/Питер/Василеостровский/prepared/heat.csv' with csv header delimiter '|';
+copy heat_raw from '/home/vlad/Develop/FuzzySearch/Питер/data/Василеостровский/prepared/heat.csv' with csv header delimiter '|';
 
 
 Калининский

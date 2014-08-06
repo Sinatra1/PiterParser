@@ -789,8 +789,9 @@ CREATE OR REPLACE VIEW house_raw_uslov_report AS (
 		, ho5."Дом"
 		, (CASE ((SELECT count(he2.bticode) FROM heat_raw AS he2 
 			WHERE he2.bticode = ho5."Код БТИ") = 0) AND (ho5."Код БТИ" IS NOT NULL) WHEN TRUE THEN 'Да' END ) AS "Нет информации на вкладе ТЭ"
-		, (CASE ((SELECT count(he3.bticode) FROM heat_raw AS he3 WHERE he3.bticode = ho5."Код БТИ") <> 
-			(SELECT count(ho2.bticode) FROM house_raw AS ho2 WHERE ho2.bticode = ho5."Код БТИ")
+		, (CASE (((SELECT count(he3.bticode) FROM heat_raw AS he3 WHERE he3.bticode = ho5."Код БТИ") <> 
+			(SELECT count(ho2.bticode) FROM house_raw AS ho2 WHERE ho2.bticode = ho5."Код БТИ"))
+			AND ((SELECT count(he4.bticode) FROM heat_raw AS he4 WHERE he4.bticode = ho5."Код БТИ") > 1)
 		) WHEN TRUE THEN 'Да' END ) 									AS "Если не каждой строке ТЭ => строка МКД"
 		, (CASE (ho5.floors IS NULL) WHEN TRUE THEN 'Да' END) 						AS "Колич. этажей < 1"
 		, (CASE (ho5.porches IS NULL) WHEN TRUE THEN 'Да' END) 						AS "Колич. парадных < 1"

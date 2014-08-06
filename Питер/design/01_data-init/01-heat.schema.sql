@@ -65,7 +65,7 @@ CREATE TYPE danet2 AS ENUM (
 
 create table heat_raw (
     	id_in_file  		varchar(4), --1
-    	bticode     		decimal(20,0), --2
+    	bticode     		varchar(50), --2
     	supplier    		varchar(255), --3
     	connection_type 	connection, --4
     	system_type     	system, --5 для СЗАО его нет

@@ -12,6 +12,7 @@ import org.apache.poi.ss.usermodel.Cell
 import org.apache.poi.ss.usermodel.Row
 import org.apache.poi.ss.usermodel.Sheet
 import ru.fuzzysearch.FuzzySearch
+import sun.text.normalizer.UCharacter
 
 import static org.apache.poi.ss.usermodel.IndexedColors.*
 
@@ -114,8 +115,28 @@ def getContractLoad2013(def cell) {
 def getBtiCode(def cell) {
 
     def intValue = ""
-    if(cell.cellType == Cell.CELL_TYPE_NUMERIC && cell.getNumericCellValue() > 0 && ((cell.getNumericCellValue() as int) as String).length() > 2) {
-        intValue =  cell.getNumericCellValue() as int
+    def tmpBtiCode = ""
+    def BtiCode = ""
+    if(cell.cellType == Cell.CELL_TYPE_STRING) {
+        BtiCode = cell.getRichStringCellValue().getString()
+        tmpBtiCode = BtiCode.toLowerCase().trim().replaceAll('_', '').replaceAll('-', '')
+
+        if(!tmpBtiCode.isInteger()) {
+            return ""
+        }
+        else {
+            tmpBtiCode = tmpBtiCode as int
+        }
+        if(tmpBtiCode > 0 && tmpBtiCode.toString().length() > 2) {
+            intValue =  BtiCode
+        }
+    }
+    else if(cell.cellType == Cell.CELL_TYPE_NUMERIC && cell.getNumericCellValue() > 0 && ((cell.getNumericCellValue() as int) as String).length() > 2) {
+        BtiCode =  cell.getNumericCellValue() as int
+        tmpBtiCode = BtiCode
+        if(tmpBtiCode > 0 && tmpBtiCode.toString().length() > 2) {
+            intValue =  BtiCode
+        }
     }
 
     intValue
@@ -135,9 +156,10 @@ def getSearchWordInDictionaryWord(Set<String> dictionary, String word) {
     def nearestWord = ""
 
     dictionary.each {
+
         def sb= new StringBuffer(it.toLowerCase().trim().replaceAll('-', ''))
         word = word.toLowerCase().trim().replaceAll('-', '')
-        if(sb.indexOf(word) != -1) {
+        if((sb.indexOf(word) != -1) && (word.size() > 1)) {
             nearestWord = it
         }
     }
@@ -147,8 +169,13 @@ def getSearchWordInDictionaryWord(Set<String> dictionary, String word) {
 
 def getDictionaryWordInSearchWord(def dictionary, String word) {
     def nearestWord = ""
+    def searchWord = word.toLowerCase().trim().replaceAll('-', '')
 
-    def sb= new StringBuffer(word.toLowerCase().trim().replaceAll('-', ''))
+    if(!(searchWord.size() > 1)) {
+        return nearestWord
+    }
+
+    def sb= new StringBuffer(searchWord)
 
     dictionary.eachWithIndex{ dict, value ->
         if(sb.indexOf(dict.key.toString().toLowerCase().trim().replaceAll('-', '')) != -1) {
@@ -788,6 +815,10 @@ def parseTESheet(def fileName) {
     exportExcelTE(resultArray, fields)
 }
 
-parseMKDSheet('/home/vlad/Develop/FuzzySearch/Питер/data/Фрунзенский/raw/Фрунзенский.xls')
-parseTESheet('/home/vlad/Develop/FuzzySearch/Питер/data/Фрунзенский/raw/Фрунзенский.xls')
+def getSeriesGroup() {
+
+}
+
+parseMKDSheet('/home/vlad/Develop/FuzzySearch/Питер/data/Центральный/raw/Центральный.xls')
+parseTESheet('/home/vlad/Develop/FuzzySearch/Питер/data/Центральный/raw/Центральный.xls')
 
