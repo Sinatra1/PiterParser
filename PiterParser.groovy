@@ -6,17 +6,89 @@
  * Time: 11:47
  * To change this template use File | Settings | File Templates.
  */
+import groovy.sql.Sql
 import org.apache.poi.hssf.usermodel.HSSFWorkbook
 import org.apache.poi.poifs.filesystem.POIFSFileSystem
 import org.apache.poi.ss.usermodel.Cell
 import org.apache.poi.ss.usermodel.Row
 import org.apache.poi.ss.usermodel.Sheet
-import ru.fuzzysearch.FuzzySearch
-import sun.text.normalizer.UCharacter
 
-import static org.apache.poi.ss.usermodel.IndexedColors.*
+import java.sql.Driver
+import java.sql.DriverManager
 
-//org.apache.commons.lang3.StringUtils.getLevenshteinDistance()
+def connectToDataBase(def dataBaseName) {
+    def dbUrl      = "jdbc:postgresql://localhost:5432/${dataBaseName}"
+    def dbUser     = "postgres"
+    def dbPassword = "1"
+
+    def conn = DriverManager.getConnection(dbUrl, dbUser, dbPassword);
+    new Sql(conn)
+}
+
+def createInsertStr(def fields, def tableName) {
+
+    def fieldsPlace = "%FIELDS%"
+    def sqlStrInsert = "INSERT INTO ${tableName}(${fieldsPlace})"
+
+    def strFields = ""
+    fields.each {
+        if(strFields == "") {
+            strFields = it.value
+        }
+        else {
+            strFields += ", ${it.value}"
+        }
+    }
+
+    sqlStrInsert.replaceAll(fieldsPlace, strFields)
+}
+
+def createValuesStr(def resultArray, def fields) {
+    def strValues = "VALUES"
+    resultArray.each {
+       def strDataPlace = "%DATA%"
+       def row = "(${strDataPlace})"
+       def currentRow = it.value
+       def strData = ""
+
+       int i = 0
+       while (i < fields.size()) {
+            def cellValue = "NULL"
+            if(currentRow.containsKey(fields[i]) && currentRow[fields[i]]) {
+                cellValue = "'${currentRow[fields[i]]}'"
+            }
+
+            if(strData == "") {
+                strData = cellValue
+            }
+            else {
+                strData += ", ${cellValue}"
+            }
+
+            i++
+       }
+
+       if(strValues == "VALUES") {
+           strValues += row.replaceAll(strDataPlace, strData)
+       }
+       else {
+           strValues += ", ${row.replaceAll(strDataPlace, strData)}"
+       }
+
+    }
+
+    strValues
+}
+
+def insertIntoDataBase(def dataBaseName, def fields, def resultArray, def tableName) {
+    def sql = connectToDataBase(dataBaseName)
+
+    def sqlStrInsert = createInsertStr(fields, tableName)
+
+    def sqlStrValues = createValuesStr(resultArray, fields)
+
+    sql.call(sqlStrInsert + " " + sqlStrValues)
+}
 
 def getAddress(def cell) {
 
@@ -56,7 +128,7 @@ def getUnsignedFloatFieldsWithout0(def cell) {
 
     def floatValue = ""
     if(cell.cellType == Cell.CELL_TYPE_NUMERIC && cell.getNumericCellValue() > 0) {
-        floatValue =  cell.getNumericCellValue()
+        floatValue =  cell.getNumericCellValue().toString().replaceAll(',', '.')
     }
 
     floatValue
@@ -76,7 +148,7 @@ def getUnsignedFloatField(def cell) {
 
     def floatValue = ""
     if(cell.cellType == Cell.CELL_TYPE_NUMERIC && cell.getNumericCellValue() >= 0) {
-        floatValue =  cell.getNumericCellValue()
+        floatValue =  cell.getNumericCellValue().toString().replaceAll(',', '.')
     }
 
     floatValue
@@ -86,7 +158,7 @@ def getEnterDiametr(def cell) {
 
     def floatValue = ""
     if(cell.cellType == Cell.CELL_TYPE_NUMERIC && cell.getNumericCellValue() >= 0 && cell.getNumericCellValue() <= 200) {
-        floatValue =  cell.getNumericCellValue()
+        floatValue =  cell.getNumericCellValue().toString().replaceAll(',', '.')
     }
 
     floatValue
@@ -96,7 +168,7 @@ def getEnterPressure(def cell) {
 
     def floatValue = ""
     if(cell.cellType == Cell.CELL_TYPE_NUMERIC && cell.getNumericCellValue() >= 0 && cell.getNumericCellValue() <= 17) {
-        floatValue = cell.getNumericCellValue()
+        floatValue = cell.getNumericCellValue().toString().replaceAll(',', '.')
     }
 
     floatValue
@@ -106,7 +178,7 @@ def getEnterPressure(def cell) {
 def getContractLoad2013(def cell) {
     def floatValue = ""
     if(cell.cellType == Cell.CELL_TYPE_NUMERIC && cell.getNumericCellValue() >= 0.01 && cell.getNumericCellValue() <= 25) {
-        floatValue = cell.getNumericCellValue()
+        floatValue = cell.getNumericCellValue().toString().replaceAll(',', '.')
     }
 
     floatValue
@@ -250,9 +322,9 @@ def getMkdUpravForm(def cell) {
 
 def getCategory(def cell) {
     def permissibleValues = ['ведомственный дом', 'общежитие', 'дом гостиничного типа', 'аварийный', 'под снос',
-            'сцепка', 'культурного наследия', 'на техническом обслуживании'] as Set
+            'сцепка', 'культурного наследия', 'на техническом обслуживании', 'нежилой'] as Set
     def keyValues = ['ведомств':'ведомственный дом', 'общеж':'общежитие', 'гостин':'дом гостиничного типа', 'авари':'аварийный',
-            'снос':'под снос', 'сцеп':'сцепка', 'культур':'культурного наследия', 'культ':'культурного наследия', 'технич':'на техническом обслуживании']
+            'снос':'под снос', 'сцеп':'сцепка', 'культур':'культурного наследия', 'культ':'культурного наследия', 'технич':'на техническом обслуживании', 'не жилой':'нежилой', 'не жил':'нежилой', 'нежил':'нежилой']
     def category = ""
 
     if(cell.cellType == Cell.CELL_TYPE_STRING) {
@@ -319,8 +391,8 @@ def getWallType(def cell) {
 def getSquare(def cell) {
 
     def intValue = ""
-    if(cell.cellType == Cell.CELL_TYPE_NUMERIC && (cell.getNumericCellValue() >= 50)) {
-        intValue = cell.getNumericCellValue()
+    if(cell.cellType == Cell.CELL_TYPE_NUMERIC && (cell.getNumericCellValue() >= 0)) {
+        intValue = cell.getNumericCellValue().toString().replaceAll(',', '.')
     }
 
     intValue
@@ -510,56 +582,74 @@ def parseSheetMKD(Sheet sheetMKD, fields) {
 
     Iterator<Row> rows=sheetMKD.rowIterator()
     int i = 0
+    boolean fillTmpRow = false
+    boolean startToParse = false
+    String signToStartFeel = "1.0"
+
     while (rows.hasNext()) {
         Row row = (Row) rows.next()
         Iterator cells = row.cellIterator()
 
         def tmpRow = [:]
-        while (cells.hasNext()) {
+        boolean stopWhile = false
+        while (cells.hasNext() && !stopWhile) {
             Cell cell = (Cell) cells.next()
             int j = cell.columnIndex
 
-            if(addressFields.contains(fields[j])) {
-                tmpRow[fields[j]] = getAddress(cell)
+            if(cell.toString() == signToStartFeel && j == 0 && !fillTmpRow) {
+                fillTmpRow = true
+                stopWhile = true
             }
-           else if(unsignedIntFieldsWithout0.contains(fields[j])) {
-                tmpRow[fields[j]] = getUnsignedIntFieldWithout0(cell)
+            else if(!fillTmpRow) {
+                stopWhile = true
             }
-            else if(unsignedIntFields.contains(fields[j])) {
-                tmpRow[fields[j]] = getUnsignedIntField(cell)
+            else {
+                if(addressFields.contains(fields[j])) {
+                    tmpRow[fields[j]] = getAddress(cell)
+                }
+                else if(unsignedIntFieldsWithout0.contains(fields[j])) {
+                    tmpRow[fields[j]] = getUnsignedIntFieldWithout0(cell)
+                }
+                else if(unsignedIntFields.contains(fields[j])) {
+                    tmpRow[fields[j]] = getUnsignedIntField(cell)
+                }
+                else if(btiCode.contains(fields[j])) {
+                    tmpRow[fields[j]] = getBtiCode(cell)
+                }
+                else if(year.contains(fields[j])) {
+                    tmpRow[fields[j]] = getYear(cell)
+                }
+                else if(mkdUpravForm.contains(fields[j])) {
+                    tmpRow[fields[j]] = getMkdUpravForm(cell)
+                }
+                else if(category.contains(fields[j])) {
+                    tmpRow[fields[j]] = getCategory(cell)
+                }
+                else if(houseType.contains(fields[j])) {
+                    tmpRow[fields[j]] = getHouseType(cell)
+                }
+                else if(series.contains(fields[j])) {
+                    tmpRow[fields[j]] = getSeries(cell)
+                }
+                else if(wallType.contains(fields[j])) {
+                    tmpRow[fields[j]] = getWallType(cell)
+                }
+                else if(square.contains(fields[j])) {
+                    tmpRow[fields[j]] = getSquare(cell)
+                }
+                else if(yesNo.contains(fields[j])) {
+                    tmpRow[fields[j]] = getYesNoField(cell)
+                }
             }
-            else if(btiCode.contains(fields[j])) {
-                tmpRow[fields[j]] = getBtiCode(cell)
-            }
-            else if(year.contains(fields[j])) {
-                tmpRow[fields[j]] = getYear(cell)
-            }
-            else if(mkdUpravForm.contains(fields[j])) {
-                tmpRow[fields[j]] = getMkdUpravForm(cell)
-            }
-            else if(category.contains(fields[j])) {
-                tmpRow[fields[j]] = getCategory(cell)
-            }
-            else if(houseType.contains(fields[j])) {
-                tmpRow[fields[j]] = getHouseType(cell)
-            }
-            else if(series.contains(fields[j])) {
-                tmpRow[fields[j]] = getSeries(cell)
-            }
-            else if(wallType.contains(fields[j])) {
-                tmpRow[fields[j]] = getWallType(cell)
-            }
-            else if(square.contains(fields[j])) {
-                tmpRow[fields[j]] = getSquare(cell)
-            }
-            else if(yesNo.contains(fields[j])) {
-                tmpRow[fields[j]] = getYesNoField(cell)
-            }
-
 
         }
 
-        parsedSheet[i] = tmpRow
+        if(startToParse) {
+            parsedSheet[i] = tmpRow
+        }
+        else if(fillTmpRow) {
+            startToParse = true
+        }
 
         i++
     }
@@ -575,9 +665,9 @@ def parseSheetMKD(Sheet sheetMKD, fields) {
     parsedSheet
 }
 
-def getArrayMKD(String fileName, def fields, int sheetNumber)
+def getArrayMKD(String filePath, def fields, int sheetNumber)
 {
-    InputStream inp = new FileInputStream(fileName)
+    InputStream inp = new FileInputStream(filePath)
 
     POIFSFileSystem xssfwb = new POIFSFileSystem(inp)
     HSSFWorkbook wb = new HSSFWorkbook(xssfwb)
@@ -590,15 +680,11 @@ def getArrayMKD(String fileName, def fields, int sheetNumber)
     parsedSheet
 }
 
-def exportExcelMKD(def resultArray, def fields) {
+def exportExcelMKD(def resultArray, def fields, def filePath) {
+    def fileName = new File(filePath).name.split("\\.", 2)[0]
+
     new HSSFWorkbook().with { workbook ->
-        def styles = [ LIGHT_BLUE, LIGHT_GREEN, LIGHT_ORANGE ].collect { color ->
-            createCellStyle().with { style ->
-                fillForegroundColor = color.index
-                fillPattern = SOLID_FOREGROUND
-                style
-            }
-        }
+
         createSheet( 'Output' ).with { sheet ->
             resultArray.each{str ->
                 createRow( str.key ).with { row ->
@@ -616,14 +702,14 @@ def exportExcelMKD(def resultArray, def fields) {
                     }
                 }
             }
-            new File('/tmp/house.xls').withOutputStream { os ->
+            new File("/tmp/house ${fileName}.xls").withOutputStream { os ->
                 write( os )
             }
         }
     }
 }
 
-def parseMKDSheet(def fileName) {
+def parseMKDSheet(def filePath) {
 
     def fields = [0:'id_in_file', 1:'okrug', 2:'raion', 3:'street', 4:'house', 5:'korpus', 6:'stroenie', 7:'bticode', 8:'mkd_uprav_form',
             9:'category', 10:'house_type', 11:'series', 12:'year_built', 13:'wall_type', 14:'floors', 15:'underfloors', 16:'porches',17:'flats',
@@ -631,9 +717,11 @@ def parseMKDSheet(def fileName) {
             25:'sewerage',26:'heat_supply',27:'gas_supply',28:'gas_heaters',29:'gas_ovens',30:'electro_ovens',31:'lifts_count',32:'e_devices_count',
             33:'cw_devices_count',34:'hw_devices_count',35:'heat_devices_count',36:'gas_devices_count']
 
-    def resultArray = getArrayMKD(fileName, fields, 0)
+    def resultArray = getArrayMKD(filePath, fields, 0)
 
-    exportExcelMKD(resultArray, fields)
+    exportExcelMKD(resultArray, fields, filePath)
+
+    insertIntoDataBase("admiral", fields, resultArray, "house_raw")
 }
 
 def parseSheetTE(Sheet sheetMKD, fields) {
@@ -745,9 +833,9 @@ def parseSheetTE(Sheet sheetMKD, fields) {
     parsedSheet
 }
 
-def getArrayTE(String fileName, def fields, int sheetNumber)
+def getArrayTE(String filePath, def fields, int sheetNumber)
 {
-    InputStream inp = new FileInputStream(fileName)
+    InputStream inp = new FileInputStream(filePath)
 
     POIFSFileSystem xssfwb = new POIFSFileSystem(inp)
     HSSFWorkbook wb = new HSSFWorkbook(xssfwb)
@@ -760,15 +848,12 @@ def getArrayTE(String fileName, def fields, int sheetNumber)
     parsedSheet
 }
 
-def exportExcelTE(def resultArray, def fields) {
+def exportExcelTE(def resultArray, def fields, def filePath) {
+
+    def fileName = new File(filePath).name.split("\\.", 2)[0]
+
     new HSSFWorkbook().with { workbook ->
-        def styles = [ LIGHT_BLUE, LIGHT_GREEN, LIGHT_ORANGE ].collect { color ->
-            createCellStyle().with { style ->
-                fillForegroundColor = color.index
-                fillPattern = SOLID_FOREGROUND
-                style
-            }
-        }
+
         createSheet( 'Output' ).with { sheet ->
             resultArray.each{str ->
                 createRow( str.key ).with { row ->
@@ -786,14 +871,15 @@ def exportExcelTE(def resultArray, def fields) {
                     }
                 }
             }
-            new File('/tmp/heat.xls').withOutputStream { os ->
+
+            new File("/tmp/heat ${fileName}.xls").withOutputStream { os ->
                 write( os )
             }
         }
     }
 }
 
-def parseTESheet(def fileName) {
+def parseTESheet(def filePath) {
 
     def fields = [0:'id_in_file', 1:'bticode', 2:'supplier', 3:'connection_type',
             4:'system_type',5:'consumer', 6:'resource_type', 7:'mes_units',
@@ -810,15 +896,31 @@ def parseTESheet(def fileName) {
             47:'contract_load_2013', 48:'temperature_grafic', 49:'heating_scheme',
             50:'count_lift_nodes', 51:'heating_transit']
 
-    def resultArray = getArrayTE(fileName, fields, 1)
+    def resultArray = getArrayTE(filePath, fields, 1)
 
-    exportExcelTE(resultArray, fields)
+    exportExcelTE(resultArray, fields, filePath)
 }
 
 def getSeriesGroup() {
 
 }
 
-parseMKDSheet('/home/vlad/Develop/FuzzySearch/Питер/data/Центральный/raw/Центральный.xls')
-parseTESheet('/home/vlad/Develop/FuzzySearch/Питер/data/Центральный/raw/Центральный.xls')
+def filePath = '/home/vlad/Develop/FuzzySearch/Питер/data/Адмиралтейский/raw/Адмиралтейский 2.xls'
 
+parseMKDSheet(filePath)
+parseTESheet(filePath)
+
+
+int n = 0;
+
+/*def props = new Properties()
+props.setProperty("user", "1468-user")
+props.setProperty("password", "1468")
+
+
+
+def conn = driver.connect("jdbc:postgresql://localhost:5432/admiral", props)
+def sql = new Sql(conn)
+
+
+ */

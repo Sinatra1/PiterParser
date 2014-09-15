@@ -1,4 +1,5 @@
 --Дома каторые, должны участвовать в анализе
+drop view analyzed_houses;
 CREATE OR REPLACE VIEW analyzed_houses AS (
 
 	SELECT ho.bticode
@@ -24,11 +25,13 @@ CREATE OR REPLACE VIEW analyzed_houses AS (
 			)
 			OR he.supplier IS NULL)
 			AND ho.category IS NULL
+			AND ho.full_area >= '500'
 			
 		GROUP BY ho.bticode
 );
 
 --Дома каторые, должны попасть в отчет о корректности полей
+drop view houses_for_feeling_report;
 CREATE OR REPLACE VIEW houses_for_feeling_report AS (
 
 	SELECT ho.bticode AS "Код БТИ"
@@ -99,14 +102,6 @@ CREATE OR REPLACE VIEW houses_for_feeling_report AS (
 		OR he.mr_2013_apr    IS NULL
 		OR he.total_2013_may  IS NULL
 		OR he.mr_2013_may    IS NULL
-		OR he.total_2013_jun  IS NULL
-		OR he.mr_2013_jun    IS NULL
-		OR he.total_2013_jul  IS NULL
-		OR he.mr_2013_jul    IS NULL
-		OR he.total_2013_aug  IS NULL
-		OR he.mr_2013_aug    IS NULL
-		OR he.total_2013_sep IS NULL
-		OR he.mr_2013_sep    IS NULL
 		OR he.total_2013_oct IS NULL
 		OR he.mr_2013_oct    IS NULL
 		OR he.total_2013_nov  IS NULL
@@ -124,6 +119,7 @@ CREATE OR REPLACE VIEW houses_for_feeling_report AS (
 );
 
 --Отчет о полноте данных
+drop view feeling_report;
 CREATE OR REPLACE VIEW feeling_report AS (
 	SELECT 
 	      (SELECT ho2.raion FROM house_raw AS ho2 
@@ -498,20 +494,6 @@ CREATE OR REPLACE VIEW feeling_report AS (
 		LEFT JOIN heat_raw AS he2 ON ho2.bticode = he2.bticode
 		WHERE ho2.bticode = t."Код БТИ" LIMIT 1) AS "МР 2013 апрель",
 
-	      (SELECT (CASE (he2.total_2013_sep IS NULL)  
-			AND ((SELECT count(he4.bticode) FROM heat_raw AS he4 WHERE he4.bticode = t."Код БТИ") = 1)
-			WHEN TRUE THEN '?' END )
-		FROM house_raw AS ho2
-		LEFT JOIN heat_raw AS he2 ON ho2.bticode = he2.bticode
-		WHERE ho2.bticode = t."Код БТИ" LIMIT 1) AS "Всего за 2013 сентябрь",
-
-		(SELECT (CASE (he2.mr_2013_sep IS NULL) 
-			AND ((SELECT count(he4.bticode) FROM heat_raw AS he4 WHERE he4.bticode = t."Код БТИ") = 1)
-			WHEN TRUE THEN '?' END )
-		FROM house_raw AS ho2
-		LEFT JOIN heat_raw AS he2 ON ho2.bticode = he2.bticode
-		WHERE ho2.bticode = t."Код БТИ" LIMIT 1) AS "МР 2013 сентябрь",
-
 	      (SELECT (CASE (he2.total_2013_oct IS NULL) 
 			AND ((SELECT count(he4.bticode) FROM heat_raw AS he4 WHERE he4.bticode = t."Код БТИ") = 1)
 			WHEN TRUE THEN '?' END )
@@ -593,6 +575,7 @@ CREATE OR REPLACE VIEW feeling_report AS (
 );
 
 --Дома со вкладки МКД, каторые должны попасть в отчет о выполнении условий
+drop view heat_raw_for_uslov_report;
 CREATE OR REPLACE VIEW heat_raw_for_uslov_report AS (
 
 SELECT 	   he5.bticode AS "Код БТИ"
@@ -661,7 +644,9 @@ SELECT 	   he5.bticode AS "Код БТИ"
 			he5.total_2013_sep+
 			he5.total_2013_oct+
 			he5.total_2013_nov+
-			he5.total_2013_dec)
+			he5.total_2013_dec+
+			he5.total_2011+
+			he5.total_2012)
 			<> he5.total_2013
 		   )
 		OR he5.contract_load_2013 IS NULL   
@@ -736,7 +721,9 @@ CREATE OR REPLACE VIEW heat_raw_uslov_report AS (
 				he5.total_2013_sep+
 				he5.total_2013_oct+
 				he5.total_2013_nov+
-				he5.total_2013_dec) <> he5.total_2013
+				he5.total_2013_dec+
+				he5.total_2011+
+				) <> he5.total_2013
 	   	) WHEN TRUE THEN 'Да' END) 						AS "Сумма по мес. 2013 не равна Итого 2013"
 		, (CASE (he5.contract_load_2013 IS NULL) WHEN TRUE THEN 'Да' END) 	AS "Договор. нагр. не в интервале [0,01: 25]"
 
@@ -751,6 +738,7 @@ CREATE OR REPLACE VIEW heat_raw_uslov_report AS (
 );
 
 --Дома со вкладки МКД, каторые должны попасть в отчет о выполнении условий
+drop view house_raw_for_uslov_report;
 CREATE OR REPLACE VIEW house_raw_for_uslov_report AS (
 
 SELECT 	   ho5.bticode AS "Код БТИ",
@@ -775,7 +763,6 @@ SELECT 	   ho5.bticode AS "Код БТИ",
 		OR ho5.heating_area IS NULL
 		OR ho5.living_area IS NULL
 		OR ho5.full_area < ho5.heating_area
-		OR ho5.full_area <> (ho5.nonliving_area + ho5.living_area)
 	       
 	GROUP BY "Район", "Улица", "Дом", "Код БТИ"
 );
@@ -800,7 +787,6 @@ CREATE OR REPLACE VIEW house_raw_uslov_report AS (
 		, (CASE (ho5.heating_area IS NULL) WHEN TRUE THEN 'Да' END) 					AS "Отаплив. площадь < 50"
 		, (CASE (ho5.living_area IS NULL) WHEN TRUE THEN 'Да' END) 					AS "Жил. площадь < 50"
 		, (CASE (ho5.full_area < ho5.heating_area) WHEN TRUE THEN 'Да' END) 				AS "Общ. площадь < Отаплив. площади"
-		, (CASE (ho5.full_area <> (ho5.nonliving_area + ho5.living_area)) WHEN TRUE THEN 'Да' END) AS "Общ. площадь не = (жил. + нежил.)"
 
 	FROM (SELECT t2."Код БТИ"
 		, t2."Улица"
@@ -848,9 +834,6 @@ CREATE OR REPLACE VIEW uslov_report_MKD AS (
 		, (SELECT h3."Общ. площадь < Отаплив. площади"
 			FROM house_raw_uslov_report AS h3 
 			WHERE h3."Код БТИ" = h."Код БТИ" LIMIT 1) AS "Общ. площадь < Отаплив. площади"
-		, (SELECT h3."Общ. площадь не = (жил. + нежил.)"
-			FROM house_raw_uslov_report AS h3 
-			WHERE h3."Код БТИ" = h."Код БТИ" LIMIT 1) AS "Общ. площадь не = (жил. + нежил.)" 
 	FROM (SELECT h2."Код БТИ" FROM house_raw_uslov_report AS h2 GROUP BY h2."Код БТИ") AS h
 );
 
@@ -975,8 +958,6 @@ CREATE OR REPLACE VIEW error_cells AS (
 		(CASE t."МР 2013 март" IS NOT NULL WHEN TRUE THEN 1 ELSE 0 END ) +
 		(CASE t."Всего за 2013 апрель" IS NOT NULL WHEN TRUE THEN 1 ELSE 0 END ) +
 		(CASE t."МР 2013 апрель" IS NOT NULL WHEN TRUE THEN 1 ELSE 0 END ) +
-		(CASE t."Всего за 2013 сентябрь" IS NOT NULL WHEN TRUE THEN 1 ELSE 0 END ) +
-		(CASE t."МР 2013 сентябрь" IS NOT NULL WHEN TRUE THEN 1 ELSE 0 END ) +
 		(CASE t."Всего за 2013 октябрь" IS NOT NULL WHEN TRUE THEN 1 ELSE 0 END ) +
 		(CASE t."МР 2013 октябрь" IS NOT NULL WHEN TRUE THEN 1 ELSE 0 END ) +
 		(CASE t."Всего за 2013 ноябрь" IS NOT NULL WHEN TRUE THEN 1 ELSE 0 END ) +

@@ -16,6 +16,9 @@
     <orderEntry type="library" name="xmlbeans-2.3.0" level="project" />
     <orderEntry type="library" name="dom4j-1.6" level="project" />
     <orderEntry type="library" name="fuzzy" level="project" />
+    <orderEntry type="library" name="xdocreport-1.0.4" level="project" />
+    <orderEntry type="library" name="itext-2.1.7" level="project" />
+    <orderEntry type="library" name="postgresql-9.3-1102.jdbc3" level="project" />
   </component>
 </module>
 

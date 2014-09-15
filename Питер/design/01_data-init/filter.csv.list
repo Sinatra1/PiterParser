@@ -9,9 +9,9 @@ sudo -s -H -u postgres
 %s/'\(\d\+\.\d\+\)'/\1/g
 %s/'\(\d\+\)'/\1/g
 
-copy house_raw from '/home/vlad/Develop/FuzzySearch/Питер/data/Адмиралтейский/prepared/house.csv' with csv header delimiter '|';
+copy house_raw from '/home/vlad/Develop/FuzzySearch/Питер/data/Адмиралтейский/prepared/house 2.csv' with csv header delimiter '|';
 
-	copy heat_raw from '/home/vlad/Develop/FuzzySearch/Питер/data/Адмиралтейский/prepared/heat.csv' with csv header delimiter '|';
+	copy heat_raw from '/home/vlad/Develop/FuzzySearch/Питер/data/Адмиралтейский/prepared/heat 2.csv' with csv header delimiter '|';
 
 --Белоостров
 house
@@ -104,9 +104,24 @@ copy heat_raw from '/home/vlad/Develop/FuzzySearch/Питер/data/Красно�
 %s/'\(\d\+\.\d\+\)'/\1/g
 %s/'\(\d\+\)'/\1/g
 
-copy house_raw from '/home/vlad/Develop/FuzzySearch/Питер/data/Красносельский/prepared/house.csv' with csv header delimiter '|';
+copy house_raw from '/home/vlad/Develop/FuzzySearch/Питер/data/Красносельский/prepared/house 2.csv' with csv header delimiter '|';
 
-copy heat_raw from '/home/vlad/Develop/FuzzySearch/Питер/data/Красносельский/prepared/heat.csv' with csv header delimiter '|';
+copy heat_raw from '/home/vlad/Develop/FuzzySearch/Питер/data/Красносельский/prepared/heat 2.csv' with csv header delimiter '|';
+
+Кронштадтский
+Василий 
+юрьивич
+удовольствие и крмфррт
+79219103293
+
+%s/'\s\+/'/g
+%s/\s\+'/'/g
+%s/'\(\d\+\.\d\+\)'/\1/g
+%s/'\(\d\+\)'/\1/g
+
+copy house_raw from '/home/vlad/Develop/FuzzySearch/Питер/data/Кронштадтский/prepared/house 2.csv' with csv header delimiter '|';
+
+copy heat_raw from '/home/vlad/Develop/FuzzySearch/Питер/data/Кронштадтский/prepared/heat 2.csv' with csv header delimiter '|';
 
 Московский
 
@@ -159,9 +174,9 @@ copy heat_raw from '/home/vlad/Develop/FuzzySearch/Питер/data/Петрог�
 %s/'\(\d\+\.\d\+\)'/\1/g
 %s/'\(\d\+\)'/\1/g
 
-copy house_raw from '/home/vlad/Develop/FuzzySearch/Питер/data/Петродворцовый/prepared/house.csv' with csv header delimiter '|';
+copy house_raw from '/home/vlad/Develop/FuzzySearch/Питер/data/Петродворцовый/prepared/house 2.csv' with csv header delimiter '|';
 
-copy heat_raw from '/home/vlad/Develop/FuzzySearch/Питер/data/Петродворцовый/prepared/heat.csv' with csv header delimiter '|';
+copy heat_raw from '/home/vlad/Develop/FuzzySearch/Питер/data/Петродворцовый/prepared/heat 2.csv' with csv header delimiter '|';
 
 Приморский
 
@@ -169,10 +184,13 @@ copy heat_raw from '/home/vlad/Develop/FuzzySearch/Питер/data/Петрод�
 %s/\s\+'/'/g
 %s/'\(\d\+\.\d\+\)'/\1/g
 %s/'\(\d\+\)'/\1/g
+235-08-01
+235-08-00
+235-08-10
 
-copy house_raw from '/home/vlad/Develop/FuzzySearch/Питер/data/Приморский/prepared/house.csv' with csv header delimiter '|';
+copy house_raw from '/home/vlad/Develop/FuzzySearch/Питер/data/Приморский/prepared/house 2.csv' with csv header delimiter '|';
 
-copy heat_raw from '/home/vlad/Develop/FuzzySearch/Питер/data/Приморский/prepared/heat.csv' with csv header delimiter '|';
+copy heat_raw from '/home/vlad/Develop/FuzzySearch/Питер/data/Приморский/prepared/heat 2.csv' with csv header delimiter '|';
 
 Пушкинский
 
