@@ -450,7 +450,7 @@ def getWallType(def cell) {
 def getSquare(def cell) {
 
     def intValue = ""
-    if(cell.cellType == Cell.CELL_TYPE_NUMERIC && (cell.getNumericCellValue() >= 0)) {
+    if(cell.cellType == Cell.CELL_TYPE_NUMERIC && (cell.getNumericCellValue() > 0)) {
         intValue = cell.getNumericCellValue().toString().replaceAll(',', '.')
     }
 
@@ -993,5 +993,58 @@ def parseExcelFile(def filePath) {
 }
 
 def filePath = '/home/vlad/Develop/FuzzySearch/Питер/data/Адмиралтейский/raw/Адмиралтейский 2.xls'
-
 parseExcelFile(filePath)
+
+filePath = '/home/vlad/Develop/FuzzySearch/Питер/data/Белоостров/raw/Белоостров.xls'
+parseExcelFile(filePath)
+
+filePath = '/home/vlad/Develop/FuzzySearch/Питер/data/Василеостровский/raw/Василеостровский 2.xls'
+parseExcelFile(filePath)
+
+filePath = '/home/vlad/Develop/FuzzySearch/Питер/data/Калининский/raw/Калининский.xls'
+parseExcelFile(filePath)
+
+filePath = '/home/vlad/Develop/FuzzySearch/Питер/data/Кировский/raw/Кировский.xls'
+parseExcelFile(filePath)
+
+filePath = '/home/vlad/Develop/FuzzySearch/Питер/data/Колпинский/raw/Колпинский.xls'
+parseExcelFile(filePath)
+
+filePath = '/home/vlad/Develop/FuzzySearch/Питер/data/Красногвардейский/raw/Красногвардейский.xls'
+parseExcelFile(filePath)
+
+filePath = '/home/vlad/Develop/FuzzySearch/Питер/data/Красносельский/raw/Красносельский.xls'
+parseExcelFile(filePath)
+
+filePath = '/home/vlad/Develop/FuzzySearch/Питер/data/Кронштадтский/raw/Кронштадтский 2.xls'
+parseExcelFile(filePath)
+
+filePath = '/home/vlad/Develop/FuzzySearch/Питер/data/Московский/raw/Московский.xls'
+parseExcelFile(filePath)
+
+filePath = '/home/vlad/Develop/FuzzySearch/Питер/data/Невский/raw/Невский 2.xls'
+parseExcelFile(filePath)
+
+filePath = '/home/vlad/Develop/FuzzySearch/Питер/data/Осиновая роща Приозерское/raw/Осиновая роща Приозерское.xls'
+parseExcelFile(filePath)
+
+filePath = '/home/vlad/Develop/FuzzySearch/Питер/data/Петроградский/raw/Петроградский.xls'
+parseExcelFile(filePath)
+
+filePath = '/home/vlad/Develop/FuzzySearch/Питер/data/Петродворцовый/raw/Петродворцовый 2.xls'
+parseExcelFile(filePath)
+
+filePath = '/home/vlad/Develop/FuzzySearch/Питер/data/Приморский/raw/Приморский 2.xls'
+parseExcelFile(filePath)
+
+filePath = '/home/vlad/Develop/FuzzySearch/Питер/data/Пушкинский/raw/Пушкинский.xls'
+parseExcelFile(filePath)
+
+filePath = '/home/vlad/Develop/FuzzySearch/Питер/data/Фрунзенский/raw/Фрунзенский.xls'
+parseExcelFile(filePath)
+
+filePath = '/home/vlad/Develop/FuzzySearch/Питер/data/Центральный/raw/Центральный.xls'
+parseExcelFile(filePath)
+
+
+
