@@ -16,13 +16,64 @@ import org.apache.poi.ss.usermodel.Sheet
 import java.sql.Driver
 import java.sql.DriverManager
 
+def findCurrentRaion(def filePath, def raionToDataBase) {
+    def currentRaion = ""
+    raionToDataBase.each {
+        if(filePath.contains(it.key)) {
+            currentRaion = it
+        }
+    }
+
+    currentRaion
+}
+
+def dropDataBase(def dataBaseName) {
+    def dbUrlPostgres  = "jdbc:postgresql://localhost:5432/postgres"
+    def dbUser = "postgres"
+    def dbPassword = "1"
+
+    def connectionPostgres = DriverManager.getConnection(dbUrlPostgres, dbUser, dbPassword)
+    def sqlConnection = new Sql(connectionPostgres)
+
+    sqlConnection.call("DROP DATABASE IF EXISTS "+dataBaseName)
+    sqlConnection.close()
+}
+
+def createDataBase(def dataBaseName) {
+    def dbUrlPostgres  = "jdbc:postgresql://localhost:5432/postgres"
+    def dbUser = "postgres"
+    def dbPassword = "1"
+
+    def connectionPostgres = DriverManager.getConnection(dbUrlPostgres, dbUser, dbPassword)
+    def sqlConnection = new Sql(connectionPostgres)
+
+    sqlConnection.call("CREATE DATABASE "+dataBaseName)
+    sqlConnection.close()
+}
+
+def createTables(def sqlConnection) {
+    def createHouseSql = new File("/home/vlad/Develop/FuzzySearch/Питер/design/01_data-init/01-house.schema (copy).sql").text
+    sqlConnection.call(createHouseSql)
+
+    def createHeatSql = new File("/home/vlad/Develop/FuzzySearch/Питер/design/01_data-init/01-heat.schema (copy).sql").text
+    sqlConnection.call(createHeatSql)
+}
+
 def connectToDataBase(def dataBaseName) {
+
+    dropDataBase(dataBaseName)
+    createDataBase(dataBaseName)
+
     def dbUrl      = "jdbc:postgresql://localhost:5432/${dataBaseName}"
     def dbUser     = "postgres"
     def dbPassword = "1"
 
-    def conn = DriverManager.getConnection(dbUrl, dbUser, dbPassword);
-    new Sql(conn)
+    def connection = DriverManager.getConnection(dbUrl, dbUser, dbPassword);
+    def sqlConnection = new Sql(connection)
+
+    createTables(sqlConnection)
+
+    sqlConnection
 }
 
 def createInsertStr(def fields, def tableName) {
@@ -80,14 +131,22 @@ def createValuesStr(def resultArray, def fields) {
     strValues
 }
 
-def insertIntoDataBase(def dataBaseName, def fields, def resultArray, def tableName) {
-    def sql = connectToDataBase(dataBaseName)
+def createReports(def sqlConnection, def raionName) {
+    def createViewsSql = new File("/home/vlad/Develop/FuzzySearch/Питер/design/03_heat-completeness/01-views for reports (copy).sql").text
+    sqlConnection.call(createViewsSql)
+
+    def createReportsSql = new File("/home/vlad/Develop/FuzzySearch/Питер/design/03_heat-completeness/02-reports (copy).sql").text
+    createReportsSql = createReportsSql.replaceAll('%raion%', raionName)
+    sqlConnection.call(createReportsSql)
+}
+
+def insertIntoDataBase(def sqlConnection, def fields, def resultArray, def tableName) {
 
     def sqlStrInsert = createInsertStr(fields, tableName)
 
     def sqlStrValues = createValuesStr(resultArray, fields)
 
-    sql.call(sqlStrInsert + " " + sqlStrValues)
+    sqlConnection.call(sqlStrInsert + " " + sqlStrValues)
 }
 
 def getAddress(def cell) {
@@ -709,7 +768,7 @@ def exportExcelMKD(def resultArray, def fields, def filePath) {
     }
 }
 
-def parseMKDSheet(def filePath) {
+def parseMKDSheet(def filePath, def sqlConnection) {
 
     def fields = [0:'id_in_file', 1:'okrug', 2:'raion', 3:'street', 4:'house', 5:'korpus', 6:'stroenie', 7:'bticode', 8:'mkd_uprav_form',
             9:'category', 10:'house_type', 11:'series', 12:'year_built', 13:'wall_type', 14:'floors', 15:'underfloors', 16:'porches',17:'flats',
@@ -721,7 +780,7 @@ def parseMKDSheet(def filePath) {
 
     exportExcelMKD(resultArray, fields, filePath)
 
-    insertIntoDataBase("admiral", fields, resultArray, "house_raw")
+    insertIntoDataBase(sqlConnection, fields, resultArray, "house_raw")
 }
 
 def parseSheetTE(Sheet sheetMKD, fields) {
@@ -879,7 +938,7 @@ def exportExcelTE(def resultArray, def fields, def filePath) {
     }
 }
 
-def parseTESheet(def filePath) {
+def parseTESheet(def filePath, def sqlConnection) {
 
     def fields = [0:'id_in_file', 1:'bticode', 2:'supplier', 3:'connection_type',
             4:'system_type',5:'consumer', 6:'resource_type', 7:'mes_units',
@@ -899,28 +958,40 @@ def parseTESheet(def filePath) {
     def resultArray = getArrayTE(filePath, fields, 1)
 
     exportExcelTE(resultArray, fields, filePath)
+
+    insertIntoDataBase(sqlConnection, fields, resultArray, "heat_raw")
 }
 
 def getSeriesGroup() {
 
 }
 
+
+def parseExcelFile(def filePath) {
+    def raionToDataBase = ['Адмиралтейский':'admiral', 'Белоостров':'belo',
+                           'Василеостровский':'vasil', 'Калининский':'kalin',
+                            'Кировский':'kirov', 'Колпинский':'kolpin',
+                            'Красногвардейский':'krasn', 'Красносельский':'selsk',
+                            'Кронштадтский':'kronsh', 'Московский':'moskov',
+                            'Невский':'nevsk', 'Осиновая роща Приозерское':'osinov',
+                            'Петроградский':'petro', 'Петродворцовый':'dvorc',
+                            'Приморский':'primor', 'Пушкинский':'pushkin',
+                            'Фрунзенский':'frunz', 'Центральный':'centr']
+
+    def currentRaion = findCurrentRaion(filePath, raionToDataBase)
+    def dataBaseName = currentRaion.value
+    def raionName = currentRaion.key
+
+    def sqlConnection = connectToDataBase(dataBaseName)
+
+    parseMKDSheet(filePath, sqlConnection)
+    parseTESheet(filePath, sqlConnection)
+
+    createReports(sqlConnection, raionName)
+
+    sqlConnection.close()
+}
+
 def filePath = '/home/vlad/Develop/FuzzySearch/Питер/data/Адмиралтейский/raw/Адмиралтейский 2.xls'
 
-parseMKDSheet(filePath)
-parseTESheet(filePath)
-
-
-int n = 0;
-
-/*def props = new Properties()
-props.setProperty("user", "1468-user")
-props.setProperty("password", "1468")
-
-
-
-def conn = driver.connect("jdbc:postgresql://localhost:5432/admiral", props)
-def sql = new Sql(conn)
-
-
- */
+parseExcelFile(filePath)

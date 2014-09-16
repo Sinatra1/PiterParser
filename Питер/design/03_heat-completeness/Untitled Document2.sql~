@@ -1,0 +1,27 @@
+CREATE OR REPLACE VIEW house_raw_for_uslov_report AS (
+
+SELECT 	   ho5.bticode AS "Код БТИ",
+	   ho5.raion AS "Район",
+	   ho5.street AS "Улица",
+	   ho5.house AS "Дом"
+
+	FROM analyzed_houses AS ah
+	JOIN house_raw AS ho5 ON ah.bticode = ho5.bticode
+	LEFT JOIN heat_raw AS he5 ON ho5.bticode = he5.bticode
+	 
+	WHERE   (ho5.bticode IS NOT NULL AND he5.bticode IS NULL) 
+		OR (--если не каждой строке вкладки ТЭ с данным кодом БТИ соответствует строка с данным кодом БТИ на вкладке МКД
+			(SELECT count(he3.bticode) FROM heat_raw AS he3 WHERE he3.bticode = ho5.bticode) <> 
+			(SELECT count(ho2.bticode) FROM house_raw AS ho2 WHERE ho2.bticode = ho5.bticode)
+
+		)
+		OR ho5.floors IS NULL
+		OR ho5.porches IS NULL
+		OR ho5.flats IS NULL
+		OR ho5.full_area IS NULL
+		OR ho5.heating_area IS NULL
+		OR ho5.living_area IS NULL
+		OR ho5.full_area < ho5.heating_area
+	       
+	GROUP BY "Район", "Улица", "Дом", "Код БТИ"
+);

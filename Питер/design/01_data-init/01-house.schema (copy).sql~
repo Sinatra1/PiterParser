@@ -1,10 +1,10 @@
 drop table if exists house_raw CASCADE;
 drop table if exists heat_raw CASCADE;
 
-DROP TYPE korp;
+DROP TYPE if exists korp;
 CREATE TYPE korp AS ENUM ('А', 'Б', 'В', 'Г', 'Д', 'Е', 'Ё', 'Ж', 'З', 'И', 'Й', 'К', 'Л', 'М', 'Н', 'О', 'П', 'Р', 'С', 'Т', 'У', 'Ф', 'Х', 'Ц', 'Ч', 'Ш', 'Щ', 'Ъ', 'Ы', 'Ь', 'Э', 'Ю', 'Я', 'А1', '--', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14', '15', '16', '17', '18', '19', '20', '21', '22', '23', '24', '25', '26', '27', '28', '29', '30', '31', '32', '33', '34', '35', '36', '37', '38', '39', '40', '41', '42', '43', '44', '45', '46', '47', '48', '49', '50');
 
-DROP TYPE uprav;
+DROP TYPE if exists uprav;
 CREATE TYPE uprav AS ENUM (
 'ГУП ДЕЗ',
 'Частная управляющая организация',
@@ -21,7 +21,7 @@ CREATE TYPE uprav AS ENUM (
 'Районное жилищное агентство'
 );
 
-DROP TYPE cat;
+DROP TYPE if exists cat;
 CREATE TYPE cat AS ENUM (
 'ведомственный дом',
 'общежитие',
@@ -34,7 +34,7 @@ CREATE TYPE cat AS ENUM (
 'нежилой'
 );
 
-DROP TYPE hstype;
+DROP TYPE if exists hstype;
 CREATE TYPE hstype AS ENUM (
 'блочный',
 'брежневка',
@@ -48,7 +48,7 @@ CREATE TYPE hstype AS ENUM (
 'другое'
 );
 
-DROP TYPE ser;
+DROP TYPE if exists ser;
 CREATE TYPE ser AS ENUM (
 'II-01',
 'II-02',
@@ -145,7 +145,7 @@ CREATE TYPE ser AS ENUM (
 'другое'
 );
 
-DROP TYPE wall;
+DROP TYPE if exists wall;
 CREATE TYPE wall AS ENUM (
 'железобетонные',
 'блочные',
@@ -156,7 +156,7 @@ CREATE TYPE wall AS ENUM (
 'другое'
 );
 
-DROP TYPE nomer;
+DROP TYPE if exists nomer;
 CREATE TYPE nomer AS ENUM (
 '1',
 '2',
@@ -190,7 +190,7 @@ CREATE TYPE nomer AS ENUM (
 '30'
 );
 
-DROP TYPE nomer2;
+DROP TYPE if exists nomer2;
 CREATE TYPE nomer2 AS ENUM (
 '0',
 '1',
@@ -225,7 +225,7 @@ CREATE TYPE nomer2 AS ENUM (
 '30'
 );
 
-DROP TYPE danet;
+DROP TYPE if exists danet;
 CREATE TYPE danet AS ENUM (
 'да',
 'нет'

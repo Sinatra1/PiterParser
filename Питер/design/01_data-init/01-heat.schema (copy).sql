@@ -4,11 +4,14 @@ drop type if exists scheme;
 
 drop type if exists connection;
 drop type if exists system;
+drop type if exists system2;
 drop type if exists nodes;
 drop type if exists grafic;
 drop type if exists resourcetype;
 drop type if exists units;
 drop type if exists mr;
+drop type if exists connection2;
+drop type if exists danet2;
 
 CREATE TYPE mr AS ENUM ('Д', 'Дср', 'Р', 'ОДПУ', 'ОДДУ', 'Нр');
 
@@ -21,7 +24,7 @@ CREATE TYPE scheme AS ENUM ('зависимая', 'независимая', 'з�
 
 CREATE TYPE connection AS ENUM ('ИТП', 'ЦТП', 'котельная', 'тепловая сеть','Тепловая сеть');
 
-DROP TYPE connection2;
+
 CREATE TYPE connection2 AS ENUM (
 'элеватор',
 'безэлеватор'
@@ -30,11 +33,9 @@ CREATE TYPE connection2 AS ENUM (
 CREATE TYPE system AS ENUM ('закрытая', 'открытая');
 CREATE TYPE system2 AS ENUM ('местная', 'центральная');
 
-CREATE TYPE nodes AS ENUM ('0','1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14', '15', '16', '17','18','19','20', '24','26','43','111','АУУ');
-
 CREATE TYPE grafic AS ENUM ('95-70','105-70','120-70','150-70','125-70','130-70', '70-50', '90-70', '120-90');
 
-DROP TYPE pressure;
+DROP TYPE if exists pressure;
 CREATE TYPE pressure AS ENUM (
 '0',
 '1',
@@ -56,7 +57,7 @@ CREATE TYPE pressure AS ENUM (
 '17'
 );
 
-DROP TYPE danet2;
+
 CREATE TYPE danet2 AS ENUM (
 'да',
 'нет'
@@ -114,7 +115,7 @@ create table heat_raw (
     	contract_load_2013	decimal, --37 <=10
     	temperature_grafic 	grafic, --38
     	heating_scheme 		scheme, --39 нет - это не правильно
-    	count_lift_nodes 	nodes, --40 АУУ верно
+    	count_lift_nodes 	varchar(50), --40 АУУ верно
     	heating_transit  	transit --41 да нет
 
 );

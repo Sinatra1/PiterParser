@@ -1,5 +1,5 @@
 --Дома каторые, должны участвовать в анализе
-drop view analyzed_houses;
+--drop view analyzed_houses;
 CREATE OR REPLACE VIEW analyzed_houses AS (
 
 	SELECT ho.bticode
@@ -31,7 +31,7 @@ CREATE OR REPLACE VIEW analyzed_houses AS (
 );
 
 --Дома каторые, должны попасть в отчет о корректности полей
-drop view houses_for_feeling_report;
+--drop view houses_for_feeling_report;
 CREATE OR REPLACE VIEW houses_for_feeling_report AS (
 
 	SELECT ho.bticode AS "Код БТИ"
@@ -119,7 +119,7 @@ CREATE OR REPLACE VIEW houses_for_feeling_report AS (
 );
 
 --Отчет о полноте данных
-drop view feeling_report;
+--drop view feeling_report;
 CREATE OR REPLACE VIEW feeling_report AS (
 	SELECT 
 	      (SELECT ho2.raion FROM house_raw AS ho2 
@@ -575,7 +575,7 @@ CREATE OR REPLACE VIEW feeling_report AS (
 );
 
 --Дома со вкладки МКД, каторые должны попасть в отчет о выполнении условий
-drop view heat_raw_for_uslov_report;
+--drop view heat_raw_for_uslov_report;
 CREATE OR REPLACE VIEW heat_raw_for_uslov_report AS (
 
 SELECT 	   he5.bticode AS "Код БТИ"
@@ -654,7 +654,7 @@ SELECT 	   he5.bticode AS "Код БТИ"
 	GROUP BY "Код БТИ"
 );
 
-drop view heat_raw_uslov_report;
+--drop view heat_raw_uslov_report;
 CREATE OR REPLACE VIEW heat_raw_uslov_report AS (
 
 	SELECT he5."Код БТИ"
@@ -723,6 +723,7 @@ CREATE OR REPLACE VIEW heat_raw_uslov_report AS (
 				he5.total_2013_nov+
 				he5.total_2013_dec+
 				he5.total_2011+
+				he5.total_2012
 				) <> he5.total_2013
 	   	) WHEN TRUE THEN 'Да' END) 						AS "Сумма по мес. 2013 не равна Итого 2013"
 		, (CASE (he5.contract_load_2013 IS NULL) WHEN TRUE THEN 'Да' END) 	AS "Договор. нагр. не в интервале [0,01: 25]"
@@ -738,7 +739,7 @@ CREATE OR REPLACE VIEW heat_raw_uslov_report AS (
 );
 
 --Дома со вкладки МКД, каторые должны попасть в отчет о выполнении условий
-drop view house_raw_for_uslov_report;
+--drop view house_raw_for_uslov_report;
 CREATE OR REPLACE VIEW house_raw_for_uslov_report AS (
 
 SELECT 	   ho5.bticode AS "Код БТИ",
@@ -768,7 +769,7 @@ SELECT 	   ho5.bticode AS "Код БТИ",
 );
 
 
-drop view house_raw_uslov_report;
+--drop view house_raw_uslov_report;
 CREATE OR REPLACE VIEW house_raw_uslov_report AS (
 
 	SELECT ho5."Код БТИ"
