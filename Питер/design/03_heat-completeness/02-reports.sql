@@ -3,7 +3,7 @@ copy (
 	FROM feeling_report AS t
 	ORDER BY t."Район", t."Улица", t."Дом", t."Корпус", t."Код БТИ"
 
-) to '/home/vlad/reports/ac-data-qual/Отчет о полноте данных.csv'
+) to '/home/vlad/reports/ac-data-qual/%raion% Отчет о полноте данных.csv'
 with csv header delimiter ';' encoding 'win_1251'
 ;
 
@@ -13,7 +13,7 @@ copy (
 	FROM uslov_report_MKD AS t
 	ORDER BY t."Улица", t."Дом", t."Код БТИ"
 
-) to '/home/vlad/reports/ac-data-qual/Отчет о выполнении условий вкладка МКД.csv'
+) to '/home/vlad/reports/ac-data-qual/%raion% Отчет о выполнении условий вкладка МКД.csv'
 with csv header delimiter ';' encoding 'win_1251'
 ;
 
@@ -24,7 +24,7 @@ copy (
 
 	ORDER BY t."Код БТИ"
 
-) to '/home/vlad/reports/ac-data-qual/Отчет о выполнении условий вкладка ТЭ.csv'
+) to '/home/vlad/reports/ac-data-qual/%raion% Отчет о выполнении условий вкладка ТЭ.csv'
 with csv header delimiter ';' encoding 'win_1251'
 ;
 
@@ -36,7 +36,7 @@ copy (
 	*100::float
 	) AS "Процент некорректных строк"
 
-) to '/home/vlad/reports/ac-data-qual/Процент некорректных строк.csv'
+) to '/home/vlad/reports/ac-data-qual/%raion% Процент некорректных строк.csv'
 with csv header delimiter ';' encoding 'win_1251'
 ;
 
@@ -48,7 +48,7 @@ copy (
 	*100::float
 	) AS "Процент некорректных ячеек"
 
-) to '/home/vlad/reports/ac-data-qual/Процент некорректных ячеек.csv'
+) to '/home/vlad/reports/ac-data-qual/%raion% Процент некорректных ячеек.csv'
 with csv header delimiter ';' encoding 'win_1251'
 ;
 
@@ -99,7 +99,7 @@ copy (
 	JOIN heat_raw AS he ON ho.bticode = he.bticode
 	ORDER BY   Cast(ho.id_in_file as integer)
 
-) to '/home/vlad/reports/ac-data-qual/Вкладка МКД.csv'
+) to '/home/vlad/reports/ac-data-qual/%raion% Вкладка МКД.csv'
 with csv header delimiter ';' encoding 'win_1251'
 ;
 
@@ -110,7 +110,7 @@ copy (
 	JOIN heat_raw AS he ON ho.bticode = he.bticode
 	ORDER BY   Cast(he.id_in_file as integer)
 
-) to '/home/vlad/reports/ac-data-qual/Вкладка ТЭ.csv'
+) to '/home/vlad/reports/ac-data-qual/%raion% Вкладка ТЭ.csv'
 with csv header delimiter ';' encoding 'win_1251'
 ;
 

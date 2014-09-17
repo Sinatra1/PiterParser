@@ -52,10 +52,10 @@ def createDataBase(def dataBaseName) {
 }
 
 def createTables(def sqlConnection) {
-    def createHouseSql = new File("/home/vlad/Develop/FuzzySearch/Питер/design/01_data-init/01-house.schema (copy).sql").text
+    def createHouseSql = new File("/home/vlad/Develop/FuzzySearch/Питер/design/01_data-init/01-house.schema.sql").text
     sqlConnection.call(createHouseSql)
 
-    def createHeatSql = new File("/home/vlad/Develop/FuzzySearch/Питер/design/01_data-init/01-heat.schema (copy).sql").text
+    def createHeatSql = new File("/home/vlad/Develop/FuzzySearch/Питер/design/01_data-init/01-heat.schema.sql").text
     sqlConnection.call(createHeatSql)
 }
 
@@ -127,10 +127,10 @@ def createValuesStr(def resultArray, def fields) {
 }
 
 def createReports(def sqlConnection, def raionName) {
-    def createViewsSql = new File("/home/vlad/Develop/FuzzySearch/Питер/design/03_heat-completeness/01-views for reports (copy).sql").text
+    def createViewsSql = new File("/home/vlad/Develop/FuzzySearch/Питер/design/03_heat-completeness/01-views for reports.sql").text
     sqlConnection.call(createViewsSql)
 
-    def createReportsSql = new File("/home/vlad/Develop/FuzzySearch/Питер/design/03_heat-completeness/02-reports (copy).sql").text
+    def createReportsSql = new File("/home/vlad/Develop/FuzzySearch/Питер/design/03_heat-completeness/02-reports.sql").text
     createReportsSql = createReportsSql.replaceAll('%raion%', raionName)
     sqlConnection.call(createReportsSql)
 }
