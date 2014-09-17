@@ -635,19 +635,21 @@ SELECT 	   he5.bticode AS "Код БТИ"
 		OR he5.total_2012 <= he5.total_2013_oct
 		OR he5.total_2012 <= he5.total_2013_nov
 		OR he5.total_2012 <= he5.total_2013_dec
-		OR (	(he5.total_2013_jan+
-			he5.total_2013_feb+
-			he5.total_2013_mar+
-			he5.total_2013_apr+
-			he5.total_2013_may+
-			he5.total_2013_jun+
-			he5.total_2013_jul+
-			he5.total_2013_aug+
-			he5.total_2013_sep+
-			he5.total_2013_oct+
-			he5.total_2013_nov+
-			he5.total_2013_dec)
-			<> he5.total_2013
+		OR (	abs(
+				(he5.total_2013_jan+
+				he5.total_2013_feb+
+				he5.total_2013_mar+
+				he5.total_2013_apr+
+				he5.total_2013_may+
+				he5.total_2013_jun+
+				he5.total_2013_jul+
+				he5.total_2013_aug+
+				he5.total_2013_sep+
+				he5.total_2013_oct+
+				he5.total_2013_nov+
+				he5.total_2013_dec)
+				- he5.total_2013
+			    ) > 0.1
 		   )
 		OR he5.contract_load_2013 IS NULL   
 	     )  
@@ -710,7 +712,8 @@ CREATE OR REPLACE VIEW heat_raw_uslov_report AS (
 			OR he5.total_2012 <= he5.total_2013_nov) WHEN TRUE THEN 'Да' END) AS "Ноябрь 2013 >= итого 2011 или 2012"
 		, (CASE (he5.total_2011 <= he5.total_2013_dec
 			OR he5.total_2012 <= he5.total_2013_dec) WHEN TRUE THEN 'Да' END) AS "Декабрь 2013 >= итого 2011 или 2012"
-		, (CASE (	(he5.total_2013_jan+
+		, (CASE (	abs(
+				(he5.total_2013_jan+
 				he5.total_2013_feb+
 				he5.total_2013_mar+
 				he5.total_2013_apr+
@@ -721,7 +724,9 @@ CREATE OR REPLACE VIEW heat_raw_uslov_report AS (
 				he5.total_2013_sep+
 				he5.total_2013_oct+
 				he5.total_2013_nov+
-				he5.total_2013_dec) <> he5.total_2013
+				he5.total_2013_dec)
+				- he5.total_2013
+			    ) > 0.1
 	   	) WHEN TRUE THEN 'Да' END) 						AS "Сумма по мес. 2013 не равна Итого 2013"
 		, (CASE (he5.contract_load_2013 IS NULL) WHEN TRUE THEN 'Да' END) 	AS "Договор. нагр. не в интервале [0,01: 25]"
 

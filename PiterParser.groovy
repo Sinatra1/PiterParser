@@ -182,7 +182,7 @@ def getUnsignedFloatFieldsWithout0(def cell) {
 
     def floatValue = ""
     if(cell.cellType == Cell.CELL_TYPE_NUMERIC && cell.getNumericCellValue() > 0) {
-        floatValue =  cell.getNumericCellValue().toString().replaceAll(',', '.')
+        floatValue =  (Math.round(cell.getNumericCellValue()*100)/100).toString().replaceAll(',', '.')
     }
 
     floatValue
@@ -202,7 +202,7 @@ def getUnsignedFloatField(def cell) {
 
     def floatValue = ""
     if(cell.cellType == Cell.CELL_TYPE_NUMERIC && cell.getNumericCellValue() >= 0) {
-        floatValue =  cell.getNumericCellValue().toString().replaceAll(',', '.')
+        floatValue =  (Math.round(cell.getNumericCellValue()*100)/100).toString().replaceAll(',', '.')
     }
 
     floatValue
@@ -212,7 +212,7 @@ def getEnterDiametr(def cell) {
 
     def floatValue = ""
     if(cell.cellType == Cell.CELL_TYPE_NUMERIC && cell.getNumericCellValue() >= 0 && cell.getNumericCellValue() <= 200) {
-        floatValue =  cell.getNumericCellValue().toString().replaceAll(',', '.')
+        floatValue =  (Math.round(cell.getNumericCellValue()*100)/100).toString().replaceAll(',', '.')
     }
 
     floatValue
@@ -222,7 +222,7 @@ def getEnterPressure(def cell) {
 
     def floatValue = ""
     if(cell.cellType == Cell.CELL_TYPE_NUMERIC && cell.getNumericCellValue() >= 0 && cell.getNumericCellValue() <= 17) {
-        floatValue = cell.getNumericCellValue().toString().replaceAll(',', '.')
+        floatValue = (Math.round(cell.getNumericCellValue()*100)/100).toString().replaceAll(',', '.')
     }
 
     floatValue
@@ -232,7 +232,7 @@ def getEnterPressure(def cell) {
 def getContractLoad2013(def cell) {
     def floatValue = ""
     if(cell.cellType == Cell.CELL_TYPE_NUMERIC && cell.getNumericCellValue() >= 0.01 && cell.getNumericCellValue() <= 25) {
-        floatValue = cell.getNumericCellValue().toString().replaceAll(',', '.')
+        floatValue = (Math.round(cell.getNumericCellValue()*100)/100).toString().replaceAll(',', '.')
     }
 
     floatValue
@@ -353,6 +353,25 @@ def getCountLiftNodes(def cell) {
     intValue
 }
 
+
+def getCountFlats(def cell) {
+
+    def intValue = ""
+    if(cell.cellType == Cell.CELL_TYPE_NUMERIC && cell.getNumericCellValue() >= 0 && cell.getNumericCellValue() <= 50) {
+        intValue = cell.getNumericCellValue() as int
+    }
+    else if(cell.cellType == Cell.CELL_TYPE_STRING) {
+        def word = cell.getRichStringCellValue().getString()
+
+        if(word.contains("/")) {
+            intValue = word
+        }
+
+    }
+
+    intValue
+}
+
 def getMkdUpravForm(def cell) {
     def permissibleValues = ['ГУП ДЕЗ', 'Частная управляющая организация', 'ТСЖ',
             'ЖК', 'ЖСК', 'непосредственное управление', 'орг-ия с гос. участием', 'организация с государственным участием',
@@ -405,14 +424,15 @@ def getHouseType(def cell) {
 }
 
 def getSeries(def cell) {
-    def permissibleValues = ['II-01','II-02','II-03','II-04','II-05','II-07','II-08','II-14','II-17','II-18/12','II-18/9',
+    /*def permissibleValues = ['II-01','II-02','II-03','II-04','II-05','II-07','II-08','II-14','II-17','II-18/12','II-18/9',
             'II-20','II-28','II-29','II-32','II-34','II-35','II-49','II-57','II-66','II-68','II-68-02','II-68-03','II-68-04',
             'III/17','121','131','137','1-305','1-405','1-440','1-447','1-507','1-510','1-511','1-513','1-515/5','1-515/9м',
             '1-515/9ш','1-527','1-528','1-528КП-40','1-528КП-41','1-528КП-80','1-528КП-82','1605/12','1605/9','1-ЛГ-600-I',
             '1-мг-600','1-мг-601','600 (1-ЛГ-600)','602 (1-ЛГ-602)','606 (1-ЛГ-606)','Бекерон','В-2002','ГМС-1','И-155',
             'И-1723','И-1724','И-2076','И-209а','И-491а','И-521а','И-522а','И-700','И-700А','И-760а','ИП-46С','К-7','Колос',
             'МГ-1','МГ-2','П-111','П-3','П-30','П-3М','П-42','П-43','П-44','П-44М','П-44Т','П-46','П-55','ПД-1','ПД-3','ПД-4',
-            'ПП-70','ПП-83','Ш5733','Щ9378','Юникон','индивидуальный','другое', "нет данных"] as Set
+            'ПП-70','ПП-83','Ш5733','Щ9378','Юникон','индивидуальный','другое', "нет данных"] as Set */
+    def permissibleValues = ['Юникон','индивидуальный','другое', "нет данных"] as Set
     def keyValues = ['Юник':'Юникон', 'инд':'индивидуальный', 'друг':'другое', "нет":"нет данных" , "дан":"нет данных"]
     def series = ""
 
@@ -423,6 +443,13 @@ def getSeries(def cell) {
     else if(cell.cellType == Cell.CELL_TYPE_NUMERIC) {
         def word = (cell.getNumericCellValue() as int).toString()
         series = getNearestWordInDictionary(permissibleValues, keyValues, word, 2)
+    }
+
+    if(cell.cellType == Cell.CELL_TYPE_STRING && series == "" && cell.getRichStringCellValue().getString() != "") {
+        series = cell.getRichStringCellValue().getString()
+    }
+    else if(cell.cellType == Cell.CELL_TYPE_NUMERIC && series == "" && (cell.getNumericCellValue() as int) > 0) {
+        series = (cell.getNumericCellValue() as int).toString()
     }
 
     series
@@ -446,7 +473,7 @@ def getSquare(def cell) {
 
     def intValue = ""
     if(cell.cellType == Cell.CELL_TYPE_NUMERIC && (cell.getNumericCellValue() > 0)) {
-        intValue = cell.getNumericCellValue().toString().replaceAll(',', '.')
+        intValue = (Math.round(cell.getNumericCellValue()*100)/100).toString().replaceAll(',', '.')
     }
 
     intValue
@@ -456,7 +483,7 @@ def getNotLivingSquare(def cell) {
 
     def intValue = ""
     if(cell.cellType == Cell.CELL_TYPE_NUMERIC && (cell.getNumericCellValue() >= 0)) {
-        intValue = cell.getNumericCellValue().toString().replaceAll(',', '.')
+        intValue = (Math.round(cell.getNumericCellValue()*100)/100).toString().replaceAll(',', '.')
     }
 
     intValue
@@ -631,7 +658,8 @@ def getMrMonth(def cell) {
 def parseSheetMKD(Sheet sheetMKD, fields) {
     def addressFields = [fields[1], fields[2], fields[3], fields[4], fields[5], fields[6]]
     def unsignedIntFieldsWithout0 = [fields[0], fields[17]]
-    def countLiftNodes =  [fields[14], fields[16]]
+    def countLiftNodes =  [fields[16]]
+    def countFlats = [fields[14]]
     def unsignedIntFields = [fields[15], fields[31], fields[32], fields[33], fields[34], fields[35], fields[36]]
     def btiCode = [fields[7]]
     def year = [fields[12]]
@@ -717,6 +745,10 @@ def parseSheetMKD(Sheet sheetMKD, fields) {
                 else if(countLiftNodes.contains(fields[j])) {
                     tmpRow[fields[j]] = getCountLiftNodes(cell)
                 }
+                else if(countFlats.contains(fields[j])) {
+                    tmpRow[fields[j]] = getCountFlats(cell)
+                }
+
             }
 
         }
@@ -1014,20 +1046,20 @@ def averagePercentOfAllRaions(def raionToDataBase) {
         def sqlConnection = connectToDataBase(it.value)
 
         def percentErrorRows = sqlConnection.rows('''
-                SELECT (
-                    (SELECT count(e.*) FROM error_bticodes AS e)::float /
+        SELECT (
+            (SELECT count(e.*) FROM error_bticodes AS e)::float /
 
-                    (SELECT count(a.*) FROM analyzed_houses AS a)::float
-                    *100::float
-                )''')
+            (SELECT count(a.*) FROM analyzed_houses AS a)::float
+            *100::float
+        )''')
 
         def percentErrorCells = sqlConnection.rows('''
           SELECT (
-                    (SELECT sum_feeling FROM error_cells AS e)::float /
+            (SELECT sum_feeling FROM error_cells AS e)::float /
 
-                    (SELECT count(a.*)::float*75::float FROM analyzed_houses AS a)::float
-                    *100::float
-                  )''')
+            (SELECT count(a.*)::float*75::float FROM analyzed_houses AS a)::float
+            *100::float
+          )''')
 
         totalPercentErrorRows += percentErrorRows[0][0]
         totalPercentErrorCells += percentErrorCells[0][0]
@@ -1040,17 +1072,39 @@ def averagePercentOfAllRaions(def raionToDataBase) {
 
 }
 
+def getSum() {
+    def sqlConnection = connectToDataBase("frunz2")
+
+    def percentErrorRows = sqlConnection.rows('''
+        SELECT he5.total_2013_jan+
+                he5.total_2013_feb+
+                he5.total_2013_mar+
+                he5.total_2013_apr+
+                he5.total_2013_may+
+                he5.total_2013_jun+
+                he5.total_2013_jul+
+                he5.total_2013_aug+
+                he5.total_2013_sep+
+                he5.total_2013_oct+
+                he5.total_2013_nov+
+                he5.total_2013_dec
+                , he5.total_2013'''+
+                " FROM heat_raw as he5 WHERE he5.bticode = '17_000027'")
+
+    sqlConnection.close()
+}
+
 def raionToDataBase = ['Адмиралтейский':'admiral', 'Белоостров':'belo',
                        'Василеостровский':'vasil', 'Калининский':'kalin',
                        'Кировский':'kirov', 'Колпинский':'kolpin',
-                       'Красногвардейский':'krasn', 'Красносельский':'selsk2',
+                       'Красногвардейский':'krasn', 'Красносельский':'selsk',
                        'Кронштадтский':'kronsh', 'Московский':'moskov',
                        'Невский':'nevsk', 'Осиновая роща Приозерское':'osinov',
                        'Петроградский':'petro', 'Петродворцовый':'dvorc',
                        'Приморский':'primor', 'Пушкинский':'pushkin',
-                       'Фрунзенский':'frunz', 'Центральный':'centr']
+                       'Фрунзенский':'frunz2', 'Центральный':'centr']
 
-/*def filePath = '/home/vlad/Develop/FuzzySearch/Питер/data/Адмиралтейский/raw/Адмиралтейский 2.xls'
+def filePath = '/home/vlad/Develop/FuzzySearch/Питер/data/Адмиралтейский/raw/Адмиралтейский 2.xls'
 parseExcelFile(filePath, raionToDataBase)
 
 filePath = '/home/vlad/Develop/FuzzySearch/Питер/data/Белоостров/raw/Белоостров.xls'
@@ -1102,7 +1156,8 @@ filePath = '/home/vlad/Develop/FuzzySearch/Питер/data/Фрунзенски�
 parseExcelFile(filePath, raionToDataBase)
 
 filePath = '/home/vlad/Develop/FuzzySearch/Питер/data/Центральный/raw/Центральный.xls'
-parseExcelFile(filePath, raionToDataBase)*/
+parseExcelFile(filePath, raionToDataBase)
 
 averagePercentOfAllRaions(raionToDataBase)
+//getSum()
 

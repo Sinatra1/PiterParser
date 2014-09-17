@@ -246,7 +246,7 @@ create table house_raw (
     category 		cat,--10
 
     house_type 		hstype,--11
-    series 		ser,--12
+    series 		varchar(255),--12
     year_built 		decimal(4,0),--13
     wall_type 		wall,--14
     floors 		varchar(255),--15
