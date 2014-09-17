@@ -25,7 +25,7 @@ CREATE OR REPLACE VIEW analyzed_houses AS (
 			)
 			OR he.supplier IS NULL)
 			AND ho.category IS NULL
-			AND ho.full_area >= '500'
+			AND (ho.full_area >= '500' OR ho.full_area IS NULL)
 			
 		GROUP BY ho.bticode
 );
@@ -136,6 +136,8 @@ CREATE OR REPLACE VIEW feeling_report AS (
 	      (SELECT ho2.stroenie FROM house_raw AS ho2 
 		WHERE ho2.bticode = t."Код БТИ" LIMIT 1) AS "Строение",
     	      t."Код БТИ",
+	      (CASE ((SELECT count(he2.bticode) FROM heat_raw AS he2 
+			WHERE he2.bticode = t."Код БТИ") = 0) AND (ho5."Код БТИ" IS NOT NULL) WHEN TRUE THEN 'Да' END ) AS "Нет информации на вкладе ТЭ",
 
 	      (SELECT (CASE (ho2.mkd_uprav_form IS NULL) 
 			AND ((SELECT count(he4.bticode) FROM heat_raw AS he4 WHERE he4.bticode = t."Код БТИ") = 1)
@@ -644,9 +646,7 @@ SELECT 	   he5.bticode AS "Код БТИ"
 			he5.total_2013_sep+
 			he5.total_2013_oct+
 			he5.total_2013_nov+
-			he5.total_2013_dec+
-			he5.total_2011+
-			he5.total_2012)
+			he5.total_2013_dec)
 			<> he5.total_2013
 		   )
 		OR he5.contract_load_2013 IS NULL   
@@ -721,10 +721,7 @@ CREATE OR REPLACE VIEW heat_raw_uslov_report AS (
 				he5.total_2013_sep+
 				he5.total_2013_oct+
 				he5.total_2013_nov+
-				he5.total_2013_dec+
-				he5.total_2011+
-				he5.total_2012
-				) <> he5.total_2013
+				he5.total_2013_dec) <> he5.total_2013
 	   	) WHEN TRUE THEN 'Да' END) 						AS "Сумма по мес. 2013 не равна Итого 2013"
 		, (CASE (he5.contract_load_2013 IS NULL) WHEN TRUE THEN 'Да' END) 	AS "Договор. нагр. не в интервале [0,01: 25]"
 
@@ -767,6 +764,216 @@ SELECT 	   ho5.bticode AS "Код БТИ",
 	       
 	GROUP BY "Район", "Улица", "Дом", "Код БТИ"
 );
+
+
+--drop view house_raw_uslov_report;
+CREATE OR REPLACE VIEW house_raw_uslov_report AS (
+
+	SELECT ho5."Код БТИ"
+		, ho5."Улица"
+		, ho5."Дом"
+		, (CASE ((SELECT count(he2.bticode) FROM heat_raw AS he2 
+			WHERE he2.bticode = ho5."Код БТИ") = 0) AND (ho5."Код БТИ" IS NOT NULL) WHEN TRUE THEN 'Да' END ) AS "Нет информации на вкладе ТЭ"
+		, (CASE (((SELECT count(he3.bticode) FROM heat_raw AS he3 WHERE he3.bticode = ho5."Код БТИ") <> 
+			(SELECT count(ho2.bticode) FROM house_raw AS ho2 WHERE ho2.bticode = ho5."Код БТИ"))
+			AND ((SELECT count(he4.bticode) FROM heat_raw AS he4 WHERE he4.bticode = ho5."Код БТИ") > 1)
+		) WHEN TRUE THEN 'Да' END ) 									AS "Если не каждой строке ТЭ => строка МКД"
+		, (CASE (ho5.floors IS NULL) WHEN TRUE THEN 'Да' END) 						AS "Колич. этажей < 1"
+		, (CASE (ho5.porches IS NULL) WHEN TRUE THEN 'Да' END) 						AS "Колич. парадных < 1"
+		, (CASE (ho5.flats IS NULL) WHEN TRUE THEN 'Да' END) 						AS "Колич. квартир < 1"
+		, (CASE (ho5.full_area IS NULL) WHEN TRUE THEN 'Да' END) 						AS "Общ. площадь не задана"
+		, (CASE (ho5.heating_area IS NULL) WHEN TRUE THEN 'Да' END) 					AS "Отаплив. площадь не задана"
+		, (CASE (ho5.living_area IS NULL) WHEN TRUE THEN 'Да' END) 					AS "Жил. площадь не задана"
+		, (CASE (ho5.full_area < ho5.heating_area) WHEN TRUE THEN 'Да' END) 				AS "Общ. площадь < Отаплив. площади"
+
+	FROM (SELECT t2."Код БТИ"
+		, t2."Улица"
+		, t2."Дом"
+		, ho6.*
+		
+		FROM house_raw_for_uslov_report AS t2
+		JOIN house_raw AS ho6 ON (t2."Код БТИ" = ho6.bticode AND t2."Улица" = ho6.street AND t2."Дом" = ho6.house)
+		LEFT JOIN heat_raw AS he6 ON ho6.bticode = he6.bticode
+	) AS ho5
+);
+
+CREATE OR REPLACE VIEW uslov_report_MKD AS (
+	SELECT h."Код БТИ"
+		, (SELECT h3."Улица" 
+			FROM house_raw_uslov_report AS h3 
+			WHERE h3."Код БТИ" = h."Код БТИ" LIMIT 1) AS "Улица" 
+		, (SELECT h3."Дом" 
+			FROM house_raw_uslov_report AS h3 
+			WHERE h3."Код БТИ" = h."Код БТИ" LIMIT 1) AS "Дом" 
+		, (SELECT h3."Нет информации на вкладе ТЭ" 
+			FROM house_raw_uslov_report AS h3 
+			WHERE h3."Код БТИ" = h."Код БТИ" LIMIT 1) AS "Нет информации на вкладе ТЭ"
+		, (SELECT h3."Если не каждой строке ТЭ => строка МКД" 
+			FROM house_raw_uslov_report AS h3 
+			WHERE h3."Код БТИ" = h."Код БТИ" LIMIT 1) AS "Раздвоение во вкладке ТЭ"
+		, (SELECT h3."Колич. этажей < 1" 
+			FROM house_raw_uslov_report AS h3 
+			WHERE h3."Код БТИ" = h."Код БТИ" LIMIT 1) AS "Колич. этажей < 1"
+		, (SELECT h3."Колич. парадных < 1" 
+			FROM house_raw_uslov_report AS h3 
+			WHERE h3."Код БТИ" = h."Код БТИ" LIMIT 1) AS "Колич. парадных < 1"
+		, (SELECT h3."Колич. квартир < 1"
+			FROM house_raw_uslov_report AS h3 
+			WHERE h3."Код БТИ" = h."Код БТИ" LIMIT 1) AS "Колич. квартир < 1"
+		, (SELECT h3."Общ. площадь не задана"
+			FROM house_raw_uslov_report AS h3 
+			WHERE h3."Код БТИ" = h."Код БТИ" LIMIT 1) AS "Общ. площадь не задана"
+		, (SELECT h3."Отаплив. площадь не задана"
+			FROM house_raw_uslov_report AS h3 
+			WHERE h3."Код БТИ" = h."Код БТИ" LIMIT 1) AS "Отаплив. площадь не задана"
+		, (SELECT h3."Жил. площадь не задана"
+			FROM house_raw_uslov_report AS h3 
+			WHERE h3."Код БТИ" = h."Код БТИ" LIMIT 1) AS "Жил. площадь не задана"
+		, (SELECT h3."Общ. площадь < Отаплив. площади"
+			FROM house_raw_uslov_report AS h3 
+			WHERE h3."Код БТИ" = h."Код БТИ" LIMIT 1) AS "Общ. площадь < Отаплив. площади"
+	FROM (SELECT h2."Код БТИ" FROM house_raw_uslov_report AS h2 GROUP BY h2."Код БТИ") AS h
+);
+
+CREATE OR REPLACE VIEW uslov_report_TE AS (
+	SELECT he."Код БТИ"
+		, (SELECT he3."Нет информации на вкладе МКД" 
+			FROM heat_raw_uslov_report AS he3 
+			WHERE he3."Код БТИ" = he."Код БТИ" LIMIT 1) AS "Нет информации на вкладе МКД"
+		, (SELECT he3."Раздвоение во вкладке МКД" 
+			FROM heat_raw_uslov_report AS he3 
+			WHERE he3."Код БТИ" = he."Код БТИ" LIMIT 1) AS "Раздвоение во вкладке МКД"
+		, (SELECT he3."Диаметр ввода > 200" 
+			FROM heat_raw_uslov_report AS he3 
+			WHERE he3."Код БТИ" = he."Код БТИ" LIMIT 1) AS "Диаметр ввода > 200"
+		, (SELECT he3."Давление на вводе > 17" 
+			FROM heat_raw_uslov_report AS he3 
+			WHERE he3."Код БТИ" = he."Код БТИ" LIMIT 1) AS "Давление на вводе > 17"
+		, (SELECT he3."Итого за 2011 <= чем в месяце за 2013" 
+			FROM heat_raw_uslov_report AS he3 
+			WHERE he3."Код БТИ" = he."Код БТИ" LIMIT 1) AS "Итого за 2011 <= чем в месяце за 2013"
+		, (SELECT he3."Итого за 2012 <= чем в месяце за 2013" 
+			FROM heat_raw_uslov_report AS he3 
+			WHERE he3."Код БТИ" = he."Код БТИ" LIMIT 1) AS "Итого за 2012 <= чем в месяце за 2013"
+		, (SELECT he3."Январь 2013 >= итого 2011 или 2012" 
+			FROM heat_raw_uslov_report AS he3 
+			WHERE he3."Код БТИ" = he."Код БТИ" LIMIT 1) AS "Январь 2013 >= итого 2011 или 2012"
+		, (SELECT he3."Февраль 2013 >= итого 2011 или 2012" 
+			FROM heat_raw_uslov_report AS he3 
+			WHERE he3."Код БТИ" = he."Код БТИ" LIMIT 1) AS "Февраль 2013 >= итого 2011 или 2012"
+		, (SELECT he3."Март 2013 >= итого 2011 или 2012" 
+			FROM heat_raw_uslov_report AS he3 
+			WHERE he3."Код БТИ" = he."Код БТИ" LIMIT 1) AS "Март 2013 >= итого 2011 или 2012"
+		, (SELECT he3."Апрель 2013 >= итого 2011 или 2012" 
+			FROM heat_raw_uslov_report AS he3 
+			WHERE he3."Код БТИ" = he."Код БТИ" LIMIT 1) AS "Апрель 2013 >= итого 2011 или 2012"
+		, (SELECT he3."Октябрь 2013 >= итого 2011 или 2012" 
+			FROM heat_raw_uslov_report AS he3 
+			WHERE he3."Код БТИ" = he."Код БТИ" LIMIT 1) AS "Октябрь 2013 >= итого 2011 или 2012"
+		, (SELECT he3."Ноябрь 2013 >= итого 2011 или 2012" 
+			FROM heat_raw_uslov_report AS he3 
+			WHERE he3."Код БТИ" = he."Код БТИ" LIMIT 1) AS "Ноябрь 2013 >= итого 2011 или 2012"
+		, (SELECT he3."Декабрь 2013 >= итого 2011 или 2012" 
+			FROM heat_raw_uslov_report AS he3 
+			WHERE he3."Код БТИ" = he."Код БТИ" LIMIT 1) AS "Декабрь 2013 >= итого 2011 или 2012"
+		, (SELECT he3."Сумма по мес. 2013 не равна Итого 2013" 
+			FROM heat_raw_uslov_report AS he3 
+			WHERE he3."Код БТИ" = he."Код БТИ" LIMIT 1) AS "Сумма по мес. 2013 не равна Итого 2013"
+		, (SELECT he3."Договор. нагр. не в интервале [0,01: 25]" 
+			FROM heat_raw_uslov_report AS he3 
+			WHERE he3."Код БТИ" = he."Код БТИ" LIMIT 1) AS "Договор. нагр. не в интервале [0,01: 25]"
+	FROM (SELECT he2."Код БТИ" FROM heat_raw_uslov_report AS he2 GROUP BY he2."Код БТИ") AS he
+);
+
+CREATE OR REPLACE VIEW error_bticodes AS (
+	SELECT f."Код БТИ" FROM feeling_report AS f
+	UNION
+	SELECT mkd."Код БТИ" FROM uslov_report_MKD AS mkd
+	UNION
+	SELECT te."Код БТИ" FROM uslov_report_TE AS te
+);
+
+CREATE OR REPLACE VIEW error_cells AS (
+	SELECT SUM(
+	      	(CASE t."Район" IS NOT NULL WHEN TRUE THEN 1 ELSE 0 END ) +
+	      	(CASE t."Улица" IS NOT NULL WHEN TRUE THEN 1 ELSE 0 END ) +
+		(CASE t."Дом" IS NOT NULL WHEN TRUE THEN 1 ELSE 0 END ) +
+		(CASE t."Корпус" IS NOT NULL WHEN TRUE THEN 1 ELSE 0 END ) +
+		(CASE t."Строение" IS NOT NULL WHEN TRUE THEN 1 ELSE 0 END ) +
+		(CASE t."Код БТИ" IS NOT NULL WHEN TRUE THEN 1 ELSE 0 END ) +
+		(CASE t."Форма управления МКД" IS NULL WHEN TRUE THEN 1 ELSE 0 END ) +
+		(CASE t."Тип дома" IS NOT NULL WHEN TRUE THEN 1 ELSE 0 END ) +
+		(CASE t."Серия дома" IS NOT NULL WHEN TRUE THEN 1 ELSE 0 END ) +
+		(CASE t."Год постройки" IS NOT NULL WHEN TRUE THEN 1 ELSE 0 END ) +
+		(CASE t."Тип стен" IS NOT NULL WHEN TRUE THEN 1 ELSE 0 END ) +
+		(CASE t."Количество этажей" IS NOT NULL WHEN TRUE THEN 1 ELSE 0 END ) +
+		(CASE t."Количество подземных этажей" IS NOT NULL WHEN TRUE THEN 1 ELSE 0 END ) +
+		(CASE t."Количество парадных" IS NOT NULL WHEN TRUE THEN 1 ELSE 0 END ) +
+		(CASE t."Количество квартир" IS NOT NULL WHEN TRUE THEN 1 ELSE 0 END ) +
+		(CASE t."Общая площадь дома" IS NOT NULL WHEN TRUE THEN 1 ELSE 0 END ) +
+		(CASE t."Общая отапливаемой площадь" IS NOT NULL WHEN TRUE THEN 1 ELSE 0 END ) +
+		(CASE t."Площадь жилых помещений" IS NOT NULL WHEN TRUE THEN 1 ELSE 0 END ) +
+		(CASE t."Площадь нежилых помещений" IS NOT NULL WHEN TRUE THEN 1 ELSE 0 END ) +
+		(CASE t."Электоэнергия" IS NOT NULL WHEN TRUE THEN 1 ELSE 0 END ) +
+		(CASE t."ХВС" IS NOT NULL WHEN TRUE THEN 1 ELSE 0 END ) +
+		(CASE t."ГВС" IS NOT NULL WHEN TRUE THEN 1 ELSE 0 END ) +
+		(CASE t."Водоотведение" IS NOT NULL WHEN TRUE THEN 1 ELSE 0 END ) +
+		(CASE t."Отопление" IS NOT NULL WHEN TRUE THEN 1 ELSE 0 END ) +
+		(CASE t."Газоснабжение" IS NOT NULL WHEN TRUE THEN 1 ELSE 0 END ) +
+		(CASE t."Оснащение газ. колонками" IS NOT NULL WHEN TRUE THEN 1 ELSE 0 END ) +
+		(CASE t."Оснащение газ.плитами" IS NOT NULL WHEN TRUE THEN 1 ELSE 0 END ) +
+		(CASE t."Оснащение электроплитами" IS NOT NULL WHEN TRUE THEN 1 ELSE 0 END ) +
+		(CASE t."Кол-во лифтов дома" IS NOT NULL WHEN TRUE THEN 1 ELSE 0 END ) +
+		(CASE t."колич. ЭЭ" IS NOT NULL WHEN TRUE THEN 1 ELSE 0 END ) +
+		(CASE t."колич. ХВС" IS NOT NULL WHEN TRUE THEN 1 ELSE 0 END ) +
+		(CASE t."колич. ГВС" IS NOT NULL WHEN TRUE THEN 1 ELSE 0 END ) +
+		(CASE t."колич. ТЭ" IS NOT NULL WHEN TRUE THEN 1 ELSE 0 END ) +
+		(CASE t."колич. Газ" IS NOT NULL WHEN TRUE THEN 1 ELSE 0 END ) +
+		(CASE t."Поставщик ресурсов" IS NOT NULL WHEN TRUE THEN 1 ELSE 0 END ) +
+		(CASE t."Тип подключения дома" IS NOT NULL WHEN TRUE THEN 1 ELSE 0 END ) +
+		(CASE t."Потребитель ресурса" IS NOT NULL WHEN TRUE THEN 1 ELSE 0 END ) +
+		(CASE t."Вид ресурса" IS NOT NULL WHEN TRUE THEN 1 ELSE 0 END ) +
+		(CASE t."Ед. изм." IS NOT NULL WHEN TRUE THEN 1 ELSE 0 END ) +
+		(CASE t."Кол-во приборов учета тепловой энергии" IS NOT NULL WHEN TRUE THEN 1 ELSE 0 END ) +
+		(CASE t."Тим системы" IS NOT NULL WHEN TRUE THEN 1 ELSE 0 END ) +
+		(CASE t."Диаметр ввода" IS NOT NULL WHEN TRUE THEN 1 ELSE 0 END ) +
+		(CASE t."Давление на вводе" IS NOT NULL WHEN TRUE THEN 1 ELSE 0 END ) +
+		(CASE t."Температурный график тепловой сети" IS NOT NULL WHEN TRUE THEN 1 ELSE 0 END ) +
+		(CASE t."Наличие ГВС" IS NOT NULL WHEN TRUE THEN 1 ELSE 0 END ) +
+		(CASE t."Необходимость резерва ГВС" IS NOT NULL WHEN TRUE THEN 1 ELSE 0 END ) +
+		(CASE t."Наличие систем учета" IS NOT NULL WHEN TRUE THEN 1 ELSE 0 END ) +
+		(CASE t."Необходимость дииспетчиризации" IS NOT NULL WHEN TRUE THEN 1 ELSE 0 END ) +
+		(CASE t."Схема присоединения к тепловой сети" IS NOT NULL WHEN TRUE THEN 1 ELSE 0 END ) +
+		(CASE t."Резервирование насосов ГВС" IS NOT NULL WHEN TRUE THEN 1 ELSE 0 END ) +
+		(CASE t."Потребление за 2011 год" IS NOT NULL WHEN TRUE THEN 1 ELSE 0 END ) +
+		(CASE t."Потребление за 2012 год" IS NOT NULL WHEN TRUE THEN 1 ELSE 0 END ) +
+		(CASE t."Потребление за 2013 год" IS NOT NULL WHEN TRUE THEN 1 ELSE 0 END ) +
+		(CASE t."Всего за 2013 январь" IS NOT NULL WHEN TRUE THEN 1 ELSE 0 END ) +
+		(CASE t."МР 2013 январь" IS NOT NULL WHEN TRUE THEN 1 ELSE 0 END ) +
+		(CASE t."Всего за 2013 февраль" IS NOT NULL WHEN TRUE THEN 1 ELSE 0 END ) +
+		(CASE t."МР 2013 февраль" IS NOT NULL WHEN TRUE THEN 1 ELSE 0 END ) +
+		(CASE t."Всего за 2013 март" IS NOT NULL WHEN TRUE THEN 1 ELSE 0 END ) +
+		(CASE t."МР 2013 март" IS NOT NULL WHEN TRUE THEN 1 ELSE 0 END ) +
+		(CASE t."Всего за 2013 апрель" IS NOT NULL WHEN TRUE THEN 1 ELSE 0 END ) +
+		(CASE t."МР 2013 апрель" IS NOT NULL WHEN TRUE THEN 1 ELSE 0 END ) +
+		(CASE t."Всего за 2013 октябрь" IS NOT NULL WHEN TRUE THEN 1 ELSE 0 END ) +
+		(CASE t."МР 2013 октябрь" IS NOT NULL WHEN TRUE THEN 1 ELSE 0 END ) +
+		(CASE t."Всего за 2013 ноябрь" IS NOT NULL WHEN TRUE THEN 1 ELSE 0 END ) +
+		(CASE t."МР 2013 ноябрь" IS NOT NULL WHEN TRUE THEN 1 ELSE 0 END ) +
+		(CASE t."Всего за 2013 декабрь" IS NOT NULL WHEN TRUE THEN 1 ELSE 0 END ) +
+		(CASE t."МР 2013 декабрь" IS NOT NULL WHEN TRUE THEN 1 ELSE 0 END ) +
+		(CASE t."Договорная нагрузка" IS NOT NULL WHEN TRUE THEN 1 ELSE 0 END ) +
+		(CASE t."Нормативный температурный график" IS NOT NULL WHEN TRUE THEN 1 ELSE 0 END ) +
+		(CASE t."Схема присоединения системы отопления" IS NOT NULL WHEN TRUE THEN 1 ELSE 0 END ) +
+		(CASE t."Количество элеваторных узлов" IS NOT NULL WHEN TRUE THEN 1 ELSE 0 END ) +
+		(CASE t."Транзит на отопление" IS NOT NULL WHEN TRUE THEN 1 ELSE 0 END )
+	     ) AS sum_feeling
+		
+
+	FROM feeling_report AS t
+);
+
+
 
 
 

@@ -61,17 +61,12 @@ def createTables(def sqlConnection) {
 
 def connectToDataBase(def dataBaseName) {
 
-    dropDataBase(dataBaseName)
-    createDataBase(dataBaseName)
-
     def dbUrl      = "jdbc:postgresql://localhost:5432/${dataBaseName}"
     def dbUser     = "postgres"
     def dbPassword = "1"
 
     def connection = DriverManager.getConnection(dbUrl, dbUser, dbPassword);
     def sqlConnection = new Sql(connection)
-
-    createTables(sqlConnection)
 
     sqlConnection
 }
@@ -105,7 +100,7 @@ def createValuesStr(def resultArray, def fields) {
        int i = 0
        while (i < fields.size()) {
             def cellValue = "NULL"
-            if(currentRow.containsKey(fields[i]) && currentRow[fields[i]]) {
+            if(currentRow.containsKey(fields[i]) && currentRow[fields[i]] != "") {
                 cellValue = "'${currentRow[fields[i]]}'"
             }
 
@@ -196,7 +191,7 @@ def getUnsignedFloatFieldsWithout0(def cell) {
 def getUnsignedIntField(def cell) {
 
     def intValue = ""
-    if(cell.cellType == Cell.CELL_TYPE_NUMERIC && cell.getNumericCellValue() >= 0) {
+    if(cell.cellType == Cell.CELL_TYPE_NUMERIC && cell.getNumericCellValue() >= 0 && cell.getNumericCellValue() <= 50) {
         intValue =  cell.getNumericCellValue() as int
     }
 
@@ -342,7 +337,7 @@ def getNearestWordInDictionary(Set<String> dictionary, def keyValues, def word, 
 def getCountLiftNodes(def cell) {
 
     def intValue = ""
-    if(cell.cellType == Cell.CELL_TYPE_NUMERIC && cell.getNumericCellValue() >= 0) {
+    if(cell.cellType == Cell.CELL_TYPE_NUMERIC && cell.getNumericCellValue() >= 0 && cell.getNumericCellValue() <= 50) {
         intValue = cell.getNumericCellValue() as int
     }
     else if(cell.cellType == Cell.CELL_TYPE_STRING) {
@@ -417,8 +412,8 @@ def getSeries(def cell) {
             '1-мг-600','1-мг-601','600 (1-ЛГ-600)','602 (1-ЛГ-602)','606 (1-ЛГ-606)','Бекерон','В-2002','ГМС-1','И-155',
             'И-1723','И-1724','И-2076','И-209а','И-491а','И-521а','И-522а','И-700','И-700А','И-760а','ИП-46С','К-7','Колос',
             'МГ-1','МГ-2','П-111','П-3','П-30','П-3М','П-42','П-43','П-44','П-44М','П-44Т','П-46','П-55','ПД-1','ПД-3','ПД-4',
-            'ПП-70','ПП-83','Ш5733','Щ9378','Юникон','индивидуальный','другое'] as Set
-    def keyValues = ['Юник':'Юникон', 'инд':'индивидуальный', 'друг':'другое']
+            'ПП-70','ПП-83','Ш5733','Щ9378','Юникон','индивидуальный','другое', "нет данных"] as Set
+    def keyValues = ['Юник':'Юникон', 'инд':'индивидуальный', 'друг':'другое', "нет":"нет данных" , "дан":"нет данных"]
     def series = ""
 
     if(cell.cellType == Cell.CELL_TYPE_STRING) {
@@ -451,6 +446,16 @@ def getSquare(def cell) {
 
     def intValue = ""
     if(cell.cellType == Cell.CELL_TYPE_NUMERIC && (cell.getNumericCellValue() > 0)) {
+        intValue = cell.getNumericCellValue().toString().replaceAll(',', '.')
+    }
+
+    intValue
+}
+
+def getNotLivingSquare(def cell) {
+
+    def intValue = ""
+    if(cell.cellType == Cell.CELL_TYPE_NUMERIC && (cell.getNumericCellValue() >= 0)) {
         intValue = cell.getNumericCellValue().toString().replaceAll(',', '.')
     }
 
@@ -625,7 +630,8 @@ def getMrMonth(def cell) {
 
 def parseSheetMKD(Sheet sheetMKD, fields) {
     def addressFields = [fields[1], fields[2], fields[3], fields[4], fields[5], fields[6]]
-    def unsignedIntFieldsWithout0 = [fields[0], fields[14], fields[16], fields[17]]
+    def unsignedIntFieldsWithout0 = [fields[0], fields[17]]
+    def countLiftNodes =  [fields[14], fields[16]]
     def unsignedIntFields = [fields[15], fields[31], fields[32], fields[33], fields[34], fields[35], fields[36]]
     def btiCode = [fields[7]]
     def year = [fields[12]]
@@ -634,7 +640,8 @@ def parseSheetMKD(Sheet sheetMKD, fields) {
     def houseType = [fields[10]]
     def series = [fields[11]]
     def wallType = [fields[13]]
-    def square = [fields[18], fields[19], fields[20], fields[21]]
+    def square = [fields[18], fields[19], fields[20]]
+    def notLivingSquare = [fields[21]]
     def yesNo = [fields[22], fields[23], fields[24], fields[25], fields[26], fields[27], fields[28], fields[29], fields[30]]
 
     def parsedSheet = [:]
@@ -651,9 +658,14 @@ def parseSheetMKD(Sheet sheetMKD, fields) {
 
         def tmpRow = [:]
         boolean stopWhile = false
+
         while (cells.hasNext() && !stopWhile) {
             Cell cell = (Cell) cells.next()
             int j = cell.columnIndex
+
+            if(cell.cellType == Cell.CELL_TYPE_NUMERIC && cell.getNumericCellValue() as int == 8454) {
+                int k = 0;
+            }
 
             if(cell.toString() == signToStartFeel && j == 0 && !fillTmpRow) {
                 fillTmpRow = true
@@ -696,8 +708,14 @@ def parseSheetMKD(Sheet sheetMKD, fields) {
                 else if(square.contains(fields[j])) {
                     tmpRow[fields[j]] = getSquare(cell)
                 }
+                else if(notLivingSquare.contains(fields[j])) {
+                    tmpRow[fields[j]] = getNotLivingSquare(cell)
+                }
                 else if(yesNo.contains(fields[j])) {
                     tmpRow[fields[j]] = getYesNoField(cell)
+                }
+                else if(countLiftNodes.contains(fields[j])) {
+                    tmpRow[fields[j]] = getCountLiftNodes(cell)
                 }
             }
 
@@ -967,22 +985,17 @@ def getSeriesGroup() {
 }
 
 
-def parseExcelFile(def filePath) {
-    def raionToDataBase = ['Адмиралтейский':'admiral', 'Белоостров':'belo',
-                           'Василеостровский':'vasil', 'Калининский':'kalin',
-                            'Кировский':'kirov', 'Колпинский':'kolpin',
-                            'Красногвардейский':'krasn', 'Красносельский':'selsk',
-                            'Кронштадтский':'kronsh', 'Московский':'moskov',
-                            'Невский':'nevsk', 'Осиновая роща Приозерское':'osinov',
-                            'Петроградский':'petro', 'Петродворцовый':'dvorc',
-                            'Приморский':'primor', 'Пушкинский':'pushkin',
-                            'Фрунзенский':'frunz', 'Центральный':'centr']
+def parseExcelFile(def filePath, def raionToDataBase) {
+
 
     def currentRaion = findCurrentRaion(filePath, raionToDataBase)
     def dataBaseName = currentRaion.value
     def raionName = currentRaion.key
 
+    dropDataBase(dataBaseName)
+    createDataBase(dataBaseName)
     def sqlConnection = connectToDataBase(dataBaseName)
+    createTables(sqlConnection)
 
     parseMKDSheet(filePath, sqlConnection)
     parseTESheet(filePath, sqlConnection)
@@ -992,59 +1005,104 @@ def parseExcelFile(def filePath) {
     sqlConnection.close()
 }
 
-def filePath = '/home/vlad/Develop/FuzzySearch/Питер/data/Адмиралтейский/raw/Адмиралтейский 2.xls'
-parseExcelFile(filePath)
+def averagePercentOfAllRaions(def raionToDataBase) {
+
+    def totalPercentErrorRows = 0
+    def totalPercentErrorCells = 0
+
+    raionToDataBase.each {
+        def sqlConnection = connectToDataBase(it.value)
+
+        def percentErrorRows = sqlConnection.rows('''
+                SELECT (
+                    (SELECT count(e.*) FROM error_bticodes AS e)::float /
+
+                    (SELECT count(a.*) FROM analyzed_houses AS a)::float
+                    *100::float
+                )''')
+
+        def percentErrorCells = sqlConnection.rows('''
+          SELECT (
+                    (SELECT sum_feeling FROM error_cells AS e)::float /
+
+                    (SELECT count(a.*)::float*75::float FROM analyzed_houses AS a)::float
+                    *100::float
+                  )''')
+
+        totalPercentErrorRows += percentErrorRows[0][0]
+        totalPercentErrorCells += percentErrorCells[0][0]
+
+        sqlConnection.close()
+    }
+
+    println("Средний процент косячных строк ${totalPercentErrorRows/raionToDataBase.size()}")
+    println("Средний процент косячных ячеек ${totalPercentErrorCells/raionToDataBase.size()}")
+
+}
+
+def raionToDataBase = ['Адмиралтейский':'admiral', 'Белоостров':'belo',
+                       'Василеостровский':'vasil', 'Калининский':'kalin',
+                       'Кировский':'kirov', 'Колпинский':'kolpin',
+                       'Красногвардейский':'krasn', 'Красносельский':'selsk2',
+                       'Кронштадтский':'kronsh', 'Московский':'moskov',
+                       'Невский':'nevsk', 'Осиновая роща Приозерское':'osinov',
+                       'Петроградский':'petro', 'Петродворцовый':'dvorc',
+                       'Приморский':'primor', 'Пушкинский':'pushkin',
+                       'Фрунзенский':'frunz', 'Центральный':'centr']
+
+/*def filePath = '/home/vlad/Develop/FuzzySearch/Питер/data/Адмиралтейский/raw/Адмиралтейский 2.xls'
+parseExcelFile(filePath, raionToDataBase)
 
 filePath = '/home/vlad/Develop/FuzzySearch/Питер/data/Белоостров/raw/Белоостров.xls'
-parseExcelFile(filePath)
+parseExcelFile(filePath, raionToDataBase)
 
 filePath = '/home/vlad/Develop/FuzzySearch/Питер/data/Василеостровский/raw/Василеостровский 2.xls'
-parseExcelFile(filePath)
+parseExcelFile(filePath, raionToDataBase)
 
 filePath = '/home/vlad/Develop/FuzzySearch/Питер/data/Калининский/raw/Калининский.xls'
-parseExcelFile(filePath)
+parseExcelFile(filePath, raionToDataBase)
 
 filePath = '/home/vlad/Develop/FuzzySearch/Питер/data/Кировский/raw/Кировский.xls'
-parseExcelFile(filePath)
+parseExcelFile(filePath, raionToDataBase)
 
 filePath = '/home/vlad/Develop/FuzzySearch/Питер/data/Колпинский/raw/Колпинский.xls'
-parseExcelFile(filePath)
+parseExcelFile(filePath, raionToDataBase)
 
 filePath = '/home/vlad/Develop/FuzzySearch/Питер/data/Красногвардейский/raw/Красногвардейский.xls'
-parseExcelFile(filePath)
+parseExcelFile(filePath, raionToDataBase)
 
-filePath = '/home/vlad/Develop/FuzzySearch/Питер/data/Красносельский/raw/Красносельский.xls'
-parseExcelFile(filePath)
+filePath = '/home/vlad/Develop/FuzzySearch/Питер/data/Красносельский/raw/Красносельский 2.xls'
+parseExcelFile(filePath, raionToDataBase)
 
 filePath = '/home/vlad/Develop/FuzzySearch/Питер/data/Кронштадтский/raw/Кронштадтский 2.xls'
-parseExcelFile(filePath)
+parseExcelFile(filePath, raionToDataBase)
 
 filePath = '/home/vlad/Develop/FuzzySearch/Питер/data/Московский/raw/Московский.xls'
-parseExcelFile(filePath)
+parseExcelFile(filePath, raionToDataBase)
 
 filePath = '/home/vlad/Develop/FuzzySearch/Питер/data/Невский/raw/Невский 2.xls'
-parseExcelFile(filePath)
+parseExcelFile(filePath, raionToDataBase)
 
 filePath = '/home/vlad/Develop/FuzzySearch/Питер/data/Осиновая роща Приозерское/raw/Осиновая роща Приозерское.xls'
-parseExcelFile(filePath)
+parseExcelFile(filePath, raionToDataBase)
 
 filePath = '/home/vlad/Develop/FuzzySearch/Питер/data/Петроградский/raw/Петроградский.xls'
-parseExcelFile(filePath)
+parseExcelFile(filePath, raionToDataBase)
 
 filePath = '/home/vlad/Develop/FuzzySearch/Питер/data/Петродворцовый/raw/Петродворцовый 2.xls'
-parseExcelFile(filePath)
+parseExcelFile(filePath, raionToDataBase)
 
 filePath = '/home/vlad/Develop/FuzzySearch/Питер/data/Приморский/raw/Приморский 2.xls'
-parseExcelFile(filePath)
+parseExcelFile(filePath, raionToDataBase)
 
 filePath = '/home/vlad/Develop/FuzzySearch/Питер/data/Пушкинский/raw/Пушкинский.xls'
-parseExcelFile(filePath)
+parseExcelFile(filePath, raionToDataBase)
 
-filePath = '/home/vlad/Develop/FuzzySearch/Питер/data/Фрунзенский/raw/Фрунзенский.xls'
-parseExcelFile(filePath)
+filePath = '/home/vlad/Develop/FuzzySearch/Питер/data/Фрунзенский/raw/Фрунзенский 2.xls'
+parseExcelFile(filePath, raionToDataBase)
 
 filePath = '/home/vlad/Develop/FuzzySearch/Питер/data/Центральный/raw/Центральный.xls'
-parseExcelFile(filePath)
+parseExcelFile(filePath, raionToDataBase)*/
 
-
+averagePercentOfAllRaions(raionToDataBase)
 

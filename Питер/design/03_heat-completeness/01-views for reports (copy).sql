@@ -25,7 +25,7 @@ CREATE OR REPLACE VIEW analyzed_houses AS (
 			)
 			OR he.supplier IS NULL)
 			AND ho.category IS NULL
-			AND ho.full_area >= '500'
+			AND (ho.full_area >= '500' OR ho.full_area IS NULL)
 			
 		GROUP BY ho.bticode
 );
@@ -136,6 +136,8 @@ CREATE OR REPLACE VIEW feeling_report AS (
 	      (SELECT ho2.stroenie FROM house_raw AS ho2 
 		WHERE ho2.bticode = t."Код БТИ" LIMIT 1) AS "Строение",
     	      t."Код БТИ",
+	      (CASE ((SELECT count(he2.bticode) FROM heat_raw AS he2 
+			WHERE he2.bticode = t."Код БТИ") = 0) AND (t."Код БТИ" IS NOT NULL) WHEN TRUE THEN 'Да' END ) AS "Нет информации на вкладе ТЭ",
 
 	      (SELECT (CASE (ho2.mkd_uprav_form IS NULL) 
 			AND ((SELECT count(he4.bticode) FROM heat_raw AS he4 WHERE he4.bticode = t."Код БТИ") = 1)
@@ -644,9 +646,7 @@ SELECT 	   he5.bticode AS "Код БТИ"
 			he5.total_2013_sep+
 			he5.total_2013_oct+
 			he5.total_2013_nov+
-			he5.total_2013_dec+
-			he5.total_2011+
-			he5.total_2012)
+			he5.total_2013_dec)
 			<> he5.total_2013
 		   )
 		OR he5.contract_load_2013 IS NULL   
@@ -721,10 +721,7 @@ CREATE OR REPLACE VIEW heat_raw_uslov_report AS (
 				he5.total_2013_sep+
 				he5.total_2013_oct+
 				he5.total_2013_nov+
-				he5.total_2013_dec+
-				he5.total_2011+
-				he5.total_2012
-				) <> he5.total_2013
+				he5.total_2013_dec) <> he5.total_2013
 	   	) WHEN TRUE THEN 'Да' END) 						AS "Сумма по мес. 2013 не равна Итого 2013"
 		, (CASE (he5.contract_load_2013 IS NULL) WHEN TRUE THEN 'Да' END) 	AS "Договор. нагр. не в интервале [0,01: 25]"
 
@@ -784,9 +781,9 @@ CREATE OR REPLACE VIEW house_raw_uslov_report AS (
 		, (CASE (ho5.floors IS NULL) WHEN TRUE THEN 'Да' END) 						AS "Колич. этажей < 1"
 		, (CASE (ho5.porches IS NULL) WHEN TRUE THEN 'Да' END) 						AS "Колич. парадных < 1"
 		, (CASE (ho5.flats IS NULL) WHEN TRUE THEN 'Да' END) 						AS "Колич. квартир < 1"
-		, (CASE (ho5.full_area IS NULL) WHEN TRUE THEN 'Да' END) 						AS "Общ. площадь < 50"
-		, (CASE (ho5.heating_area IS NULL) WHEN TRUE THEN 'Да' END) 					AS "Отаплив. площадь < 50"
-		, (CASE (ho5.living_area IS NULL) WHEN TRUE THEN 'Да' END) 					AS "Жил. площадь < 50"
+		, (CASE (ho5.full_area IS NULL) WHEN TRUE THEN 'Да' END) 						AS "Общ. площадь не задана"
+		, (CASE (ho5.heating_area IS NULL) WHEN TRUE THEN 'Да' END) 					AS "Отаплив. площадь не задана"
+		, (CASE (ho5.living_area IS NULL) WHEN TRUE THEN 'Да' END) 					AS "Жил. площадь не задана"
 		, (CASE (ho5.full_area < ho5.heating_area) WHEN TRUE THEN 'Да' END) 				AS "Общ. площадь < Отаплив. площади"
 
 	FROM (SELECT t2."Код БТИ"
@@ -823,15 +820,15 @@ CREATE OR REPLACE VIEW uslov_report_MKD AS (
 		, (SELECT h3."Колич. квартир < 1"
 			FROM house_raw_uslov_report AS h3 
 			WHERE h3."Код БТИ" = h."Код БТИ" LIMIT 1) AS "Колич. квартир < 1"
-		, (SELECT h3."Общ. площадь < 50"
+		, (SELECT h3."Общ. площадь не задана"
 			FROM house_raw_uslov_report AS h3 
-			WHERE h3."Код БТИ" = h."Код БТИ" LIMIT 1) AS "Общ. площадь < 50"
-		, (SELECT h3."Отаплив. площадь < 50"
+			WHERE h3."Код БТИ" = h."Код БТИ" LIMIT 1) AS "Общ. площадь не задана"
+		, (SELECT h3."Отаплив. площадь не задана"
 			FROM house_raw_uslov_report AS h3 
-			WHERE h3."Код БТИ" = h."Код БТИ" LIMIT 1) AS "Отаплив. площадь < 50"
-		, (SELECT h3."Жил. площадь < 50"
+			WHERE h3."Код БТИ" = h."Код БТИ" LIMIT 1) AS "Отаплив. площадь не задана"
+		, (SELECT h3."Жил. площадь не задана"
 			FROM house_raw_uslov_report AS h3 
-			WHERE h3."Код БТИ" = h."Код БТИ" LIMIT 1) AS "Жил. площадь < 50"
+			WHERE h3."Код БТИ" = h."Код БТИ" LIMIT 1) AS "Жил. площадь не задана"
 		, (SELECT h3."Общ. площадь < Отаплив. площади"
 			FROM house_raw_uslov_report AS h3 
 			WHERE h3."Код БТИ" = h."Код БТИ" LIMIT 1) AS "Общ. площадь < Отаплив. площади"

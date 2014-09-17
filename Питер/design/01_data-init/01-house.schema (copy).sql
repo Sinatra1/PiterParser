@@ -142,7 +142,8 @@ CREATE TYPE ser AS ENUM (
 'Щ9378',
 'Юникон',
 'индивидуальный',
-'другое'
+'другое',
+'нет данных'
 );
 
 DROP TYPE if exists wall;
@@ -249,9 +250,9 @@ create table house_raw (
     year_built 		decimal(4,0),--13
     wall_type 		wall,--14
     floors 		varchar(255),--15
-    underfloors 	decimal(4,0),--16
-    porches 		decimal(4,0),--17
-    flats 		decimal(4,0),--18
+    underfloors 	int,--16
+    porches 		int,--17
+    flats 		varchar(50),--18
 
     full_area 		decimal,--19	
     heating_area 	decimal,--20
