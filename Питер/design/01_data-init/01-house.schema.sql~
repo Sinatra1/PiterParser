@@ -50,7 +50,7 @@ CREATE TYPE hstype AS ENUM (
 
 DROP TYPE if exists ser;
 CREATE TYPE ser AS ENUM (
-/*'II-01',
+'II-01',
 'II-02',
 'II-03',
 'II-04',
@@ -139,7 +139,7 @@ CREATE TYPE ser AS ENUM (
 'ПП-70',
 'ПП-83',
 'Ш5733',
-'Щ9378',*/
+'Щ9378',
 'Юникон',
 'индивидуальный',
 'другое',
@@ -246,7 +246,7 @@ create table house_raw (
     category 		cat,--10
 
     house_type 		hstype,--11
-    series 		ser,--12
+    series 		varchar(255),--12
     year_built 		decimal(4,0),--13
     wall_type 		wall,--14
     floors 		varchar(255),--15
@@ -276,7 +276,7 @@ create table house_raw (
     heat_devices_count 	decimal(4,0),--36
     gas_devices_count 	decimal(4,0)--,--37
 
-    --notes varchar(255)--38
+    notes varchar(255)--38
 );
 
 CREATE INDEX ho_ind ON house_raw(bticode);

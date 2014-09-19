@@ -26,6 +26,7 @@ CREATE OR REPLACE VIEW analyzed_houses AS (
 			OR he.supplier IS NULL)
 			AND ho.category IS NULL
 			AND (ho.full_area >= '500' OR ho.full_area IS NULL)
+			AND ho.notes IS NULL
 			
 		GROUP BY ho.bticode
 );

@@ -16,6 +16,14 @@ import org.apache.poi.ss.usermodel.Sheet
 import java.sql.Driver
 import java.sql.DriverManager
 
+def getFloatCell(def cell) {
+    cell.getRichStringCellValue().getString().replaceAll(",", ".").replaceAll("'", "") as float
+}
+
+def isFloatCell(def cell) {
+    cell.getRichStringCellValue().getString().replaceAll(",", ".").replaceAll("'", "").float
+}
+
 def findCurrentRaion(def filePath, def raionToDataBase) {
     def currentRaion = ""
     raionToDataBase.each {
@@ -184,6 +192,9 @@ def getUnsignedFloatFieldsWithout0(def cell) {
     if(cell.cellType == Cell.CELL_TYPE_NUMERIC && cell.getNumericCellValue() > 0) {
         floatValue =  (Math.round(cell.getNumericCellValue()*100)/100).toString().replaceAll(',', '.')
     }
+    else if(cell.cellType == Cell.CELL_TYPE_STRING && isFloatCell(cell) && (getFloatCell(cell))  > 0) {
+        floatValue =  (Math.round((getFloatCell(cell))*100)/100).toString().replaceAll(',', '.')
+    }
 
     floatValue
 }
@@ -193,6 +204,9 @@ def getUnsignedIntField(def cell) {
     def intValue = ""
     if(cell.cellType == Cell.CELL_TYPE_NUMERIC && cell.getNumericCellValue() >= 0 && cell.getNumericCellValue() <= 50) {
         intValue =  cell.getNumericCellValue() as int
+    }
+    else if(cell.cellType == Cell.CELL_TYPE_STRING && isFloatCell(cell) && (cell.getRichStringCellValue().getString() as int) >= 0 && (cell.getRichStringCellValue().getString() as int) <= 50) {
+        intValue =  (cell.getRichStringCellValue().getString() as int)
     }
 
     intValue
@@ -204,6 +218,9 @@ def getUnsignedFloatField(def cell) {
     if(cell.cellType == Cell.CELL_TYPE_NUMERIC && cell.getNumericCellValue() >= 0) {
         floatValue =  (Math.round(cell.getNumericCellValue()*100)/100).toString().replaceAll(',', '.')
     }
+    else if(cell.cellType == Cell.CELL_TYPE_STRING && isFloatCell(cell) && (getFloatCell(cell))  >= 0) {
+        floatValue =  (Math.round((getFloatCell(cell))*100)/100).toString().replaceAll(',', '.')
+    }
 
     floatValue
 }
@@ -213,6 +230,9 @@ def getEnterDiametr(def cell) {
     def floatValue = ""
     if(cell.cellType == Cell.CELL_TYPE_NUMERIC && cell.getNumericCellValue() >= 0 && cell.getNumericCellValue() <= 200) {
         floatValue =  (Math.round(cell.getNumericCellValue()*100)/100).toString().replaceAll(',', '.')
+    }
+    else if(cell.cellType == Cell.CELL_TYPE_STRING && isFloatCell(cell) && (getFloatCell(cell))  >= 0 && (getFloatCell(cell))  <= 200) {
+        floatValue =  (Math.round((getFloatCell(cell))*100)/100).toString().replaceAll(',', '.')
     }
 
     floatValue
@@ -224,6 +244,9 @@ def getEnterPressure(def cell) {
     if(cell.cellType == Cell.CELL_TYPE_NUMERIC && cell.getNumericCellValue() >= 0 && cell.getNumericCellValue() <= 17) {
         floatValue = (Math.round(cell.getNumericCellValue()*100)/100).toString().replaceAll(',', '.')
     }
+    else if(cell.cellType == Cell.CELL_TYPE_STRING && isFloatCell(cell) && (getFloatCell(cell))  >= 0 && (getFloatCell(cell))  <= 17) {
+        floatValue = (Math.round((getFloatCell(cell))*100)/100).toString().replaceAll(',', '.')
+    }
 
     floatValue
 }
@@ -233,6 +256,9 @@ def getContractLoad2013(def cell) {
     def floatValue = ""
     if(cell.cellType == Cell.CELL_TYPE_NUMERIC && cell.getNumericCellValue() >= 0.01 && cell.getNumericCellValue() <= 25) {
         floatValue = (Math.round(cell.getNumericCellValue()*100)/100).toString().replaceAll(',', '.')
+    }
+    else if(cell.cellType == Cell.CELL_TYPE_STRING && isFloatCell(cell) && (getFloatCell(cell))  >= 0.01 && (getFloatCell(cell))  <= 25) {
+        floatValue = (Math.round((getFloatCell(cell))*100)/100).toString().replaceAll(',', '.')
     }
 
     floatValue
@@ -366,6 +392,9 @@ def getCountFlats(def cell) {
         if(word.contains("/")) {
             intValue = word
         }
+        else if(cell.getRichStringCellValue().getString().replaceAll("'", "").float) {
+            intValue = getFloatCell(cell) as int
+        }
 
     }
 
@@ -396,12 +425,16 @@ def getMkdUpravForm(def cell) {
 def getCategory(def cell) {
     def permissibleValues = ['ведомственный дом', 'общежитие', 'дом гостиничного типа', 'аварийный', 'под снос',
             'сцепка', 'культурного наследия', 'на техническом обслуживании', 'нежилой'] as Set
-    def keyValues = ['ведомств':'ведомственный дом', 'общеж':'общежитие', 'гостин':'дом гостиничного типа', 'авари':'аварийный',
+    def keyValues = ['ведомств':'ведомственный дом', 'общеж':'общежитие', 'гостин':'дом гостиничного типа', 'авари':'аварийный', '0':'аварийный',
             'снос':'под снос', 'сцеп':'сцепка', 'культур':'культурного наследия', 'культ':'культурного наследия', 'технич':'на техническом обслуживании', 'не жилой':'нежилой', 'не жил':'нежилой', 'нежил':'нежилой']
     def category = ""
 
     if(cell.cellType == Cell.CELL_TYPE_STRING) {
         def word = cell.getRichStringCellValue().getString()
+        category = getNearestWordInDictionary(permissibleValues, keyValues, word, 3)
+    }
+    else if(cell.cellType == Cell.CELL_TYPE_NUMERIC) {
+        def word = cell.getNumericCellValue() as String
         category = getNearestWordInDictionary(permissibleValues, keyValues, word, 3)
     }
 
@@ -475,6 +508,9 @@ def getSquare(def cell) {
     if(cell.cellType == Cell.CELL_TYPE_NUMERIC && (cell.getNumericCellValue() > 0)) {
         intValue = (Math.round(cell.getNumericCellValue()*100)/100).toString().replaceAll(',', '.')
     }
+    else if(cell.cellType == Cell.CELL_TYPE_STRING && ((getFloatCell(cell)) > 0)) {
+        intValue = (Math.round((getFloatCell(cell))*100)/100).toString().replaceAll(',', '.')
+    }
 
     intValue
 }
@@ -484,6 +520,9 @@ def getNotLivingSquare(def cell) {
     def intValue = ""
     if(cell.cellType == Cell.CELL_TYPE_NUMERIC && (cell.getNumericCellValue() >= 0)) {
         intValue = (Math.round(cell.getNumericCellValue()*100)/100).toString().replaceAll(',', '.')
+    }
+    else if(cell.cellType == Cell.CELL_TYPE_STRING && ((getFloatCell(cell)) >= 0)) {
+        intValue = (Math.round((getFloatCell(cell))*100)/100).toString().replaceAll(',', '.')
     }
 
     intValue
@@ -656,7 +695,7 @@ def getMrMonth(def cell) {
 
 
 def parseSheetMKD(Sheet sheetMKD, fields) {
-    def addressFields = [fields[1], fields[2], fields[3], fields[4], fields[5], fields[6]]
+    def addressFields = [fields[1], fields[2], fields[3], fields[4], fields[5], fields[6], fields[37]]
     def unsignedIntFieldsWithout0 = [fields[0], fields[17]]
     def countLiftNodes =  [fields[16]]
     def countFlats = [fields[14]]
@@ -690,10 +729,6 @@ def parseSheetMKD(Sheet sheetMKD, fields) {
         while (cells.hasNext() && !stopWhile) {
             Cell cell = (Cell) cells.next()
             int j = cell.columnIndex
-
-            if(cell.cellType == Cell.CELL_TYPE_NUMERIC && cell.getNumericCellValue() as int == 8454) {
-                int k = 0;
-            }
 
             if(cell.toString() == signToStartFeel && j == 0 && !fillTmpRow) {
                 fillTmpRow = true
@@ -824,7 +859,7 @@ def parseMKDSheet(def filePath, def sqlConnection) {
             9:'category', 10:'house_type', 11:'series', 12:'year_built', 13:'wall_type', 14:'floors', 15:'underfloors', 16:'porches',17:'flats',
             18:'full_area', 19:'heating_area', 20:'living_area', 21:'nonliving_area', 22:'electricity', 23:'water_cold', 24:'water_hot',
             25:'sewerage',26:'heat_supply',27:'gas_supply',28:'gas_heaters',29:'gas_ovens',30:'electro_ovens',31:'lifts_count',32:'e_devices_count',
-            33:'cw_devices_count',34:'hw_devices_count',35:'heat_devices_count',36:'gas_devices_count']
+            33:'cw_devices_count',34:'hw_devices_count',35:'heat_devices_count',36:'gas_devices_count', 37:'notes']
 
     def resultArray = getArrayMKD(filePath, fields, 0)
 
@@ -860,81 +895,82 @@ def parseSheetTE(Sheet sheetMKD, fields) {
 
     Iterator<Row> rows=sheetMKD.rowIterator()
     int i = 0
+    boolean fillTmpRow = false
+    boolean startToParse = false
+    String signToStartFeel = "1.0"
+
     while (rows.hasNext()) {
         Row row = (Row) rows.next()
         Iterator cells = row.cellIterator()
 
         def tmpRow = [:]
-        while (cells.hasNext()) {
+        boolean stopWhile = false
+
+        while (cells.hasNext() && !stopWhile) {
             Cell cell = (Cell) cells.next()
             int j = cell.columnIndex
 
-            if(addressFields.contains(fields[j])) {
-                tmpRow[fields[j]] = getAddress(cell)
+            if(cell.toString() == signToStartFeel && j == 0 && !fillTmpRow) {
+                fillTmpRow = true
+                stopWhile = true
             }
-            else if(unsignedFloatFieldsWithout0.contains(fields[j])) {
-                tmpRow[fields[j]] = getUnsignedFloatFieldsWithout0(cell)
+            else if(!fillTmpRow) {
+                stopWhile = true
             }
-            else if(unsignedIntFields.contains(fields[j])) {
-                tmpRow[fields[j]] = getUnsignedIntField(cell)
-            }
-            else if(unsignedFloatFields.contains(fields[j])) {
-                tmpRow[fields[j]] = getUnsignedFloatField(cell)
-            }
-            else if(btiCode.contains(fields[j])) {
-                tmpRow[fields[j]] = getBtiCode(cell)
-            }
-            else if(connectionType.contains(fields[j])) {
-                tmpRow[fields[j]] = getConnectionType(cell)
-            }
-            else if(systemType.contains(fields[j])) {
-                tmpRow[fields[j]] = getSystemType(cell)
-            }
-            else if(resourceType.contains(fields[j])) {
-                tmpRow[fields[j]] = getResourceType(cell)
-            }
-            else if(mesUnits.contains(fields[j])) {
-                tmpRow[fields[j]] = getMesUnits(cell)
-            }
-            else if(systemType2.contains(fields[j])) {
-                tmpRow[fields[j]] = getSystemType2(cell)
-            }
-            else if(enterDiametr.contains(fields[j])) {
-                tmpRow[fields[j]] = getEnterDiametr(cell)
-            }
-            else if(enterPressure.contains(fields[j])) {
-                tmpRow[fields[j]] = getEnterPressure(cell)
-            }
-            else if(yesNo.contains(fields[j])) {
-                tmpRow[fields[j]] = getYesNoField(cell)
-            }
-            else if(heatingConnection.contains(fields[j])) {
-                tmpRow[fields[j]] = getHeatingConnection(cell)
-            }
-            else if(contractLoad2013.contains(fields[j])) {
-                tmpRow[fields[j]] = getContractLoad2013(cell)
-            }
-            else if(temperatureGrafic.contains(fields[j])) {
-                tmpRow[fields[j]] = getTemperatureGrafic(cell)
-            }
-            else if(heatingGrafic.contains(fields[j])) {
-                tmpRow[fields[j]] = getHeatingGrafic(cell)
-            }
-            else if(heatingScheme.contains(fields[j])) {
-                tmpRow[fields[j]] = getHeatingScheme(cell)
-            }
-            else if(countLiftNodes.contains(fields[j])) {
-                tmpRow[fields[j]] = getCountLiftNodes(cell)
-            }
-            else if(heatingTransit.contains(fields[j])) {
-                tmpRow[fields[j]] = getHeatingTransit(cell)
-            }
-            else if(mrMonth.contains(fields[j])) {
-                tmpRow[fields[j]] = getMrMonth(cell)
+            else {
+
+                if (addressFields.contains(fields[j])) {
+                    tmpRow[fields[j]] = getAddress(cell)
+                } else if (unsignedFloatFieldsWithout0.contains(fields[j])) {
+                    tmpRow[fields[j]] = getUnsignedFloatFieldsWithout0(cell)
+                } else if (unsignedIntFields.contains(fields[j])) {
+                    tmpRow[fields[j]] = getUnsignedIntField(cell)
+                } else if (unsignedFloatFields.contains(fields[j])) {
+                    tmpRow[fields[j]] = getUnsignedFloatField(cell)
+                } else if (btiCode.contains(fields[j])) {
+                    tmpRow[fields[j]] = getBtiCode(cell)
+                } else if (connectionType.contains(fields[j])) {
+                    tmpRow[fields[j]] = getConnectionType(cell)
+                } else if (systemType.contains(fields[j])) {
+                    tmpRow[fields[j]] = getSystemType(cell)
+                } else if (resourceType.contains(fields[j])) {
+                    tmpRow[fields[j]] = getResourceType(cell)
+                } else if (mesUnits.contains(fields[j])) {
+                    tmpRow[fields[j]] = getMesUnits(cell)
+                } else if (systemType2.contains(fields[j])) {
+                    tmpRow[fields[j]] = getSystemType2(cell)
+                } else if (enterDiametr.contains(fields[j])) {
+                    tmpRow[fields[j]] = getEnterDiametr(cell)
+                } else if (enterPressure.contains(fields[j])) {
+                    tmpRow[fields[j]] = getEnterPressure(cell)
+                } else if (yesNo.contains(fields[j])) {
+                    tmpRow[fields[j]] = getYesNoField(cell)
+                } else if (heatingConnection.contains(fields[j])) {
+                    tmpRow[fields[j]] = getHeatingConnection(cell)
+                } else if (contractLoad2013.contains(fields[j])) {
+                    tmpRow[fields[j]] = getContractLoad2013(cell)
+                } else if (temperatureGrafic.contains(fields[j])) {
+                    tmpRow[fields[j]] = getTemperatureGrafic(cell)
+                } else if (heatingGrafic.contains(fields[j])) {
+                    tmpRow[fields[j]] = getHeatingGrafic(cell)
+                } else if (heatingScheme.contains(fields[j])) {
+                    tmpRow[fields[j]] = getHeatingScheme(cell)
+                } else if (countLiftNodes.contains(fields[j])) {
+                    tmpRow[fields[j]] = getCountLiftNodes(cell)
+                } else if (heatingTransit.contains(fields[j])) {
+                    tmpRow[fields[j]] = getHeatingTransit(cell)
+                } else if (mrMonth.contains(fields[j])) {
+                    tmpRow[fields[j]] = getMrMonth(cell)
+                }
             }
         }
 
-        parsedSheet[i] = tmpRow
+        if(startToParse) {
+            parsedSheet[i] = tmpRow
+        }
+        else if(fillTmpRow) {
+            startToParse = true
+        }
 
         i++
     }
@@ -1076,36 +1112,24 @@ def getSum() {
     def sqlConnection = connectToDataBase("frunz2")
 
     def percentErrorRows = sqlConnection.rows('''
-        SELECT he5.total_2013_jan+
-                he5.total_2013_feb+
-                he5.total_2013_mar+
-                he5.total_2013_apr+
-                he5.total_2013_may+
-                he5.total_2013_jun+
-                he5.total_2013_jul+
-                he5.total_2013_aug+
-                he5.total_2013_sep+
-                he5.total_2013_oct+
-                he5.total_2013_nov+
-                he5.total_2013_dec
-                , he5.total_2013'''+
-                " FROM heat_raw as he5 WHERE he5.bticode = '17_000027'")
+        SELECT count(he2.bticode) FROM heat_raw AS he2
+        WHERE he2.bticode = '''+"'12_000003'")
 
     sqlConnection.close()
 }
 
-def raionToDataBase = ['Адмиралтейский':'admiral', 'Белоостров':'belo',
+def raionToDataBase = [/*'Адмиралтейский':'admiral', */'Белоостров':'belo',
                        'Василеостровский':'vasil', 'Калининский':'kalin',
                        'Кировский':'kirov', 'Колпинский':'kolpin',
                        'Красногвардейский':'krasn', 'Красносельский':'selsk',
                        'Кронштадтский':'kronsh', 'Московский':'moskov',
-                       'Невский':'nevsk', 'Осиновая роща Приозерское':'osinov',
+                       'Невский':'nevsk2', 'Осиновая роща Приозерское':'osinov',
                        'Петроградский':'petro', 'Петродворцовый':'dvorc',
                        'Приморский':'primor', 'Пушкинский':'pushkin',
                        'Фрунзенский':'frunz2', 'Центральный':'centr']
 
 def filePath = '/home/vlad/Develop/FuzzySearch/Питер/data/Адмиралтейский/raw/Адмиралтейский 2.xls'
-parseExcelFile(filePath, raionToDataBase)
+//parseExcelFile(filePath, raionToDataBase)
 
 filePath = '/home/vlad/Develop/FuzzySearch/Питер/data/Белоостров/raw/Белоостров.xls'
 parseExcelFile(filePath, raionToDataBase)
