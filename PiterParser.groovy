@@ -17,11 +17,11 @@ import java.sql.Driver
 import java.sql.DriverManager
 
 def getFloatCell(def cell) {
-    cell.getRichStringCellValue().getString().replaceAll(",", ".").replaceAll("'", "") as float
+    cell.getRichStringCellValue().getString().replaceAll(",", ".").replaceAll("'", "").replaceAll(" ", "") as float
 }
 
 def isFloatCell(def cell) {
-    cell.getRichStringCellValue().getString().replaceAll(",", ".").replaceAll("'", "").float
+    cell.getRichStringCellValue().getString().replaceAll(",", ".").replaceAll("'", "").replaceAll(" ", "").float
 }
 
 def findCurrentRaion(def filePath, def raionToDataBase) {
@@ -299,6 +299,9 @@ def getYear(def cell) {
     def intValue = ""
     if(cell.cellType == Cell.CELL_TYPE_NUMERIC && cell.getNumericCellValue() > 0 && ((cell.getNumericCellValue() as int) as String).length() == 4) {
         intValue =  cell.getNumericCellValue() as int
+    }
+    else if(cell.cellType == Cell.CELL_TYPE_STRING && isFloatCell(cell) && (getFloatCell(cell))  > 0 && (getFloatCell(cell) as int ).toString().length() == 4) {
+        intValue = getFloatCell(cell) as int
     }
 
     intValue
@@ -869,7 +872,7 @@ def parseMKDSheet(def filePath, def sqlConnection) {
 }
 
 def parseSheetTE(Sheet sheetMKD, fields) {
-    def addressFields = [fields[2], fields[5], fields[19]]
+    def addressFields = [fields[2], fields[5], fields[19], fields[52]]
     def unsignedFloatFieldsWithout0 = [fields[20], fields[21], fields[22], fields[24], fields[26], fields[28], fields[40], fields[42], fields[44], fields[46]]
     def unsignedFloatFields = [fields[30], fields[32], fields[34], fields[36], fields[38]]
     def unsignedIntFields = [fields[0], fields[8]]
@@ -1039,7 +1042,7 @@ def parseTESheet(def filePath, def sqlConnection) {
             39:'mr_2013_sep', 40:'total_2013_oct', 41:'mr_2013_oct', 42:'total_2013_nov',
             43:'mr_2013_nov', 44:'total_2013_dec', 45:'mr_2013_dec', 46:'total_2013',
             47:'contract_load_2013', 48:'temperature_grafic', 49:'heating_scheme',
-            50:'count_lift_nodes', 51:'heating_transit']
+            50:'count_lift_nodes', 51:'heating_transit', 52:'notes2']
 
     def resultArray = getArrayTE(filePath, fields, 1)
 
@@ -1082,20 +1085,32 @@ def averagePercentOfAllRaions(def raionToDataBase) {
         def sqlConnection = connectToDataBase(it.value)
 
         def percentErrorRows = sqlConnection.rows('''
-        SELECT (
-            (SELECT count(e.*) FROM error_bticodes AS e)::float /
+        SELECT CASE (SELECT count(a.*) FROM analyzed_houses AS a)::float > 0
+               WHEN TRUE
+               THEN
+                (
+                    (SELECT count(e.*) FROM error_bticodes AS e)::float /
 
-            (SELECT count(a.*) FROM analyzed_houses AS a)::float
-            *100::float
-        )''')
+                    (SELECT count(a.*) FROM analyzed_houses AS a)::float
+                    *100::float
+                )
+                ELSE 0
+                END''')
 
         def percentErrorCells = sqlConnection.rows('''
-          SELECT (
-            (SELECT sum_feeling FROM error_cells AS e)::float /
+        SELECT CASE (SELECT count(a.*) FROM analyzed_houses AS a)::float > 0
+               WHEN TRUE
+               THEN
+                (
+                      (SELECT sum_feeling FROM error_cells AS e)::float /
 
-            (SELECT count(a.*)::float*75::float FROM analyzed_houses AS a)::float
-            *100::float
-          )''')
+                      (SELECT count(a.*)::float*75::float FROM analyzed_houses AS a)::float
+                      *100::float
+                )
+                ELSE 0
+                END
+
+          ''')
 
         totalPercentErrorRows += percentErrorRows[0][0]
         totalPercentErrorCells += percentErrorCells[0][0]
@@ -1118,18 +1133,18 @@ def getSum() {
     sqlConnection.close()
 }
 
-def raionToDataBase = [/*'Адмиралтейский':'admiral', */'Белоостров':'belo',
+def raionToDataBase = ['Адмиралтейский':'admiral', 'Белоостров':'belo',
                        'Василеостровский':'vasil', 'Калининский':'kalin',
                        'Кировский':'kirov', 'Колпинский':'kolpin',
                        'Красногвардейский':'krasn', 'Красносельский':'selsk',
                        'Кронштадтский':'kronsh', 'Московский':'moskov',
-                       'Невский':'nevsk2', 'Осиновая роща Приозерское':'osinov',
+                       'Невский':'nevsk', 'Осиновая роща Приозерское':'osinov',
                        'Петроградский':'petro', 'Петродворцовый':'dvorc',
                        'Приморский':'primor', 'Пушкинский':'pushkin',
-                       'Фрунзенский':'frunz2', 'Центральный':'centr']
+                       'Фрунзенский':'frunz', 'Центральный':'centr']
 
 def filePath = '/home/vlad/Develop/FuzzySearch/Питер/data/Адмиралтейский/raw/Адмиралтейский 2.xls'
-//parseExcelFile(filePath, raionToDataBase)
+parseExcelFile(filePath, raionToDataBase)
 
 filePath = '/home/vlad/Develop/FuzzySearch/Питер/data/Белоостров/raw/Белоостров.xls'
 parseExcelFile(filePath, raionToDataBase)

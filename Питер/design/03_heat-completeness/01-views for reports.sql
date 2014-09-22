@@ -27,6 +27,7 @@ CREATE OR REPLACE VIEW analyzed_houses AS (
 			AND ho.category IS NULL
 			AND (ho.full_area >= '500' OR ho.full_area IS NULL)
 			AND ho.notes IS NULL
+			AND he.notes2 IS NULL
 			
 		GROUP BY ho.bticode
 );
@@ -41,7 +42,6 @@ CREATE OR REPLACE VIEW houses_for_feeling_report AS (
 		LEFT JOIN heat_raw AS he ON ho.bticode = he.bticode
 	WHERE ho.bticode IS NOT NULL
 	AND (   ho.okrug IS NULL
-		OR ho.raion IS NULL
 		OR ho.street IS NULL
 		OR ho.house IS NULL
 		OR ho.house IS NULL
@@ -101,8 +101,6 @@ CREATE OR REPLACE VIEW houses_for_feeling_report AS (
 		OR he.mr_2013_mar    IS NULL
 		OR he.total_2013_apr IS NULL
 		OR he.mr_2013_apr    IS NULL
-		OR he.total_2013_may  IS NULL
-		OR he.mr_2013_may    IS NULL
 		OR he.total_2013_oct IS NULL
 		OR he.mr_2013_oct    IS NULL
 		OR he.total_2013_nov  IS NULL

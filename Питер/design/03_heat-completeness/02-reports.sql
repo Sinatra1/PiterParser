@@ -29,23 +29,34 @@ with csv header delimiter ';' encoding 'win_1251'
 ;
 
 copy ( 
-	SELECT (
-	(SELECT count(e.*) FROM error_bticodes AS e)::float
-	/
-	(SELECT count(a.*) FROM analyzed_houses AS a)::float
-	*100::float
-	) AS "Процент некорректных строк"
+	SELECT  (CASE
+			(SELECT count(a.*) FROM analyzed_houses AS a)::float > 0
+		WHEN 	TRUE
+		THEN
+			(SELECT count(e.*) FROM error_bticodes AS e)::float
+			/
+     			(SELECT count(a.*) FROM analyzed_houses AS a)::float
+     			*100::float
+				    
+		ELSE '0'
+		END)
+	 AS "Процент некорректных строк"
 
 ) to '/home/vlad/reports/ac-data-qual/%raion% Процент некорректных строк.csv'
 with csv header delimiter ';' encoding 'win_1251'
 ;
 
 copy ( 
-	SELECT (
-	(SELECT sum_feeling FROM error_cells AS e)::float
-	/
-	(SELECT count(a.*)::float*75::float FROM analyzed_houses AS a)::float
-	*100::float
+	SELECT (CASE
+			(SELECT count(a.*) FROM analyzed_houses AS a)::float > 0
+		WHEN TRUE
+		THEN (SELECT sum_feeling FROM error_cells AS e)::float
+			/
+			(SELECT count(a.*)::float*75::float FROM analyzed_houses AS a)::float
+			*100::float
+		ELSE '0'
+		END
+	
 	) AS "Процент некорректных ячеек"
 
 ) to '/home/vlad/reports/ac-data-qual/%raion% Процент некорректных ячеек.csv'

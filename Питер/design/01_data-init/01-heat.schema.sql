@@ -116,7 +116,8 @@ create table heat_raw (
     	temperature_grafic 	grafic, --38
     	heating_scheme 		scheme, --39 нет - это не правильно
     	count_lift_nodes 	varchar(50), --40 АУУ верно
-    	heating_transit  	transit --41 да нет
+    	heating_transit  	transit,--41 да нет
+	notes2 			varchar(255)--38 
 
 );
 
