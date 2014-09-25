@@ -511,7 +511,7 @@ def getSquare(def cell) {
     if(cell.cellType == Cell.CELL_TYPE_NUMERIC && (cell.getNumericCellValue() > 0)) {
         intValue = (Math.round(cell.getNumericCellValue()*100)/100).toString().replaceAll(',', '.')
     }
-    else if(cell.cellType == Cell.CELL_TYPE_STRING && ((getFloatCell(cell)) > 0)) {
+    else if(cell.cellType == Cell.CELL_TYPE_STRING && isFloatCell(cell) && ((getFloatCell(cell)) > 0)) {
         intValue = (Math.round((getFloatCell(cell))*100)/100).toString().replaceAll(',', '.')
     }
 
@@ -524,8 +524,14 @@ def getNotLivingSquare(def cell) {
     if(cell.cellType == Cell.CELL_TYPE_NUMERIC && (cell.getNumericCellValue() >= 0)) {
         intValue = (Math.round(cell.getNumericCellValue()*100)/100).toString().replaceAll(',', '.')
     }
-    else if(cell.cellType == Cell.CELL_TYPE_STRING && ((getFloatCell(cell)) >= 0)) {
+    else if(cell.cellType == Cell.CELL_TYPE_STRING && isFloatCell(cell) && ((getFloatCell(cell)) >= 0)) {
         intValue = (Math.round((getFloatCell(cell))*100)/100).toString().replaceAll(',', '.')
+    }
+    else if(cell.cellType == Cell.CELL_TYPE_STRING) {
+        def permissibleValues = ['0'] as Set
+        def keyValues = ['н':'0', 'отсут':'0']
+        def word = cell.getRichStringCellValue().getString()
+        intValue = getNearestWordInDictionary(permissibleValues, keyValues, word, 2)
     }
 
     intValue
@@ -1134,7 +1140,8 @@ def getSum() {
 }
 
 def raionToDataBase = ['Адмиралтейский':'admiral', 'Белоостров':'belo',
-                       'Василеостровский':'vasil', 'Калининский':'kalin',
+                       'Василеостровский':'vasil', 'Выборгский':'vibor',
+                       'Калининский':'kalin',
                        'Кировский':'kirov', 'Колпинский':'kolpin',
                        'Красногвардейский':'krasn', 'Красносельский':'selsk',
                        'Кронштадтский':'kronsh', 'Московский':'moskov',
@@ -1152,10 +1159,13 @@ parseExcelFile(filePath, raionToDataBase)
 filePath = '/home/vlad/Develop/FuzzySearch/Питер/data/Василеостровский/raw/Василеостровский 2.xls'
 parseExcelFile(filePath, raionToDataBase)
 
+filePath = '/home/vlad/Develop/FuzzySearch/Питер/data/Выборгский/raw/Выборгский.xls'
+parseExcelFile(filePath, raionToDataBase)
+
 filePath = '/home/vlad/Develop/FuzzySearch/Питер/data/Калининский/raw/Калининский.xls'
 parseExcelFile(filePath, raionToDataBase)
 
-filePath = '/home/vlad/Develop/FuzzySearch/Питер/data/Кировский/raw/Кировский.xls'
+filePath = '/home/vlad/Develop/FuzzySearch/Питер/data/Кировский/raw/Кировский 2.xls'
 parseExcelFile(filePath, raionToDataBase)
 
 filePath = '/home/vlad/Develop/FuzzySearch/Питер/data/Колпинский/raw/Колпинский.xls'
@@ -1170,7 +1180,7 @@ parseExcelFile(filePath, raionToDataBase)
 filePath = '/home/vlad/Develop/FuzzySearch/Питер/data/Кронштадтский/raw/Кронштадтский 2.xls'
 parseExcelFile(filePath, raionToDataBase)
 
-filePath = '/home/vlad/Develop/FuzzySearch/Питер/data/Московский/raw/Московский.xls'
+filePath = '/home/vlad/Develop/FuzzySearch/Питер/data/Московский/raw/Московский 2.xls'
 parseExcelFile(filePath, raionToDataBase)
 
 filePath = '/home/vlad/Develop/FuzzySearch/Питер/data/Невский/raw/Невский 2.xls'
