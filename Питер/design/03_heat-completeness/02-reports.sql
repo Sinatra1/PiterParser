@@ -30,7 +30,8 @@ with csv header delimiter ';' encoding 'win_1251'
 
 copy ( 
 	SELECT  (CASE
-			(SELECT count(a.*) FROM analyzed_houses AS a)::float > 0
+			(SELECT count(a.*) FROM analyzed_houses AS a)::float IS NOT NULL
+			AND (SELECT count(e.*) FROM error_bticodes AS e)::float IS NOT NULL
 		WHEN 	TRUE
 		THEN
 			(SELECT count(e.*) FROM error_bticodes AS e)::float
@@ -48,7 +49,8 @@ with csv header delimiter ';' encoding 'win_1251'
 
 copy ( 
 	SELECT (CASE
-			(SELECT count(a.*) FROM analyzed_houses AS a)::float > 0
+			(SELECT count(a.*) FROM analyzed_houses AS a)::float IS NOT NULL
+			AND (SELECT sum_feeling FROM error_cells AS e)::float IS NOT NULL
 		WHEN TRUE
 		THEN (SELECT sum_feeling FROM error_cells AS e)::float
 			/

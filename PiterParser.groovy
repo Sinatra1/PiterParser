@@ -647,7 +647,7 @@ def getHeatingGrafic(def cell) {
     def temperatureGrafic = ""
 
     if(cell.cellType == Cell.CELL_TYPE_STRING) {
-        def word = cell.getRichStringCellValue().getString()
+        def word = cell.getRichStringCellValue().getString().replaceAll('-', '/')
         temperatureGrafic = getNearestWordInDictionary(permissibleValues, keyValues, word, 2)
     }
 
@@ -1091,7 +1091,8 @@ def averagePercentOfAllRaions(def raionToDataBase) {
         def sqlConnection = connectToDataBase(it.value)
 
         def percentErrorRows = sqlConnection.rows('''
-        SELECT CASE (SELECT count(a.*) FROM analyzed_houses AS a)::float > 0
+        SELECT CASE (SELECT count(a.*) FROM analyzed_houses AS a)::float IS NOT NULL
+                    AND (SELECT count(e.*) FROM error_bticodes AS e)::float IS NOT NULL
                WHEN TRUE
                THEN
                 (
@@ -1104,7 +1105,8 @@ def averagePercentOfAllRaions(def raionToDataBase) {
                 END''')
 
         def percentErrorCells = sqlConnection.rows('''
-        SELECT CASE (SELECT count(a.*) FROM analyzed_houses AS a)::float > 0
+        SELECT CASE (SELECT count(a.*) FROM analyzed_houses AS a)::float IS NOT NULL
+                    AND (SELECT sum_feeling FROM error_cells AS e)::float IS NOT NULL
                WHEN TRUE
                THEN
                 (
@@ -1144,7 +1146,7 @@ def raionToDataBase = ['Адмиралтейский':'admiral', 'Белоост
                        'Калининский':'kalin',
                        'Кировский':'kirov', 'Колпинский':'kolpin',
                        'Красногвардейский':'krasn', 'Красносельский':'selsk',
-                       'Кронштадтский':'kronsh', 'Московский':'moskov',
+                       'Кронштадтский':'kronsh2', 'Московский':'moskov',
                        'Невский':'nevsk', 'Осиновая роща Приозерское':'osinov',
                        'Петроградский':'petro', 'Петродворцовый':'dvorc',
                        'Приморский':'primor', 'Пушкинский':'pushkin',
@@ -1177,10 +1179,10 @@ parseExcelFile(filePath, raionToDataBase)
 filePath = '/home/vlad/Develop/FuzzySearch/Питер/data/Красносельский/raw/Красносельский 2.xls'
 parseExcelFile(filePath, raionToDataBase)
 
-filePath = '/home/vlad/Develop/FuzzySearch/Питер/data/Кронштадтский/raw/Кронштадтский 2.xls'
+filePath = '/home/vlad/Develop/FuzzySearch/Питер/data/Кронштадтский/raw/Кронштадтский 3.xls'
 parseExcelFile(filePath, raionToDataBase)
 
-filePath = '/home/vlad/Develop/FuzzySearch/Питер/data/Московский/raw/Московский 2.xls'
+filePath = '/home/vlad/Develop/FuzzySearch/Питер/data/Московский/raw/Московский 3.xls'
 parseExcelFile(filePath, raionToDataBase)
 
 filePath = '/home/vlad/Develop/FuzzySearch/Питер/data/Невский/raw/Невский 2.xls'
@@ -1189,7 +1191,7 @@ parseExcelFile(filePath, raionToDataBase)
 filePath = '/home/vlad/Develop/FuzzySearch/Питер/data/Осиновая роща Приозерское/raw/Осиновая роща Приозерское.xls'
 parseExcelFile(filePath, raionToDataBase)
 
-filePath = '/home/vlad/Develop/FuzzySearch/Питер/data/Петроградский/raw/Петроградский.xls'
+filePath = '/home/vlad/Develop/FuzzySearch/Питер/data/Петроградский/raw/Петроградский 2.xls'
 parseExcelFile(filePath, raionToDataBase)
 
 filePath = '/home/vlad/Develop/FuzzySearch/Питер/data/Петродворцовый/raw/Петродворцовый 2.xls'
@@ -1198,13 +1200,13 @@ parseExcelFile(filePath, raionToDataBase)
 filePath = '/home/vlad/Develop/FuzzySearch/Питер/data/Приморский/raw/Приморский 2.xls'
 parseExcelFile(filePath, raionToDataBase)
 
-filePath = '/home/vlad/Develop/FuzzySearch/Питер/data/Пушкинский/raw/Пушкинский.xls'
+filePath = '/home/vlad/Develop/FuzzySearch/Питер/data/Пушкинский/raw/Пушкинский 2.xls'
 parseExcelFile(filePath, raionToDataBase)
 
 filePath = '/home/vlad/Develop/FuzzySearch/Питер/data/Фрунзенский/raw/Фрунзенский 2.xls'
 parseExcelFile(filePath, raionToDataBase)
 
-filePath = '/home/vlad/Develop/FuzzySearch/Питер/data/Центральный/raw/Центральный.xls'
+filePath = '/home/vlad/Develop/FuzzySearch/Питер/data/Центральный/raw/Центральный 2.xls'
 parseExcelFile(filePath, raionToDataBase)
 
 averagePercentOfAllRaions(raionToDataBase)
