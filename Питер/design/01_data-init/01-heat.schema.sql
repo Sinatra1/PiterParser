@@ -63,7 +63,6 @@ CREATE TYPE danet2 AS ENUM (
 'нет'
 );
 
-
 create table heat_raw (
     	id_in_file  		varchar(4), --1
     	bticode     		varchar(50), --2

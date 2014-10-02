@@ -1182,7 +1182,7 @@ parseExcelFile(filePath, raionToDataBase)
 filePath = '/home/vlad/Develop/FuzzySearch/Питер/data/Красногвардейский/raw/Красногвардейский.xls'
 parseExcelFile(filePath, raionToDataBase)
 
-filePath = '/home/vlad/Develop/FuzzySearch/Питер/data/Красносельский/raw/Красносельский 2.xls'
+filePath = '/home/vlad/Develop/FuzzySearch/Питер/data/Красносельский/raw/Красносельский 3.xls'
 parseExcelFile(filePath, raionToDataBase)
 
 filePath = '/home/vlad/Develop/FuzzySearch/Питер/data/Кронштадтский/raw/Кронштадтский 3.xls'
@@ -1200,7 +1200,7 @@ parseExcelFile(filePath, raionToDataBase)
 filePath = '/home/vlad/Develop/FuzzySearch/Питер/data/Петроградский/raw/Петроградский 3.xls'
 parseExcelFile(filePath, raionToDataBase)
 
-filePath = '/home/vlad/Develop/FuzzySearch/Питер/data/Петродворцовый/raw/Петродворцовый 2.xls'
+filePath = '/home/vlad/Develop/FuzzySearch/Питер/data/Петродворцовый/raw/Петродворцовый 3.xls'
 parseExcelFile(filePath, raionToDataBase)
 
 filePath = '/home/vlad/Develop/FuzzySearch/Питер/data/Приморский/raw/Приморский 2.xls'

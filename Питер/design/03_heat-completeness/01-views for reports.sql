@@ -321,6 +321,13 @@ CREATE OR REPLACE VIEW feeling_report AS (
 		LEFT JOIN heat_raw AS he2 ON ho2.bticode = he2.bticode
 		WHERE ho2.bticode = t."Код БТИ" LIMIT 1) AS "Тип подключения дома",
 
+	      (SELECT (CASE (he2.system_type IS NULL)  
+			AND ((SELECT count(he4.bticode) FROM heat_raw AS he4 WHERE he4.bticode = t."Код БТИ") = 1)
+			WHEN TRUE THEN '?' END )
+		FROM house_raw AS ho2
+		LEFT JOIN heat_raw AS he2 ON ho2.bticode = he2.bticode
+		WHERE ho2.bticode = t."Код БТИ" LIMIT 1) AS "Вид схемы теплоснабжения",
+
 	      (SELECT (CASE (he2.consumer IS NULL)  
 			AND ((SELECT count(he4.bticode) FROM heat_raw AS he4 WHERE he4.bticode = t."Код БТИ") = 1)
 			WHEN TRUE THEN '?' END )
@@ -936,6 +943,7 @@ CREATE OR REPLACE VIEW error_cells AS (
 		(CASE t."колич. Газ" IS NOT NULL WHEN TRUE THEN 1 ELSE 0 END ) +
 		(CASE t."Поставщик ресурсов" IS NOT NULL WHEN TRUE THEN 1 ELSE 0 END ) +
 		(CASE t."Тип подключения дома" IS NOT NULL WHEN TRUE THEN 1 ELSE 0 END ) +
+		(CASE t."Вид схемы теплоснабжения" IS NOT NULL WHEN TRUE THEN 1 ELSE 0 END ) +
 		(CASE t."Потребитель ресурса" IS NOT NULL WHEN TRUE THEN 1 ELSE 0 END ) +
 		(CASE t."Вид ресурса" IS NOT NULL WHEN TRUE THEN 1 ELSE 0 END ) +
 		(CASE t."Ед. изм." IS NOT NULL WHEN TRUE THEN 1 ELSE 0 END ) +
