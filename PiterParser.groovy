@@ -208,6 +208,12 @@ def getUnsignedIntField(def cell) {
     else if(cell.cellType == Cell.CELL_TYPE_STRING && isFloatCell(cell) && (cell.getRichStringCellValue().getString() as int) >= 0 && (cell.getRichStringCellValue().getString() as int) <= 50) {
         intValue =  (cell.getRichStringCellValue().getString() as int)
     }
+    else if(cell.cellType == Cell.CELL_TYPE_STRING) {
+        def permissibleValues = ['0'] as Set
+        def keyValues = ['н':'0', 'отсут':'0']
+        def word = cell.getRichStringCellValue().getString()
+        intValue = getNearestWordInDictionary(permissibleValues, keyValues, word, 2)
+    }
 
     intValue
 }
@@ -1182,7 +1188,7 @@ parseExcelFile(filePath, raionToDataBase)
 filePath = '/home/vlad/Develop/FuzzySearch/Питер/data/Кронштадтский/raw/Кронштадтский 3.xls'
 parseExcelFile(filePath, raionToDataBase)
 
-filePath = '/home/vlad/Develop/FuzzySearch/Питер/data/Московский/raw/Московский 3.xls'
+filePath = '/home/vlad/Develop/FuzzySearch/Питер/data/Московский/raw/Московский 4.xls'
 parseExcelFile(filePath, raionToDataBase)
 
 filePath = '/home/vlad/Develop/FuzzySearch/Питер/data/Невский/raw/Невский 2.xls'
@@ -1191,7 +1197,7 @@ parseExcelFile(filePath, raionToDataBase)
 filePath = '/home/vlad/Develop/FuzzySearch/Питер/data/Осиновая роща Приозерское/raw/Осиновая роща Приозерское.xls'
 parseExcelFile(filePath, raionToDataBase)
 
-filePath = '/home/vlad/Develop/FuzzySearch/Питер/data/Петроградский/raw/Петроградский 2.xls'
+filePath = '/home/vlad/Develop/FuzzySearch/Питер/data/Петроградский/raw/Петроградский 3.xls'
 parseExcelFile(filePath, raionToDataBase)
 
 filePath = '/home/vlad/Develop/FuzzySearch/Питер/data/Петродворцовый/raw/Петродворцовый 2.xls'
@@ -1203,10 +1209,10 @@ parseExcelFile(filePath, raionToDataBase)
 filePath = '/home/vlad/Develop/FuzzySearch/Питер/data/Пушкинский/raw/Пушкинский 2.xls'
 parseExcelFile(filePath, raionToDataBase)
 
-filePath = '/home/vlad/Develop/FuzzySearch/Питер/data/Фрунзенский/raw/Фрунзенский 2.xls'
+filePath = '/home/vlad/Develop/FuzzySearch/Питер/data/Фрунзенский/raw/Фрунзенский 3.xls'
 parseExcelFile(filePath, raionToDataBase)
 
-filePath = '/home/vlad/Develop/FuzzySearch/Питер/data/Центральный/raw/Центральный 2.xls'
+filePath = '/home/vlad/Develop/FuzzySearch/Питер/data/Центральный/raw/Центральный 3.xls'
 parseExcelFile(filePath, raionToDataBase)
 
 averagePercentOfAllRaions(raionToDataBase)
