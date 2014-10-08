@@ -234,10 +234,10 @@ def getUnsignedFloatField(def cell) {
 def getEnterDiametr(def cell) {
 
     def floatValue = ""
-    if(cell.cellType == Cell.CELL_TYPE_NUMERIC && cell.getNumericCellValue() >= 0 && cell.getNumericCellValue() <= 200) {
+    if(cell.cellType == Cell.CELL_TYPE_NUMERIC && cell.getNumericCellValue() > 0 && cell.getNumericCellValue() <= 200) {
         floatValue =  (Math.round(cell.getNumericCellValue()*100)/100).toString().replaceAll(',', '.')
     }
-    else if(cell.cellType == Cell.CELL_TYPE_STRING && isFloatCell(cell) && (getFloatCell(cell))  >= 0 && (getFloatCell(cell))  <= 200) {
+    else if(cell.cellType == Cell.CELL_TYPE_STRING && isFloatCell(cell) && (getFloatCell(cell))  > 0 && (getFloatCell(cell))  <= 200) {
         floatValue =  (Math.round((getFloatCell(cell))*100)/100).toString().replaceAll(',', '.')
     }
 
@@ -247,10 +247,10 @@ def getEnterDiametr(def cell) {
 def getEnterPressure(def cell) {
 
     def floatValue = ""
-    if(cell.cellType == Cell.CELL_TYPE_NUMERIC && cell.getNumericCellValue() >= 0 && cell.getNumericCellValue() <= 17) {
+    if(cell.cellType == Cell.CELL_TYPE_NUMERIC && cell.getNumericCellValue() > 0 && cell.getNumericCellValue() <= 17) {
         floatValue = (Math.round(cell.getNumericCellValue()*100)/100).toString().replaceAll(',', '.')
     }
-    else if(cell.cellType == Cell.CELL_TYPE_STRING && isFloatCell(cell) && (getFloatCell(cell))  >= 0 && (getFloatCell(cell))  <= 17) {
+    else if(cell.cellType == Cell.CELL_TYPE_STRING && isFloatCell(cell) && (getFloatCell(cell))  > 0 && (getFloatCell(cell))  <= 17) {
         floatValue = (Math.round((getFloatCell(cell))*100)/100).toString().replaceAll(',', '.')
     }
 
@@ -1152,13 +1152,13 @@ def raionToDataBase = ['Адмиралтейский':'admiral', 'Белоост
                        'Калининский':'kalin',
                        'Кировский':'kirov', 'Колпинский':'kolpin',
                        'Красногвардейский':'krasn', 'Красносельский':'selsk',
-                       'Кронштадтский':'kronsh2', 'Московский':'moskov',
+                       'Кронштадтский':'kronsh', 'Московский':'moskov',
                        'Невский':'nevsk', 'Осиновая роща Приозерское':'osinov',
                        'Петроградский':'petro', 'Петродворцовый':'dvorc',
                        'Приморский':'primor', 'Пушкинский':'pushkin',
                        'Фрунзенский':'frunz', 'Центральный':'centr']
 
-def filePath = '/home/vlad/Develop/FuzzySearch/Питер/data/Адмиралтейский/raw/Адмиралтейский 2.xls'
+def filePath = '/home/vlad/Develop/FuzzySearch/Питер/data/Адмиралтейский/raw/Адмиралтейский 3.xls'
 parseExcelFile(filePath, raionToDataBase)
 
 filePath = '/home/vlad/Develop/FuzzySearch/Питер/data/Белоостров/raw/Белоостров.xls'
@@ -1170,7 +1170,7 @@ parseExcelFile(filePath, raionToDataBase)
 filePath = '/home/vlad/Develop/FuzzySearch/Питер/data/Выборгский/raw/Выборгский.xls'
 parseExcelFile(filePath, raionToDataBase)
 
-filePath = '/home/vlad/Develop/FuzzySearch/Питер/data/Калининский/raw/Калининский.xls'
+filePath = '/home/vlad/Develop/FuzzySearch/Питер/data/Калининский/raw/Калининский 2.xls'
 parseExcelFile(filePath, raionToDataBase)
 
 filePath = '/home/vlad/Develop/FuzzySearch/Питер/data/Кировский/raw/Кировский 2.xls'
@@ -1182,7 +1182,7 @@ parseExcelFile(filePath, raionToDataBase)
 filePath = '/home/vlad/Develop/FuzzySearch/Питер/data/Красногвардейский/raw/Красногвардейский.xls'
 parseExcelFile(filePath, raionToDataBase)
 
-filePath = '/home/vlad/Develop/FuzzySearch/Питер/data/Красносельский/raw/Красносельский 3.xls'
+filePath = '/home/vlad/Develop/FuzzySearch/Питер/data/Красносельский/raw/Красносельский 4.xls'
 parseExcelFile(filePath, raionToDataBase)
 
 filePath = '/home/vlad/Develop/FuzzySearch/Питер/data/Кронштадтский/raw/Кронштадтский 3.xls'
@@ -1200,13 +1200,13 @@ parseExcelFile(filePath, raionToDataBase)
 filePath = '/home/vlad/Develop/FuzzySearch/Питер/data/Петроградский/raw/Петроградский 3.xls'
 parseExcelFile(filePath, raionToDataBase)
 
-filePath = '/home/vlad/Develop/FuzzySearch/Питер/data/Петродворцовый/raw/Петродворцовый 3.xls'
+filePath = '/home/vlad/Develop/FuzzySearch/Питер/data/Петродворцовый/raw/Петродворцовый 4.xls'
 parseExcelFile(filePath, raionToDataBase)
 
 filePath = '/home/vlad/Develop/FuzzySearch/Питер/data/Приморский/raw/Приморский 2.xls'
 parseExcelFile(filePath, raionToDataBase)
 
-filePath = '/home/vlad/Develop/FuzzySearch/Питер/data/Пушкинский/raw/Пушкинский 2.xls'
+filePath = '/home/vlad/Develop/FuzzySearch/Питер/data/Пушкинский/raw/Пушкинский 4.xls'
 parseExcelFile(filePath, raionToDataBase)
 
 filePath = '/home/vlad/Develop/FuzzySearch/Питер/data/Фрунзенский/raw/Фрунзенский 3.xls'
