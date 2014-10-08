@@ -247,7 +247,7 @@ create table house_raw (
 
     house_type 		hstype,--11
     series 		varchar(255),--12
-    year_built 		decimal(4,0),--13
+    year_built 		varchar(50),--13
     wall_type 		wall,--14
     floors 		varchar(255),--15
     underfloors 	int,--16

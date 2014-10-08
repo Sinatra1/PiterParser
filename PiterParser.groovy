@@ -309,6 +309,14 @@ def getYear(def cell) {
     else if(cell.cellType == Cell.CELL_TYPE_STRING && isFloatCell(cell) && (getFloatCell(cell))  > 0 && (getFloatCell(cell) as int ).toString().length() == 4) {
         intValue = getFloatCell(cell) as int
     }
+    else if(cell.cellType == Cell.CELL_TYPE_STRING) {
+        def word = cell.getRichStringCellValue().getString()
+        def sb= new StringBuffer(word.toLowerCase().trim())
+
+        if(sb.indexOf('/') != -1) {
+            intValue = word
+        }
+    }
 
     intValue
 }
@@ -1212,7 +1220,7 @@ parseExcelFile(filePath, raionToDataBase)
 filePath = '/home/vlad/Develop/FuzzySearch/Питер/data/Фрунзенский/raw/Фрунзенский 3.xls'
 parseExcelFile(filePath, raionToDataBase)
 
-filePath = '/home/vlad/Develop/FuzzySearch/Питер/data/Центральный/raw/Центральный 3.xls'
+filePath = '/home/vlad/Develop/FuzzySearch/Питер/data/Центральный/raw/Центральный 4.xls'
 parseExcelFile(filePath, raionToDataBase)
 
 averagePercentOfAllRaions(raionToDataBase)

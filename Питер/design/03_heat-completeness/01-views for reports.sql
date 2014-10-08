@@ -762,8 +762,9 @@ SELECT 	   ho5.bticode AS "Код БТИ",
 	 
 	WHERE   (ho5.bticode IS NOT NULL AND he5.bticode IS NULL) 
 		OR (--если не каждой строке вкладки ТЭ с данным кодом БТИ соответствует строка с данным кодом БТИ на вкладке МКД
-			(SELECT count(he3.bticode) FROM heat_raw AS he3 WHERE he3.bticode = ho5.bticode) <> 
-			(SELECT count(ho2.bticode) FROM house_raw AS ho2 WHERE ho2.bticode = ho5.bticode)
+			((SELECT count(he3.bticode) FROM heat_raw AS he3 WHERE he3.bticode = ho5.bticode) <> 
+			(SELECT count(ho2.bticode) FROM house_raw AS ho2 WHERE ho2.bticode = ho5.bticode))
+			AND ((SELECT count(he4.bticode) FROM heat_raw AS he4 WHERE he4.bticode = ho5.bticode) > 1)
 
 		)
 		OR ho5.floors IS NULL
@@ -793,7 +794,7 @@ CREATE OR REPLACE VIEW house_raw_uslov_report AS (
 		, (CASE (ho5.floors IS NULL) WHEN TRUE THEN 'Да' END) 						AS "Колич. этажей < 1"
 		, (CASE (ho5.porches IS NULL) WHEN TRUE THEN 'Да' END) 						AS "Колич. парадных < 1"
 		, (CASE (ho5.flats IS NULL) WHEN TRUE THEN 'Да' END) 						AS "Колич. квартир < 1"
-		, (CASE (ho5.full_area IS NULL) WHEN TRUE THEN 'Да' END) 						AS "Общ. площадь не задана"
+		, (CASE (ho5.full_area IS NULL) WHEN TRUE THEN 'Да' END) 					AS "Общ. площадь не задана"
 		, (CASE (ho5.heating_area IS NULL) WHEN TRUE THEN 'Да' END) 					AS "Отаплив. площадь не задана"
 		, (CASE (ho5.living_area IS NULL) WHEN TRUE THEN 'Да' END) 					AS "Жил. площадь не задана"
 		, (CASE (ho5.full_area < ho5.heating_area) WHEN TRUE THEN 'Да' END) 				AS "Общ. площадь < Отаплив. площади"

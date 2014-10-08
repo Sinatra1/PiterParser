@@ -274,7 +274,7 @@ create table house_raw (
     cw_devices_count 	decimal(4,0),--35
     hw_devices_count 	decimal(4,0),--34
     heat_devices_count 	decimal(4,0),--36
-    gas_devices_count 	decimal(4,0)--,--37
+    gas_devices_count 	decimal(4,0),--37
 
     notes varchar(255)--38
 );

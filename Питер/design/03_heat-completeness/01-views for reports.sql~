@@ -793,7 +793,7 @@ CREATE OR REPLACE VIEW house_raw_uslov_report AS (
 		, (CASE (ho5.floors IS NULL) WHEN TRUE THEN 'Да' END) 						AS "Колич. этажей < 1"
 		, (CASE (ho5.porches IS NULL) WHEN TRUE THEN 'Да' END) 						AS "Колич. парадных < 1"
 		, (CASE (ho5.flats IS NULL) WHEN TRUE THEN 'Да' END) 						AS "Колич. квартир < 1"
-		, (CASE (ho5.full_area IS NULL) WHEN TRUE THEN 'Да' END) 						AS "Общ. площадь не задана"
+		, (CASE (ho5.full_area IS NULL) WHEN TRUE THEN 'Да' END) 					AS "Общ. площадь не задана"
 		, (CASE (ho5.heating_area IS NULL) WHEN TRUE THEN 'Да' END) 					AS "Отаплив. площадь не задана"
 		, (CASE (ho5.living_area IS NULL) WHEN TRUE THEN 'Да' END) 					AS "Жил. площадь не задана"
 		, (CASE (ho5.full_area < ho5.heating_area) WHEN TRUE THEN 'Да' END) 				AS "Общ. площадь < Отаплив. площади"
@@ -943,6 +943,7 @@ CREATE OR REPLACE VIEW error_cells AS (
 		(CASE t."колич. Газ" IS NOT NULL WHEN TRUE THEN 1 ELSE 0 END ) +
 		(CASE t."Поставщик ресурсов" IS NOT NULL WHEN TRUE THEN 1 ELSE 0 END ) +
 		(CASE t."Тип подключения дома" IS NOT NULL WHEN TRUE THEN 1 ELSE 0 END ) +
+		(CASE t."Вид схемы теплоснабжения" IS NOT NULL WHEN TRUE THEN 1 ELSE 0 END ) +
 		(CASE t."Потребитель ресурса" IS NOT NULL WHEN TRUE THEN 1 ELSE 0 END ) +
 		(CASE t."Вид ресурса" IS NOT NULL WHEN TRUE THEN 1 ELSE 0 END ) +
 		(CASE t."Ед. изм." IS NOT NULL WHEN TRUE THEN 1 ELSE 0 END ) +
