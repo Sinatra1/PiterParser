@@ -1,0 +1,378 @@
+<#main#><?xml version="1.0" encoding="windows-1251"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html lang="ru" xml:lang="ru" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta name="WebsiteSpark" content="gLysLPIcyO" />
+	<meta name='yandex-verification' content='6bc7db6cc41852a3' />
+
+	<title>Аленат. Агенство недвижимости и туризма. Екатеринбург</title>
+
+	<meta name="description" lang="ru" content="Аленат - Недвижимость, туры, путёвки. Екатеринбург" />
+	<meta name="keywords" content="Аленат Недвижимость туры Екатеринбург" />
+
+	<meta http-equiv="Content-type" CONTENT="text/html; charset=Windows-1251" />
+	<meta name="robots" content="INDEX,FOLLOW" />
+	<meta name="revisit-after" content="3 days" />
+
+	<link rel="stylesheet" type="text/css" href="/css/style.css" />
+	<link rel="stylesheet" type="text/css" href="/css/styles.css" />
+	<link rel="stylesheet" type="text/css" href="/css/main.css" />
+
+
+</head>
+<body id="main_page" style="padding: 0px 1%;">
+<div style="max-width: 1400px; margin: 0 auto;">
+	<table>
+		<tr>
+			<td style="width: 13px;" class="va_b ta_r"><img src="/images/head_page_ugolokleft.gif" alt="" /><br /></td>
+			<td style="width: 48%; background: url(/images/art1a.jpg) top left no-repeat;" class="ta_r"><img class="png" width="222" height="172" src="/images/head_page_leftright.png" alt="" /><br /></td>
+			<td style="width: 210px;">
+				<a href="/"><img src="/images/logo.jpg" width="210" height="172" alt="Аленат. Агентство недвижимости и турагентство." /><br /></a>
+			</td>
+			<td style="width: 48%; background: url(/images/art2a.jpg) top right no-repeat;"><img class="png" width="222" height="172" src="/images/head_page_rightleft.png" alt="" /><br /></td>
+			<td style="width: 13px;" class="va_b"><img src="/images/head_page_ugolokright.gif" alt="" /><br /></td>
+		</tr>
+	</table>
+	<table style="background: #FFFFFF url(/images/page_bg.gif) top repeat-y;">
+		<tr>
+			<td style="width: 13px; background: url(/images/page_leftbg.gif) right repeat-y;">
+				<div style="width: 13px;"></div>
+			</td>
+			<td style="width: 99%;">
+				<!--Info Start-->
+					<#ObjectExec("default","Print")#>/config/menu/<#/ObjectExec#>
+
+					<table id="alenat_card">
+						<tr>
+							<td style="width: 19%;">
+								<table>
+									<tr>
+										<td style="width: 174px;">
+											<div style="width: 174px;" class="ta_c"><img src="/images/title_real.png" class="png" width="134" height="18" alt="Недвижимость" /><br /></div>
+										</td>
+										<td class="ta_r"><img src="/images/card_topleft1.png" width="5" height="27" class="png" alt="" /><br /></td>
+									</tr>
+								</table>
+							</td>
+							<td style="width: 14px;"><img src="/images/card_topleft.png" width="14" height="27" class="png" alt="" /></td>
+							<td style="width: 30%; background: url(/images/card_topbg.gif) 0px 6px repeat-x;">
+								<img src="/images/card_upbg.png" width="100%" height="6" class="png" alt="" /><br />
+								<div class="ta_r"><img src="/images/card_real_icona.gif" alt="" /><br /></div>
+							</td>
+							<td style="width: 1px; background: url(/images/card_delimiter.gif) 0px 6px no-repeat;">
+								<img src="/images/card_upbg.png" width="1" height="6" class="png" alt="" /><br />
+							</td>
+							<td style="width: 30%; background: url(/images/card_topbg.gif) 0px 6px repeat-x;">
+								<img src="/images/card_upbg.png" width="100%" height="6" class="png" alt="" /><br />
+								<div class="ta_l"><img src="/images/card_tour_icona.gif" alt="" /><br /></div>
+							</td>
+							<td style="width: 14px;"><img src="/images/card_topright.png" width="14" height="27" class="png" alt="" /></td>
+							<td style="width: 19%;" class="ta_r">
+								<table>
+									<tr>
+										<td class="ta_l"><img src="/images/card_topright1.png" width="5" height="27" class="png" alt="" /><br /></td>
+										<td class="ta_r" style="width: 174px;"><div style="width: 174px;" class="ta_c"><img src="/images/title_tour.png" class="png" width="66" height="18" alt="Туризм" /><br /></div></td>
+									</tr>
+								</table>
+							</td>
+						</tr>
+						<tr>
+							<td style="background: url(/images/card_leftbg.gif) right repeat-y;">
+								<!--Menu Real -->
+									<#ObjectExec("default","Print")#>/config/menu_real/<#/ObjectExec#>
+								<!--/Menu Real-->
+								<table>
+									<tr>
+										<td>
+											<div style="padding: 15px; color: #848484; width: 212px;">
+												<span style="font-size: 14px;">
+													<strong>Горячая линия <br />
+													по недвижимости: <br />
+													(343)</strong>
+												</span>
+												<span style="font-size: 20px;">290-12-27</span>
+											</div>
+										</td>
+										<td style="width: 1px;">
+											<div style="position: relative;">
+												<div style="position: absolute; top: 0px; left: -98px;">
+													<img src="/images/plan.png" class="png" width="99" height="168" alt="Квартиры в Екатеринбурге" /><br />
+												</div>
+											</div>
+										</td>
+									</tr>
+								</table>
+							</td>
+							<td style="background: #FFFFFF url(/images/card_topbg.gif) 0px -21px repeat-x;">
+								<div style="width: 2px; height:123px; background: #FFFFFF; margin: 0px auto 0px 0px;"><spacer type="block"></spacer></div>
+							</td>
+							<td style="background: #FFFFFF url(/images/card_topbg.gif) 0px -21px repeat-x;">
+
+								<div style="background: url(/images/card_real_bg.gif) repeat-x;">
+									<div style="height: 50px; background: url(/images/card_real_iconb.gif) right top no-repeat;">
+										<img src="/images/card_real_title.gif" alt="Недвижимость" /><br />
+									</div>
+								</div>
+
+							
+								<!--Info Real Главное чтобы не было жёстких блоков шириной около 250 и больше.  -->
+								<div style="padding: 0px 14px 0px 0px;">
+								<#if("($RealObject = AServer.GetObjectByPath('/realty/')) != null && $RealObject.Params.GetByName('Описание').Values.Count>0")#>
+									<#print#>$RealObject.Params.GetByName('Описание').Value<#/print#>
+								<#/if#>
+								</div>
+								<!--/Info Real-->
+							
+
+							</td>
+							<td style="background: url(/images/card_delimiter.gif) 0px -22px;">
+								<div style="width: 1px; height: 1px;"><spacer type="block"></spacer></div>
+							</td>
+							<td style="background: #FFFFFF url(/images/card_topbg.gif) 0px -21px repeat-x;">
+								<div style="width: 250px;"><spacer type="block"></spacer></div>
+								<div style="background: url(/images/card_tour_bg.gif) repeat-x;">
+									<div style="height: 50px; background: url(/images/card_tour_iconb.gif) left top no-repeat;" class="ta_r">
+										<img src="/images/card_tour_title.gif" alt="Туризм" /><br />
+									</div>
+								</div>
+
+								<!--Info Tour-->
+								
+								<div style="padding: 0px 0px 0px 14px;">
+
+									<div class="bottom-border">
+										<#ObjectExec("default","Print")#>/config/doptur/<#/ObjectExec#>
+
+									</div>
+
+
+
+									<!-- Горящие туры -->
+									<#eval#>
+										$HotTours = AServer.GetObjectByPath("/goryaschie_tury/");
+									<#/eval#>
+									<#if("$HotTours != null && $HotTours.Params.GetByName('Описание').Values.Count>0")#>
+										<div class="bottom-border">
+											<h1><#print#>$HotTours.Name<#/print#></h1><br />
+											<#print#>$HotTours.GetValueByPath('Описание').Value<#/print#>
+										</div>
+									<#/if#>
+									<!-- /Горящие туры -->
+							        
+							        
+									<!-- Спецпредложения -->
+									<#eval#>
+										$Specials = AServer.GetObjectByPath("/specpredlozheniya/");
+										if($Specials != null) $SpecialChilds = $Specials.GetChilds();
+									<#/eval#>
+									<#if("$Specials != null")#>
+										<h1><#print#>$Specials.Name<#/print#></h1><br />
+										<#ObjectExec("default","Print")#>$Specials<#/ObjectExec#>
+										<#forEach("c;$SpecialChilds")#>
+											<a href="<#ObjectURL('default','Print')#>$c<#/ObjectURL#>"><#print#>$c.Name<#/print#></a><br>
+											<#if("$c.Params.GetByName('Текст анонса').Values.Count>0")#>
+												<#print#>$c.Params.GetByName('Текст анонса').Value<#/print#><br /><br />
+											<#/if#>
+										<#/forEach#>
+									<#/if#>
+							        
+									<!-- /Спецпредложения -->
+							        
+									<div class="bottom-border">
+									</div>
+									<#eval#>
+										$NewsList = AServer.GetObjectByPath("/novosti/");
+									<#/eval#>
+									
+									<h1><#print#>$NewsList.Name<#/print#></h1><br />
+							        
+									<style>
+									.newsonmain .news-link a {color:#FF0000; font-size:125%;}
+									</style>
+									<div class="newsonmain">
+
+									<!-- Новости -->
+									<#ObjectExec("default", "Print")#>$NewsList<#/ObjectExec#>
+									<!-- /Новости -->
+                                                                        </div>
+
+
+									<#ObjectExec("default","Print")#>/config/menu_uslug_turizma/<#/ObjectExec#>
+
+									<div class="bottom-border">
+									</div>
+
+
+								</div>
+								
+								<!--/Info Tour-->
+							</td>
+							<td class="ta_r" style="background: #FFFFFF url(/images/card_topbg.gif) 0px -21px repeat-x;">
+								<div style="width: 2px; height:123px; background: #FFFFFF; margin: 0px 0px 0px auto;"><spacer type="block"></spacer></div>
+							</td>
+							<td style="background: url(/images/card_rightbg.gif) left repeat-y;" class="ta_r">
+								<!--Menu Tour-->
+									<#ObjectExec("default","Print")#>/config/menu_tour/<#/ObjectExec#>
+								<!--Menu Tour-->
+								<table>
+								<tr>
+									<td>
+										<div style="padding: 15px; color: #848484" class="ta_r">
+											<span style="font-size: 14px;">
+												<strong>Горячая линия <br />
+												по туризму: <br />
+												(343)</strong>
+											</span>
+											<span style="font-size: 20px;">290-12-28</span>
+										</div>
+									</td>
+								</tr>
+								</table>
+								
+								<div style="background: #ff9600 url(/images/menu_tour_bg.gif) left repeat-y;margin-right:7px;">
+									<img src="/images/menu_tour_top.gif" alt="" /><br />
+									<#ObjectExec("default","TourismPrint")#>/services/search/<#/ObjectExec#>
+									<img src="/images/menu_tour_bottom.gif" alt="" /><br />
+								</div>
+								
+							</td>
+						</tr>
+						<tr>
+							<td>
+								<table>
+									<tr>
+										<td style="width: 174px;">
+											<div style="width: 174px;" class="ta_c"></div>
+										</td>
+										<td class="ta_r"><img src="/images/card_bottomleft1.png" width="5" height="27" class="png" alt="" /><br /></td>
+									</tr>
+								</table>
+							</td>
+							<td>
+								<div style="position: relative;">
+									<div style="position: absolute; top: -122px; left: -138px;">
+										<img src="/images/bigicon_real.png" class="png" width="154" height="182" alt="" /><br />
+									</div>
+								</div>
+								<img src="/images/card_bottomleft.png" width="14" height="25" class="png" alt="" />
+							</td>
+							<td style="background: url(/images/card_bottomleftbg.gif) top right no-repeat;">
+								<img src="/images/card_bottomleftbg.png" width="100%" height="27" class="png" alt="" /><br />
+							</td>
+							<td style="background: none;">
+								<div style="width: 1px; height: 27px;  background: url(/images/card_bottomdelimiter.gif) top center;"><spacer type="block"></spacer></div>
+							</td>
+							<td>
+								<div style="height: 17px; background: #FFFFFF url(/images/card_ugol_down.jpg) top right no-repeat;"><spacer type="block"></spacer></div>
+								<img src="/images/card_bottomrightbg.png" width="100%" height="10" class="png" alt="" /><br />
+							</td>
+							<td>
+								<div style="position: relative;">
+									<div style="position: absolute; top: -39px; left: -28px;">
+										<img src="/images/card_ugol_up.png" class="png" width="49" height="39" alt="" /><br />
+									</div>
+								</div>
+								<div style="position: relative;">
+									<div style="position: absolute; top: -105px; left: 0px;">
+										<img src="/images/bigicon_tour.png" class="png" width="185" height="173" alt="" /><br />
+									</div>
+								</div>
+								<img src="/images/card_bottomright.png" width="14" height="27" class="png" alt="" />
+							</td>
+							<td class="ta_r">
+								<table>
+									<tr>
+										<td class="ta_l"><img src="/images/card_bottomright1.png" width="7" height="24" class="png" alt="" /><br /></td>
+										<td class="ta_r">
+											<div style="width: 174px;" class="ta_c"></div>
+										</td>
+									</tr>
+								</table>
+							</td>
+						</tr>
+					</table>
+				<!--/Info End-->
+			</td>
+			<td style="width: 13px; background: url(/images/page_rightbg.gif) left repeat-y;"><div style="width: 13px;"></div></td>
+		</tr>
+	</table>
+
+	<table style="background: #FFFFFF url(/images/page_bg.gif) top repeat-y;">
+		<tr>
+			<td class="ta_r" style="width: 13px;"><img src="/images/page_bottom_ugolleft.gif" alt="" /><br /></td>
+			<td style="width: 15%; background: url(/images/page_bottom_leftbg.gif) top repeat-x;"><img src="/images/page_bottom_leftleft.png" class="png" width="100%" height="17" alt="" /><br /></td>
+			<td style="width: 10%; background: url(/images/page_bottom_leftbg.gif) top repeat-x ;"><div style="width: 1px; height: 1px;"><spacer type="block"></spacer></div></td>
+			<td class="ta_r" style="width: 25%; background: url(/images/page_bottom_leftbg.gif) top repeat-x;">
+				<span style="background: url(/images/page_bottom_leftright1.gif) right no-repeat;"><img src="/images/page_bottom_leftright.png" class="png" width="100%" height="17" alt="" /><br /></span>
+			</td>
+			<td rowspan="2" class="ta_c" style="width: 210px;">
+				<div style="position: relative; ">
+					<div style="position: absolute; top: 0px; left: -16px; ">
+						<img src="/images/page_bottom2.png" class="png" width="32" height="5" alt="" /><br />
+					</div>
+				</div>
+
+				<div><img src="/images/page_bottom1.gif" width="210" height="5" alt="" /><br /></div>
+				<div style="height: 123px; background: #900000 url(/images/red_bg.gif) top repeat-y; ">
+					<img src="/images/page_bottom1.png" class="png" width="210" height="12" alt="" /><br />
+					<div style="height: 111px;" class="ta_c">
+					<b><font color="yellow">ООО</font> <font color="#FFFFFF">"Аленат"</font> <font color="yellow">&copy; 1996-2010</font></b>
+					</div>
+				</div>
+			</td>
+			<td style="width: 25%; background: url(/images/page_bottom_rightbg.gif) top repeat-x;"><img src="/images/page_bottom_rightleft.png" class="png" width="100%" height="17" alt="" /><br /></td>
+			<td style="width: 10%; background: url(/images/page_bottom_rightbg.gif) top repeat-x ;"><div style="width: 1px; height: 1px;"><spacer type="block"></spacer></div></td>
+			<td class="ta_r" style="width: 15%; background: url(/images/page_bottom_rightbg.gif) top repeat-x;"><span style="background: url(/images/page_bottom_rightright1.gif) right no-repeat;"><img src="/images/page_bottom_rightright.png" class="png" width="100%" height="17" alt="" /><br /></span></td>
+			<td style="width: 13px;"><img src="/images/page_bottom_ugolright.gif" alt="" /><br /></td>
+		</tr>
+		<tr>
+			<td style="width: 13px; background: #ffe8ac url(/images/bg.gif); "><div style="width: 13px; height: 111px;"><spacer type="block"></spacer></div></td>
+			<td colspan="3" style="width: 48%; background: #ffe8ac url(/images/bg.gif);">
+
+				<br /><br />
+				<a href="<#ObjectURL('default', 'Print')#>AServer.GetObjectByPath('/modules/otpravka_pisma/')<#/ObjectURL#>?layout=<#print#>Page.Layout<#/print#>&url=<#print#>AServer.Site.URL<#/print#><#print#>$Object.FullPath<#/print#>"><font size="3">Отправить сообщение с сайта</font></a>
+				<br /><br />
+				Горячая линия по туризму: 290-12-28<br />
+				Горячая линия по недвижимости: 290-12-27
+
+				
+			</td>
+			<td colspan="3" class="ta_r" style="width: 48%;background: #ffe8ac url(/images/bg.gif);">
+<div style="height: 30px;"><spacer type="block"></spacer></div>
+				<a href="http://www.anima.su/">Создание сайта</a> - <a href="http://www.conanima.ru/">Анима Екатеринбург</a>.
+<br />
+<br />
+<noindex>
+<#comment#>
+<!--begin of Top100-->
+<img style="cursor: hand;" height=31 width=31 onclick="window.location.href='http://top100.rambler.ru/top100/'" src="http://counter.rambler.ru/top100.cnt?700442" alt="Rambler's Top100" border=0>
+<!--end of Top100 code-->
+<#/comment#>
+
+<!--LiveInternet counter--><script language="JavaScript"><!--
+document.write('<img src="http://counter.yadro.ru/hit;conanima?r'+
+escape(document.referrer)+((typeof(screen)=='undefined')?'':
+';s'+screen.width+'*'+screen.height+'*'+(screen.colorDepth?
+screen.colorDepth:screen.pixelDepth))+';u'+escape(document.URL)+
+';i'+escape('Жж'+document.title)+';'+Math.random()+
+'" width=1 height=1 alt="">')//--></script>
+<!--/LiveInternet-->
+
+<!--LiveInternet logo-->
+<img style="cursor: hand;" alt="" onclick="window.location.href='http://www.liveinternet.ru/?alenat.ru'"
+src="http://counter.yadro.ru/logo;conanima?44.6" border=0 height=31 width=31 
+title="liveinternet.ru">
+<!--/LiveInternet-->
+
+
+<img style="cursor: hand;" border=0 onclick="window.location.href='http://www.uralweb.ru/hits/alenat/go'" height=31 width=88 src="http://www.uralweb.ru/hits/alenat"
+alt="Рейтинг ресурсов &quot;УралWeb&quot;">
+</noindex>
+			</td>
+			<td style="width: 13px; background: #ffe8ac url(/images/bg.gif);"><div style="width: 13px; height: 111px;"><spacer type="block"></spacer></div></td>
+		</tr>
+	</table>
+</div>
+</body>
+</html>
+<#/main#>

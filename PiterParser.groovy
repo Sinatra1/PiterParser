@@ -1172,40 +1172,40 @@ parseExcelFile(filePath, raionToDataBase)
 filePath = '/home/vlad/Develop/FuzzySearch/Питер/data/Белоостров/raw/Белоостров.xls'
 parseExcelFile(filePath, raionToDataBase)
 
-filePath = '/home/vlad/Develop/FuzzySearch/Питер/data/Василеостровский/raw/Василеостровский 2.xls'
+filePath = '/home/vlad/Develop/FuzzySearch/Питер/data/Василеостровский/raw/Василеостровский 3.xls'
 parseExcelFile(filePath, raionToDataBase)
 
-filePath = '/home/vlad/Develop/FuzzySearch/Питер/data/Выборгский/raw/Выборгский 3.xls'
+filePath = '/home/vlad/Develop/FuzzySearch/Питер/data/Выборгский/raw/Выборгский 4.xls'
 parseExcelFile(filePath, raionToDataBase)
 
 filePath = '/home/vlad/Develop/FuzzySearch/Питер/data/Калининский/raw/Калининский 2.xls'
 parseExcelFile(filePath, raionToDataBase)
 
-filePath = '/home/vlad/Develop/FuzzySearch/Питер/data/Кировский/raw/Кировский 3.xls'
+filePath = '/home/vlad/Develop/FuzzySearch/Питер/data/Кировский/raw/Кировский 4.xls'
 parseExcelFile(filePath, raionToDataBase)
 
-filePath = '/home/vlad/Develop/FuzzySearch/Питер/data/Колпинский/raw/Колпинский.xls'
+filePath = '/home/vlad/Develop/FuzzySearch/Питер/data/Колпинский/raw/Колпинский 2.xls'
 parseExcelFile(filePath, raionToDataBase)
 
-filePath = '/home/vlad/Develop/FuzzySearch/Питер/data/Красногвардейский/raw/Красногвардейский.xls'
+filePath = '/home/vlad/Develop/FuzzySearch/Питер/data/Красногвардейский/raw/Красногвардейский 2.xls'
 parseExcelFile(filePath, raionToDataBase)
 
 filePath = '/home/vlad/Develop/FuzzySearch/Питер/data/Красносельский/raw/Красносельский 4.xls'
 parseExcelFile(filePath, raionToDataBase)
 
-filePath = '/home/vlad/Develop/FuzzySearch/Питер/data/Кронштадтский/raw/Кронштадтский 3.xls'
+filePath = '/home/vlad/Develop/FuzzySearch/Питер/data/Кронштадтский/raw/Кронштадтский 4.xls'
 parseExcelFile(filePath, raionToDataBase)
 
 filePath = '/home/vlad/Develop/FuzzySearch/Питер/data/Московский/raw/Московский 4.xls'
 parseExcelFile(filePath, raionToDataBase)
 
-filePath = '/home/vlad/Develop/FuzzySearch/Питер/data/Невский/raw/Невский 3.xls'
+filePath = '/home/vlad/Develop/FuzzySearch/Питер/data/Невский/raw/Невский 4.xls'
 parseExcelFile(filePath, raionToDataBase)
 
 filePath = '/home/vlad/Develop/FuzzySearch/Питер/data/Осиновая роща Приозерское/raw/Осиновая роща Приозерское.xls'
 parseExcelFile(filePath, raionToDataBase)
 
-filePath = '/home/vlad/Develop/FuzzySearch/Питер/data/Петроградский/raw/Петроградский 5.xls'
+filePath = '/home/vlad/Develop/FuzzySearch/Питер/data/Петроградский/raw/Петроградский 9.xls'
 parseExcelFile(filePath, raionToDataBase)
 
 filePath = '/home/vlad/Develop/FuzzySearch/Питер/data/Петродворцовый/raw/Петродворцовый 5.xls'
@@ -1220,7 +1220,7 @@ parseExcelFile(filePath, raionToDataBase)
 filePath = '/home/vlad/Develop/FuzzySearch/Питер/data/Фрунзенский/raw/Фрунзенский 4.xls'
 parseExcelFile(filePath, raionToDataBase)
 
-filePath = '/home/vlad/Develop/FuzzySearch/Питер/data/Центральный/raw/Центральный 5.xls'
+filePath = '/home/vlad/Develop/FuzzySearch/Питер/data/Центральный/raw/Центральный 6.xls'
 parseExcelFile(filePath, raionToDataBase)
 
 averagePercentOfAllRaions(raionToDataBase)
